@@ -1,0 +1,11 @@
+# Rates
+delta: 0.01     # Time delta that determines the size of used points for localizing
+rate: 100       # Should be at least 1/delta (> 1/delta may use previously used points to localize)
+
+# Delays
+empty_lidar_time: 0.1     # Should be at least [FULL_TIME_ROTATION]
+real_time_delay: 0.1      # Should be at least [FULL_TIME_ROTATION] (without a modificated LiDAR driver)
+
+# Topics
+points_topic: "/velodyne_points"
+imus_topic: "/vectornav/IMU"
