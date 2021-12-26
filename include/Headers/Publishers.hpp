@@ -4,6 +4,7 @@ class Publishers {
         ros::Publisher vel_pub;
         ros::Publisher yaw_pub;
         ros::Publisher pcl_pub;
+        ros::Publisher planes_pub;
 
         Publishers() {
             this->only_couts = true;
@@ -14,6 +15,7 @@ class Publishers {
             this->vel_pub = nh.advertise<nav_msgs::Odometry>("/limovelo/vel", 1000); 
             this->yaw_pub = nh.advertise<std_msgs::Float32>("/limovelo/yaw", 1000); 
             this->pcl_pub = nh.advertise<sensor_msgs::PointCloud2>("/limovelo/pcl", 1000); 
+            this->planes_pub = nh.advertise<geometry_msgs::PoseArray>("/limovelo/planes", 1000);
             this->only_couts = false;
         }
 
@@ -21,6 +23,10 @@ class Publishers {
             if (not only_couts) publish_pos(state);
             if (not only_couts) publish_vels(state);
             if (couts) cout_state(state);
+        }
+
+        void planes(const State& X, const Planes& planes) {
+            publish_planes(X, planes);
         }
 
         void pointcloud(PointCloud& pcl) {
@@ -38,6 +44,34 @@ class Publishers {
 
     private:
         bool only_couts;
+
+        void publish_planes(const State& X, const Planes& planes) {
+            geometry_msgs::PoseArray normalPoseArray;
+            normalPoseArray.header.frame_id = "map";
+            normalPoseArray.header.stamp = ros::Time().fromSec(X.time);
+                
+            for (Plane plane : planes)
+            {
+                Point point_world = X * plane.centroid;
+                Normal n = plane.n;
+
+                geometry_msgs::Pose normalPose;
+                normalPose.position.x = point_world.x;
+                normalPose.position.y = point_world.y;
+                normalPose.position.z = point_world.z;
+
+                double NORM = std::sqrt(n.A*n.A + n.B*n.B + n.C*n.C);
+                
+                normalPose.orientation.x = 0;
+                normalPose.orientation.y = -n.C;
+                normalPose.orientation.z = n.B;
+                normalPose.orientation.w = NORM + n.A;
+
+                normalPoseArray.poses.push_back(normalPose);
+            }
+
+            this->planes_pub.publish(normalPoseArray);
+        }
 
         void cout_rottransl(const RotTransl& RT) {
             std::cout << RT.R << std::endl;

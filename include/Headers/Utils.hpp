@@ -24,7 +24,7 @@ namespace Algorithms {
 
 #define SKEW_SYM_MATRX(v) 0.0,-v[2],v[1],v[2],0.0,-v[0],-v[1],v[0],0.0
 
-namespace SO3 {
+namespace SO3Math {
 
     template<typename T, typename Ts>
     Eigen::Matrix<T, 3, 3> Exp(Eigen::Matrix<T, 3, 1> ang_vel, Ts dt)

@@ -1,12 +1,14 @@
 #ifndef __OBJECTS_H__
 #define __OBJECTS_H__
-#include "Common.hpp"
-#include "Utils.hpp"
-#include "Objects.hpp"
-#include "Publishers.hpp"
-#include "PointClouds.hpp"
-#include "Accumulator.hpp"
-#include "Compensator.hpp"
+#include "Headers/Common.hpp"
+#include "Headers/Utils.hpp"
+#include "Headers/Objects.hpp"
+#include "Headers/Publishers.hpp"
+#include "Headers/PointClouds.hpp"
+#include "Headers/Accumulator.hpp"
+#include "Headers/Compensator.hpp"
+#include "Headers/Localizator.hpp"
+#include "Headers/Mapper.hpp"
 #endif
 
 // class Accumulator
@@ -34,4 +36,42 @@
 
         void Accumulator::empty_lidar(TimeType t) {
             this->BUFFER_L.empty(t);
+        }
+
+        /////////////////////////////////
+
+        IMU Accumulator::get_next_imu(double t2) {
+            IMU last_imu = this->BUFFER_I.front();
+            for (IMU imu : this->BUFFER_I.content) {
+                if (t2 >= imu.time) return last_imu;
+                last_imu = imu;
+            }
+
+            // If not a state found, return the earliest (again)
+            return this->BUFFER_I.front();
+        }
+
+        State Accumulator::get_prev_state(double t1) {
+            for (State x : this->BUFFER_X.content)
+                if (t1 > x.time) return x;
+
+            // If not a state found, push an empty one in t1
+            this->BUFFER_X.push(State(t1));
+            return this->BUFFER_X.front();
+        }
+
+        States Accumulator::get_states(double t1, double t2) {
+            States states = this->get(this->BUFFER_X, t1, t2);
+            states.push_front(this->get_prev_state(t1));
+            return states;
+        }
+
+        Points Accumulator::get_points(double t1, double t2) {
+            return this->get(this->BUFFER_L, t1, t2);
+        }
+
+        IMUs Accumulator::get_imus(double t1, double t2) {
+            IMUs imus = this->get(this->BUFFER_I, t1, t2);
+            imus.push_back(this->get_next_imu(t2));
+            return imus;
         }

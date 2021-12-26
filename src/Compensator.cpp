@@ -1,75 +1,45 @@
 #ifndef __OBJECTS_H__
 #define __OBJECTS_H__
-#include "Common.hpp"
-#include "Utils.hpp"
-#include "Objects.hpp"
-#include "Publishers.hpp"
-#include "PointClouds.hpp"
-#include "Accumulator.hpp"
-#include "Compensator.hpp"
+#include "Headers/Common.hpp"
+#include "Headers/Utils.hpp"
+#include "Headers/Objects.hpp"
+#include "Headers/Publishers.hpp"
+#include "Headers/PointClouds.hpp"
+#include "Headers/Accumulator.hpp"
+#include "Headers/Compensator.hpp"
+#include "Headers/Localizator.hpp"
+#include "Headers/Mapper.hpp"
 #endif
 
 // class Compensator
     // public:
         PointCloud Compensator::compensate(double t1, double t2) {
             // Points from t1 to t2
-            Points points = this->get_points(t1, t2);
+            Points points = this->Ap->get_points(t1, t2);
             if (points.empty()) return PointCloud();
 
             // (Integrated) States from t1 to t2
-            States states = this->get_states(t1, t2);
-            IMUs imus = this->get_imus(states.front().time, t2);
+            States states = this->Ap->get_states(t1, t2);
+            IMUs imus = this->Ap->get_imus(states.front().time, t2);
             States path_taken = this->integrate_imus(states, imus, t1, t2);
 
             // Compensated pointcloud given a path
             return this->compensate(path_taken, points);
         }
 
+        States Compensator::integrate_imus(double t1, double t2) {
+            // (Integrated) States from t1 to t2
+            States states = this->Ap->get_states(t1, t2);
+            IMUs imus = this->Ap->get_imus(states.front().time, t2);
+            return this->integrate_imus(states, imus, t1, t2);
+        }
+
     // private:
-        IMU Compensator::get_next_imu(double t2) {
-            IMU last_imu = this->BUFFER_Ip->front();
-            for (IMU imu : this->BUFFER_Ip->content) {
-                if (t2 >= imu.time) return last_imu;
-                last_imu = imu;
-            }
-
-            // If not a state found, return the earliest (again)
-            return this->BUFFER_Ip->front();
-        }
-
-        State Compensator::get_prev_state(double t1) {
-            for (State x : this->BUFFER_Xp->content)
-                if (t1 > x.time) return x;
-
-            // If not a state found, push an empty one in t1
-            this->BUFFER_Xp->push(State(t1));
-            return this->BUFFER_Xp->front();
-        }
-
-        /////////////////////////////////
-
-        States Compensator::get_states(double t1, double t2) {
-            States states = this->get(this->BUFFER_Xp, t1, t2);
-            states.push_front(this->get_prev_state(t1));
-            return states;
-        }
-
-        Points Compensator::get_points(double t1, double t2) {
-            return this->get(this->BUFFER_Lp, t1, t2);
-        }
-
-        IMUs Compensator::get_imus(double t1, double t2) {
-            IMUs imus = this->get(this->BUFFER_Ip, t1, t2);
-            imus.push_back(this->get_next_imu(t2));
-            return imus;
-        }
-
-        ///////////////////////////////////////////////////
-
+        
         // TODO: Use already propagated states in case there's no LiDAR (more efficiency)
         States Compensator::integrate_imus(States& states, const IMUs& imus, double t1, double t2) {
             if (states.size() == 0) states.push_back(State(imus.back().time));
-            int Ip = this->before_first_state(imus, states);
+            int Ip = this->Ap->before_first_state(imus, states);
             States integrated_states;
 
             // We add a ghost state at t2
@@ -118,15 +88,15 @@
             while (Xt1.time <= Xtj.time) {
                 // Get rotation-translation pairs
                 RotTransl t2_T_tj = Xt2 - Xtj;
-                RotTransl I_T_L = Xtj.offsets();
+                RotTransl I_T_L = Xtj.I_Rt_L();
 
                 // Find all points with time > Xtj.time 
                 while (0 <= Lp and Xtj.time < points[Lp].time) {
                     Point p_L_tj = points[Lp--];
                     Point t2_p_L_tj = I_T_L.inv() * t2_T_tj * I_T_L * p_L_tj;
 
-                    // *result += t2_p_L_tj;                       // LiDAR frame
-                    *result += Xt2 * I_T_L * t2_p_L_tj;      // Global frame
+                    *result += t2_p_L_tj;                       // LiDAR frame
+                    // *result += Xt2 * I_T_L * t2_p_L_tj;      // Global frame
                 }
 
                 // Depropagate state feeding IMUs in inverse order

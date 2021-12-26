@@ -11,6 +11,10 @@ class Buffer {
         void pop_front() {
             this->content.pop_front();
         }
+
+        void pop_back() {
+            this->content.pop_back();
+        }
         
         ContentType front() {
             return this->content.front();
@@ -29,10 +33,9 @@ class Buffer {
         }
 
         void empty(TimeType t) {
-            if (this->content.size() == 0) return;
-
-            while (this->content.front().time <= t)
-                this->pop_front();
+            auto* buffer = &this->content;
+            while (buffer->size() > 0 and t >= buffer->back().time)
+                this->pop_back();
         }
 };
 
@@ -57,6 +60,13 @@ class Point {
             this->y = p.y;
             this->z = p.z;
             this->time = begin_time + p.time;
+        }
+
+        Point(float x, float y, float z, double time=0) {
+            this->x = x;
+            this->y = y;
+            this->z = z;
+            this->time = time;
         }
 
         Point(const Eigen::Matrix<float, 3, 1>& p, double t) {
@@ -137,6 +147,21 @@ class State {
 
         /////////////////////
 
+        // TODO
+        State(const state_ikfom& s) {
+            // this->R = TO_MATRIX(s.rot);
+            // this->pos = s.pos;
+
+            // this->vel = Eigen::Vector3f(0.,0.,0.);
+            // this->g = Eigen::Vector3f(0.,0.,-9.807);
+            
+            // this->bw = Eigen::Vector3f(0.,0.,0.);
+            // this->ba = Eigen::Vector3f(0.,0.,0.);
+
+            // this->RLI = TO_MATRIX(s.offset_R_L_I);
+            // this->tLI = s.offset_t_L_I;
+        }
+
         State(double time) {
             this->R = Eigen::Matrix3f::Identity();
             this->g = Eigen::Vector3f(0.,0.,-9.807);
@@ -159,12 +184,13 @@ class State {
             this->nba = Eigen::Vector3f(0.,0.,0.);
         }
 
-        RotTransl offsets();
+        RotTransl I_Rt_L();
 
         void operator+= (const IMU& imu);
         friend RotTransl operator- (const State& st, const State& s0);
-        Point operator* (const Point& p);
-        RotTransl operator* (const RotTransl& RT);
+        friend Point operator* (const State& X, const Point& p);
+        friend RotTransl operator* (const State& X, const RotTransl& RT);
+        friend PointCloud operator* (const State& X, const PointCloud& pcl);
     private:
         // When propagating, we set noises = 0
         void propagate_f(IMU imu, float dt);
@@ -192,4 +218,26 @@ class RotTransl {
 
         friend RotTransl operator* (const RotTransl&, const RotTransl&);
         friend Point operator* (const RotTransl&, const Point& p);
+        friend PointCloud operator* (const RotTransl&, const PointCloud&);
+};
+
+class Plane {
+    private:
+        int NUM_MATCH_POINTS = 5;
+        const float MAX_DIST = 2.;
+
+    public:
+        bool is_plane;
+        Point centroid;
+        Normal n;
+        
+        Plane(const PointType&, const PointTypes&, const std::vector<float>&);
+        bool on_plane(const PointType& p, float& res);
+
+    private:
+        bool enough_points(const PointTypes&);
+        bool points_close_enough(const std::vector<float>&);
+
+        void calculate_attributes(const PointType&, const PointTypes&);
+        template<typename T> bool estimate_plane(Eigen::Matrix<T, 4, 1> &, const PointTypes &, const T &);
 };

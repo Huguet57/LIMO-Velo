@@ -1,0 +1,6 @@
+[submodule "include/IKFoM"]
+	path = include/IKFoM
+	url = https://github.com/Huguet57/IKFoM.git
+[submodule "include/ikd-Tree"]
+	path = include/ikd-Tree
+	url = https://github.com/hku-mars/ikd-Tree.git

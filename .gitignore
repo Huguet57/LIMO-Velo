@@ -1,3 +1,4 @@
+*.token
 .vscode/
 devel/
 logs/

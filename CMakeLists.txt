@@ -13,7 +13,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fexceptions" )
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread -std=c++0x -std=c++14 -fexceptions")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread -std=c++0x -std=c++14 -fexceptions -Wno-dev")
 
 message("Current CPU archtecture: ${CMAKE_SYSTEM_PROCESSOR}")
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)" )
@@ -62,7 +62,8 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
   ${PCL_INCLUDE_DIRS}
   ${PYTHON_INCLUDE_DIRS}
-  include)
+  include
+)
 
 # generate_messages(
 #  DEPENDENCIES
@@ -76,12 +77,14 @@ catkin_package(
 )
 
 add_executable(limovelo
-  include/Common.hpp 
-  include/Accumulator.hpp
-  include/Objects.hpp
-  include/Publishers.hpp
-  include/PointClouds.hpp
-  include/Compensator.hpp
+  include/Headers
+
+  include/ikd-Tree/ikd_Tree/ikd_Tree.h
+  include/ikd-Tree/ikd_Tree/ikd_Tree.cpp
+  
+  include/IKFoM/IKFoM_toolkit
+  include/IKFoM/use-ikfom.hpp
+  include/IKFoM/use-ikfom.cpp
 
   src/main.cpp
   src/Utils.cpp
@@ -89,6 +92,11 @@ add_executable(limovelo
   src/Accumulator.cpp
   src/Compensator.cpp
   src/PointCloudProcessor.cpp
+  src/Localizator.cpp
+  src/Mapper.cpp
 )
 target_link_libraries(limovelo ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${PYTHON_LIBRARIES})
-target_include_directories(limovelo PRIVATE ${PYTHON_INCLUDE_DIRS})
+target_include_directories(limovelo
+  PUBLIC include/IKFoM/ include/IKFoM/IKFoM_toolkit include/ikd-Tree/ikd_Tree
+  PRIVATE ${PYTHON_INCLUDE_DIRS}
+)

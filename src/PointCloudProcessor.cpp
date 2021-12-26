@@ -1,12 +1,14 @@
 #ifndef __OBJECTS_H__
 #define __OBJECTS_H__
-#include "Common.hpp"
-#include "Utils.hpp"
-#include "Objects.hpp"
-#include "Publishers.hpp"
-#include "PointClouds.hpp"
-#include "Accumulator.hpp"
-#include "Compensator.hpp"
+#include "Headers/Common.hpp"
+#include "Headers/Utils.hpp"
+#include "Headers/Objects.hpp"
+#include "Headers/Publishers.hpp"
+#include "Headers/PointClouds.hpp"
+#include "Headers/Accumulator.hpp"
+#include "Headers/Compensator.hpp"
+#include "Headers/Localizator.hpp"
+#include "Headers/Mapper.hpp"
 #endif
 
 extern struct Params Config;

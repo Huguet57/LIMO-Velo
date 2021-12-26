@@ -1,12 +1,14 @@
 #ifndef __OBJECTS_H__
 #define __OBJECTS_H__
-#include "Common.hpp"
-#include "Utils.hpp"
-#include "Objects.hpp"
-#include "Publishers.hpp"
-#include "PointClouds.hpp"
-#include "Accumulator.hpp"
-#include "Compensator.hpp"
+#include "Headers/Common.hpp"
+#include "Headers/Utils.hpp"
+#include "Headers/Objects.hpp"
+#include "Headers/Publishers.hpp"
+#include "Headers/PointClouds.hpp"
+#include "Headers/Accumulator.hpp"
+#include "Headers/Compensator.hpp"
+#include "Headers/Localizator.hpp"
+#include "Headers/Mapper.hpp"
 #endif
 
 // class Buffer
@@ -55,7 +57,7 @@ template class Buffer<State>;
 
 // class State {
     // public:
-        RotTransl State::offsets() {
+        RotTransl State::I_Rt_L() {
             return RotTransl(
                 this->RLI,
                 this->tLI
@@ -72,12 +74,16 @@ template class Buffer<State>;
             return RotTransl(dR, dt);
         }
 
-        Point State::operator* (const Point& p) {
-            return RotTransl(*this) * p;
+        Point operator* (const State& X, const Point& p) {
+            return RotTransl(X) * p;
         }
 
-        RotTransl State::operator* (const RotTransl& RT) {
-            return RotTransl(*this) * RT;
+        RotTransl operator* (const State& X, const RotTransl& RT) {
+            return RotTransl(X) * RT;
+        }
+
+        PointCloud operator* (const State& X, const PointCloud& pcl) {
+            return RotTransl(X) * pcl;
         }
 
     // private:
@@ -91,7 +97,7 @@ template class Buffer<State>;
             // v ⊞ (R*(a - ba - na) + g)*dt
             // p ⊞ (v*dt + 1/2*(R*(a - ba - na) + g)*dt*dt)
 
-            Rtemp *= SO3::Exp(Eigen::Vector3f(imu.w - this->bw), dt);
+            Rtemp *= SO3Math::Exp(Eigen::Vector3f(imu.w - this->bw), dt);
             veltemp += (this->R*(imu.a - this->ba) - this->g)*dt;
             postemp += this->vel*dt + 0.5*(this->R*(imu.a - this->ba) - this->g)*dt*dt;
 
@@ -123,4 +129,100 @@ template class Buffer<State>;
                 RT.R*p.toEigen() + RT.t,
                 p.time
             );
+        }
+
+        PointCloud operator* (const RotTransl& RT, const PointCloud& pcl) {
+            PointCloud moved_pcl;
+            for (PointType p : pcl.points) moved_pcl += RT * Point(p);
+            return moved_pcl;
+        }
+
+// class Plane
+    // public:
+        Plane::Plane(const PointType& p, const PointTypes& points, const std::vector<float>& sq_dists) {
+            if (not enough_points(points)) return;
+            if (not points_close_enough(sq_dists)) return;
+            
+            // Given close points, return normal of plane
+            this->calculate_attributes(p, points);
+        }
+
+        bool Plane::on_plane(const PointType& p, float& res) {
+            // Calculate residue
+            res = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
+            return fabs(res) < 0.1f;
+
+            // float s = 1 - 0.9 * fabs(res) / sqrt(dist); // TODO: Why divide by dist?
+            // return s > 0.9;
+        }
+
+    // private:
+        bool Plane::enough_points(const PointTypes& points_near) {
+            return this->is_plane = points_near.size() >= this->NUM_MATCH_POINTS;
+        }
+
+        bool Plane::points_close_enough(const std::vector<float>& sq_dists) {
+            if (sq_dists.size() < 1) return this->is_plane = false;
+            return this->is_plane = sq_dists.back() < MAX_DIST*MAX_DIST;
+        }
+
+        void Plane::calculate_attributes(const PointType& p, const PointTypes& points) {
+            Eigen::Vector4f normal_ampl;
+            if (this->is_plane = this->estimate_plane(normal_ampl, points, 0.1f)) {
+                // Centroid
+                this->centroid.x = p.x;
+                this->centroid.y = p.y;
+                this->centroid.z = p.z;
+
+                // Normal
+                this->n.A = normal_ampl(0);
+                this->n.B = normal_ampl(1);
+                this->n.C = normal_ampl(2);
+                this->n.D = normal_ampl(3);
+            }
+
+            // std::cout << "Normal: " << normal_ampl << std::endl;
+            // std::cout << "Is plane: " << this->is_plane << std::endl;
+
+            // for (auto p : points) {
+            //     auto gang = fabs(normal_ampl(0) * p.x + normal_ampl(1) * p.y + normal_ampl(2) * p.z + normal_ampl(3));
+            //     std::cout << "Gang: " << gang << std::endl;
+            // }
+
+            // std::cout << "---------------" << std::endl;
+        }
+
+        template<typename T>
+        bool Plane::estimate_plane(Eigen::Matrix<T, 4, 1> &pca_result, const PointTypes &point, const T &threshold)
+        {
+            int N = this->NUM_MATCH_POINTS;
+            Eigen::Matrix<T, 5, 3> A;
+            Eigen::Matrix<T, 5, 1> b;
+            A.setZero();
+            b.setOnes();
+            b *= -1.0f;
+
+            for (int j = 0; j < N; j++)
+            {
+                A(j,0) = point[j].x;
+                A(j,1) = point[j].y;
+                A(j,2) = point[j].z;
+            }
+
+            Eigen::Matrix<T, 3, 1> normvec = A.colPivHouseholderQr().solve(b);
+
+            T n = normvec.norm();
+            pca_result(0) = normvec(0) / n;
+            pca_result(1) = normvec(1) / n;
+            pca_result(2) = normvec(2) / n;
+            pca_result(3) = 1.0 / n;
+
+            for (int j = 0; j < N; j++)
+            {
+                if (fabs(pca_result(0) * point[j].x + pca_result(1) * point[j].y + pca_result(2) * point[j].z + pca_result(3)) > threshold)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
