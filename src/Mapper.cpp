@@ -51,6 +51,7 @@ extern struct Params Config;
         bool Mapper::hasToMap(double t) {
             if (this->last_map_time < 0) this->last_map_time = t;
             else return t - this->last_map_time >= Config.full_rotation_time;
+            return false;
         }
 
     // private:

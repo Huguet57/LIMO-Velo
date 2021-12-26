@@ -13,11 +13,26 @@ class Localizator {
         esekfom::esekf<state_ikfom, 12, input_ikfom> KF;
     
     public:
-        Localizator(Mapper&);
+        Localizator();
+        Localizator(Mapper*);
         void update(const PointCloud&);
-        void h_share_model(state_ikfom&, esekfom::dyn_share_datastruct<double>&);
+        void calculate_H(const state_ikfom&, const Planes&, Eigen::MatrixXd& H, Eigen::VectorXd& h);
+    
     private:
         void init_IKFoM();
-        void calculate_H(const state_ikfom&, const Planes&, Eigen::MatrixXd& H, Eigen::VectorXd& h);
         void IKFoM_update(double&);
+
+    // Singleton pattern
+    public:
+        static Localizator& getInstance();
+    
+    private:
+        // Localizator() = default;
+
+        // Delete copy/move so extra instances can't be created/moved.
+        Localizator(const Localizator&) = delete;
+        Localizator& operator=(const Localizator&) = delete;
+        Localizator(Localizator&&) = delete;
+        Localizator& operator=(Localizator&&) = delete;
+
 };

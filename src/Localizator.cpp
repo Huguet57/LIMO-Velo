@@ -13,8 +13,13 @@
 
 // class Localizator
     // public:
-        Localizator::Localizator(Mapper& map) {
-            this->map = &map;
+        Localizator::Localizator() {
+            this->map = &Mapper::getInstance();
+            this->init_IKFoM();
+        }
+
+        Localizator::Localizator(Mapper* map) {
+            this->map = map;
             this->init_IKFoM();
         }
 
@@ -26,27 +31,9 @@
             this->IKFoM_update(solve_H_time);
         }
 
-        void Localizator::h_share_model(state_ikfom &ikfom_state, esekfom::dyn_share_datastruct<double> &ekfom_data) {
-            // // Calculate matches
-            // State state(ikfom_state);
-            // Planes matches = map->match(state, this->points2match);
-            
-            // // Calculate derivatives
-            // this->calculate_H(
-            //     // Inputs
-            //     ikfom_state,
-            //     matches,
-
-            //     // Outputs
-            //     ekfom_data.h_x,
-            //     ekfom_data.h
-            // );
-        }
-
-    // private:
         void Localizator::calculate_H(const state_ikfom& s, const Planes& matches, Eigen::MatrixXd& H, Eigen::VectorXd& h) {
             // int Nmatches = matches.size();
-            // H = MatrixXd::Zero(Nmatches, 12);
+            // H = Eigen::MatrixXd::Zero(Nmatches, 12);
             // h.resize(Nmatches);
 
             // // For each match, calculate its derivative and distance
@@ -67,22 +54,29 @@
             // }
         }
 
+    // private:
+        Localizator& Localizator::getInstance() {
+            Mapper& map = Mapper::getInstance();
+            static Localizator* localizator = new Localizator(&map);
+            return *localizator;
+        }
+
         void Localizator::init_IKFoM() {
             // Constants
             int MAX_NUM_ITERS = 5;
             Eigen::VectorXf LIMITS = 0.001*Eigen::VectorXf::Ones(23);
 
-            // // Initialize IKFoM
-            // this->KF.init_dyn_share(
-            //     // TODO: change to private functions instead of "IKFoM::"
-            //     IKFoM::get_f,
-            //     IKFoM::df_dx,
-            //     IKFoM::df_dw,
+            // Initialize IKFoM
+            this->KF.init_dyn_share(
+                // TODO: change to private functions instead of "IKFoM::"
+                IKFoM::get_f,
+                IKFoM::df_dx,
+                IKFoM::df_dw,
+                IKFoM::h_share_model,
 
-            //     this->h_share_model,
-            //     MAX_NUM_ITERS,
-            //     LIMITS
-            // );
+                MAX_NUM_ITERS,
+                LIMITS
+            );
         }
 
         void Localizator::IKFoM_update(double& solve_H_time) {

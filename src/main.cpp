@@ -32,8 +32,9 @@ int main(int argc, char** argv) {
     Publishers publish(nh);
     Accumulator accum;
     Compensator comp(accum, publish, Config.delta);
-    Mapper map;
-    Localizator kf(map);
+    
+    Mapper& map = Mapper::getInstance();
+    Localizator& KF = Localizator::getInstance();
 
     // Subscribers
     ros::Subscriber lidar_sub = nh.subscribe(
@@ -62,7 +63,7 @@ int main(int argc, char** argv) {
             publish.state(Xt, false);
 
             // // Localize points in map
-            // kf.update(compensated);
+            // KF.update(compensated);
 
             // Try out match
             Planes planes = map.match(Xt, compensated);
