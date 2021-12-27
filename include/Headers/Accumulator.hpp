@@ -4,8 +4,6 @@ class Accumulator {
         Buffer<IMU> BUFFER_I;
         Buffer<State> BUFFER_X;
 
-        Accumulator() {}
-
         // Receive from topics
         void receive_lidar(const PointCloud_msg&);
         void receive_imu(const IMU_msg&);
@@ -53,5 +51,21 @@ class Accumulator {
 
             return result;
         }
+
+    // Singleton pattern
+    public:
+        static Accumulator& getInstance() {
+            static Accumulator* accum = new Accumulator();
+            return *accum;
+        }
+
+    private:
+        Accumulator() = default;
+
+        // Delete copy/move so extra instances can't be created/moved.
+        Accumulator(const Accumulator&) = delete;
+        Accumulator& operator=(const Accumulator&) = delete;
+        Accumulator(Accumulator&&) = delete;
+        Accumulator& operator=(Accumulator&&) = delete;
 
 };

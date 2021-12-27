@@ -147,19 +147,26 @@ class State {
 
         /////////////////////
 
-        // TODO
-        State(const state_ikfom& s) {
-            // this->R = TO_MATRIX(s.rot);
-            // this->pos = s.pos;
+        State(const state_ikfom& s, double time) {
+            this->R = s.rot.toRotationMatrix().cast<float>();
+            this->pos = s.pos.cast<float>();
 
-            // this->vel = Eigen::Vector3f(0.,0.,0.);
-            // this->g = Eigen::Vector3f(0.,0.,-9.807);
+            this->vel = s.vel.cast<float>();
+            this->g = Eigen::Vector3f(0.,0.,-9.807); // TODO?
             
-            // this->bw = Eigen::Vector3f(0.,0.,0.);
-            // this->ba = Eigen::Vector3f(0.,0.,0.);
+            this->bw = s.bg.cast<float>();
+            this->ba = s.ba.cast<float>();
 
-            // this->RLI = TO_MATRIX(s.offset_R_L_I);
-            // this->tLI = s.offset_t_L_I;
+            this->RLI = s.offset_R_L_I.toRotationMatrix().cast<float>();
+            this->tLI = s.offset_T_L_I.cast<float>();
+
+            // TODO?
+            this->nw = Eigen::Vector3f(0.,0.,0.);
+            this->na = Eigen::Vector3f(0.,0.,0.);
+            this->nbw = Eigen::Vector3f(0.,0.,0.);
+            this->nba = Eigen::Vector3f(0.,0.,0.);
+
+            this->time = time;
         }
 
         State(double time) {

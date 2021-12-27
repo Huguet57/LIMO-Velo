@@ -1,14 +1,13 @@
 class Compensator {
     public:
-        Accumulator* Ap;
         Publishers output;
 
         // Delegate constructors
-        Compensator(Accumulator& A)
-            : Compensator(A, 1e-2) {};
+        Compensator()
+            : Compensator(1e-2) {};
         
-        Compensator(Accumulator& A, Publishers& pub, double delta)
-            : Compensator(A, delta) {
+        Compensator(Publishers& pub, double delta)
+            : Compensator(delta) {
                 this->output = pub;
             };
 
@@ -32,7 +31,7 @@ class Compensator {
         // Main constructor
         PointCloud compensate(double t1, double t2);
         PointCloud compensate(States& states, Points& points);
-
+        
         States integrate_imus(double t1, double t2);
 
     private:
@@ -41,10 +40,8 @@ class Compensator {
         States integrate_imus(States& states, const IMUs& imus, double t1, double t2);
 
         Compensator(
-            Accumulator& A,
             double delta
         )  {
-            this->Ap = &A;
             this->delta = delta;
         }
 };

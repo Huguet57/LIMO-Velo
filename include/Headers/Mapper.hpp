@@ -31,7 +31,6 @@ class Mapper {
         Plane match_plane(const State&, const PointType&);
 
     // Singleton pattern
-
     public:
         static Mapper& getInstance() {
             static Mapper* mapper = new Mapper();

@@ -15,12 +15,12 @@
     // public:
         PointCloud Compensator::compensate(double t1, double t2) {
             // Points from t1 to t2
-            Points points = this->Ap->get_points(t1, t2);
+            Points points = Accumulator::getInstance().get_points(t1, t2);
             if (points.empty()) return PointCloud();
 
             // (Integrated) States from t1 to t2
-            States states = this->Ap->get_states(t1, t2);
-            IMUs imus = this->Ap->get_imus(states.front().time, t2);
+            States states = Accumulator::getInstance().get_states(t1, t2);
+            IMUs imus = Accumulator::getInstance().get_imus(states.front().time, t2);
             States path_taken = this->integrate_imus(states, imus, t1, t2);
 
             // Compensated pointcloud given a path
@@ -29,8 +29,8 @@
 
         States Compensator::integrate_imus(double t1, double t2) {
             // (Integrated) States from t1 to t2
-            States states = this->Ap->get_states(t1, t2);
-            IMUs imus = this->Ap->get_imus(states.front().time, t2);
+            States states = Accumulator::getInstance().get_states(t1, t2);
+            IMUs imus = Accumulator::getInstance().get_imus(states.front().time, t2);
             return this->integrate_imus(states, imus, t1, t2);
         }
 
@@ -39,7 +39,7 @@
         // TODO: Use already propagated states in case there's no LiDAR (more efficiency)
         States Compensator::integrate_imus(States& states, const IMUs& imus, double t1, double t2) {
             if (states.size() == 0) states.push_back(State(imus.back().time));
-            int Ip = this->Ap->before_first_state(imus, states);
+            int Ip = Accumulator::getInstance().before_first_state(imus, states);
             States integrated_states;
 
             // We add a ghost state at t2

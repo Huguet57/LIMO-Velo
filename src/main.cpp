@@ -30,9 +30,8 @@ int main(int argc, char** argv) {
     
     // Objects
     Publishers publish(nh);
-    Accumulator accum;
-    Compensator comp(accum, publish, Config.delta);
-    
+    Accumulator& accum = Accumulator::getInstance();
+    Compensator comp(publish, Config.delta);
     Mapper& map = Mapper::getInstance();
     Localizator& KF = Localizator::getInstance();
 
@@ -55,24 +54,27 @@ int main(int argc, char** argv) {
             double t2 = accum.BUFFER_I.front().time - Config.real_time_delay; 
             double t1 = t2 - Config.delta;
 
+            // Integrate from t1 to t2
+            KF.propagate_to(t2);
+            State Xt2 = KF.latest_state();
+            publish.state(Xt2, false);
+
             // Compensated pointcloud given a path
             Points points = accum.get_points(t1, t2);
             States path_taken = comp.integrate_imus(t1, t2);
             PointCloud compensated = comp.compensate(path_taken, points);
-            State Xt = path_taken.back();
-            publish.state(Xt, false);
 
             // // Localize points in map
             // KF.update(compensated);
 
             // Try out match
-            Planes planes = map.match(Xt, compensated);
-            publish.planes(Xt, planes);
+            Planes planes = map.match(Xt2, compensated);
+            publish.planes(Xt2, planes);
 
             // Add updated points to map
             if (map.hasToMap(t2)) {
                 PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                PointCloud global_compensated = Xt * Xt.I_Rt_L() * full_compensated;
+                PointCloud global_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
                 
                 map.add(global_compensated);
                 publish.pointcloud(global_compensated);

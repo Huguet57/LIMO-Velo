@@ -7,20 +7,26 @@
 
 class Localizator {
     public:
-        Mapper* map;
         PointCloud points2match;
+        double last_time_integrated = -1;
+
     private:
-        esekfom::esekf<state_ikfom, 12, input_ikfom> KF;
+        esekfom::esekf<state_ikfom, 12, input_ikfom> IKFoM_KF;
     
     public:
         Localizator();
-        Localizator(Mapper*);
         void update(const PointCloud&);
         void calculate_H(const state_ikfom&, const Planes&, Eigen::MatrixXd& H, Eigen::VectorXd& h);
-    
+        
+        void propagate_to(double t);
+        State latest_state();
+
     private:
         void init_IKFoM();
+        void init_IKFoM_state();
         void IKFoM_update(double&);
+        void propagate(const IMU& imu);
+        const state_ikfom& get_x() const;
 
     // Singleton pattern
     public:
