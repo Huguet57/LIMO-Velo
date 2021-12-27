@@ -74,7 +74,8 @@ extern struct Params Config;
         Plane Mapper::match_plane(const State& X, const PointType& p) {
             // Transport the point to the global frame
             PointTypes near_points;
-            PointType global_p = (X * Point(p)).toPCL();
+            RotTransl offsets = X.I_Rt_L();
+            PointType global_p = (X * offsets * Point(p)).toPCL();
 
             // Find k nearest points
             const int NUM_MATCH_POINTS = 5;

@@ -19,6 +19,7 @@
 
         // Given points, update new position
         void Localizator::update(const PointCloud& points) {
+            if (not Mapper::getInstance().exists()) return;
             this->points2match = points;
             
             double solve_H_time = 0;
@@ -30,22 +31,33 @@
             H = Eigen::MatrixXd::Zero(Nmatches, 12);
             h.resize(Nmatches);
 
-            // // For each match, calculate its derivative and distance
-            // for (const Plane& match : matches) {
-            //     Normal n = match.n;
-            //     Point p_lidar_x = Point (n.x, n.y, n.z);
+            // For each match, calculate its derivative and distance
+            for (int i = 0; i < matches.size(); ++i) {
+                Plane match = matches[i];
+                Point p_lidar_x = match.centroid;
+                Normal n = match.n;
 
-            //     // Calculate H (:= dh/dx)
-            //     V3D A = (s.offset_R_L_I * p_lidar_x).cross(s.rot.conjugate() * n);
-            //     V3D B = (p_lidar_x).cross(s.offset_R_L_I.conjugate() * s.rot.conjugate() * n);
-            //     V3D C = (s.rot.conjugate() * n);
+                // Rotation matrices
+                State S(s, 0.);
+                Eigen::Matrix3d R = s.rot.toRotationMatrix();
+                Eigen::Matrix3d Rinv = s.rot.conjugate().toRotationMatrix();
+                Eigen::Matrix3d R_L_I = s.offset_R_L_I.toRotationMatrix();
+                Eigen::Matrix3f R_L_If = R_L_I.template cast<float>();
+
+                // Calculate H (:= dh/dx)
+                Eigen::Vector3d C = (Rinv * n);
+                Eigen::Vector3d B = (p_lidar_x).cross(R_L_I.transpose() * C);
+                Eigen::Vector3d A = (S.I_Rt_L() * p_lidar_x).cross(C);
                 
-            //     H.block<1, 6>(i,0) << n.A, n.B, n.C, VEC_FROM_ARRAY(A);
-            //     if (extr_est) H.block<1, 6>(i,6) << VEC_FROM_ARRAY(B), VEC_FROM_ARRAY(C);
+                bool extr_est = false;
+                H.block<1, 6>(i,0) << n.A, n.B, n.C, A(0), A(1), A(2);
+                if (extr_est) H.block<1, 6>(i,6) << B(0), B(1), B(2), C(0), C(1), C(2);
 
-            //     // Measurement: distance to the closest plane
-            //     h(i) = -match.distance;
-            // }
+                // Measurement: distance to the closest plane
+                Point p = S * S.I_Rt_L() * match.centroid;
+                double distance = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
+                h(i) = -distance;
+            }
         }
 
         void Localizator::propagate_to(double t) {
@@ -107,6 +119,7 @@
             init_P(15,15) = init_P(16,16) = init_P(17,17) = 0.0001;
             init_P(18,18) = init_P(19,19) = init_P(20,20) = 0.001;
             init_P(21,21) = init_P(22,22) = 0.00001; 
+            
             this->IKFoM_KF.change_P(init_P);
         }
 
@@ -120,10 +133,28 @@
             in.gyro = imu.w.cast<double>();
 
             Eigen::Matrix<double, 12, 12> Q;
-            Q.block<3, 3>(0, 0).diagonal() = Eigen::Vector3d::Constant(6.01e-4); // cov_gyr;
-            Q.block<3, 3>(3, 3).diagonal() = Eigen::Vector3d::Constant(1.53e-2); // cov_acc;
-            Q.block<3, 3>(6, 6).diagonal() = Eigen::Vector3d::Constant(3.38e-4); // cov_bias_gyr;
-            Q.block<3, 3>(9, 9).diagonal() = Eigen::Vector3d::Constant(1.54e-5); // cov_bias_acc;
+            Q.setIdentity();
+
+            Q(0,0) = 6.01e-4;
+            Q(1,1) = 6.01e-4;
+            Q(2,2) = 6.01e-4;
+            
+            Q(3,3) = 1.53e-2;
+            Q(4,4) = 1.53e-2;
+            Q(5,5) = 1.53e-2;
+            
+            Q(6,6) = 3.38e-4;
+            Q(7,7) = 3.38e-4;
+            Q(8,8) = 3.38e-4;
+            
+            Q(9,9) = 1.54e-5;
+            Q(10,10) = 1.54e-5;
+            Q(11,11) = 1.54e-5;
+            
+            // Q.block<3, 3>(0, 0).diagonal() = Eigen::Vector3d::Constant(6.01e-4); // cov_gyr;
+            // Q.block<3, 3>(3, 3).diagonal() = Eigen::Vector3d::Constant(1.53e-2); // cov_acc;
+            // Q.block<3, 3>(6, 6).diagonal() = Eigen::Vector3d::Constant(3.38e-4); // cov_bias_gyr;
+            // Q.block<3, 3>(9, 9).diagonal() = Eigen::Vector3d::Constant(1.54e-5); // cov_bias_acc;
 
             double dt = imu.time - this->last_time_integrated;
             this->last_time_integrated = imu.time;

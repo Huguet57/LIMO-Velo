@@ -18,8 +18,8 @@ template class Buffer<State>;
 
 // class Point
     // public:
-        Point operator*(const Eigen::Matrix<float, 3, 3> M, const Point& p) {
-            Eigen::Matrix<float, 3, 1> moved_p = M*p.toEigen();
+        Point operator*(const Eigen::Matrix<float, 3, 3>& R, const Point& p) {
+            Eigen::Matrix<float, 3, 1> moved_p = R*p.toEigen();
             return Point(moved_p, p.time);
         }
 
@@ -57,7 +57,7 @@ template class Buffer<State>;
 
 // class State {
     // public:
-        RotTransl State::I_Rt_L() {
+        RotTransl State::I_Rt_L() const {
             return RotTransl(
                 this->RLI,
                 this->tLI
@@ -147,10 +147,11 @@ template class Buffer<State>;
             this->calculate_attributes(p, points);
         }
 
-        bool Plane::on_plane(const PointType& p, float& res) {
+        template <typename AbstractPoint>
+        bool Plane::on_plane(const AbstractPoint& p, float& res) {
             // Calculate residue
             res = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
-            return fabs(res) < 0.1f;
+            return std::fabs(res < 0.1f);
 
             // float s = 1 - 0.9 * fabs(res) / sqrt(dist); // TODO: Why divide by dist?
             // return s > 0.9;
@@ -179,17 +180,10 @@ template class Buffer<State>;
                 this->n.B = normal_ampl(1);
                 this->n.C = normal_ampl(2);
                 this->n.D = normal_ampl(3);
+
+                // Distance
+                this->on_plane(this->centroid, this->distance);
             }
-
-            // std::cout << "Normal: " << normal_ampl << std::endl;
-            // std::cout << "Is plane: " << this->is_plane << std::endl;
-
-            // for (auto p : points) {
-            //     auto gang = fabs(normal_ampl(0) * p.x + normal_ampl(1) * p.y + normal_ampl(2) * p.z + normal_ampl(3));
-            //     std::cout << "Gang: " << gang << std::endl;
-            // }
-
-            // std::cout << "---------------" << std::endl;
         }
 
         template<typename T>
@@ -226,3 +220,11 @@ template class Buffer<State>;
             }
             return true;
         }
+
+// struct Normal
+    Eigen::Matrix<double, 3, 1> operator* (const Eigen::Matrix<double, 3, 3>& R, const Normal& n) {
+        double A = (double) n.A;
+        double B = (double) n.B;
+        double C = (double) n.C;
+        return R * Eigen::Vector3d(A, B, C);
+    }

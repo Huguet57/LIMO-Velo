@@ -72,11 +72,7 @@ typedef pcl::PointCloud<PointType> PointCloud;
 typedef sensor_msgs::PointCloud2::ConstPtr PointCloud_msg;
 typedef sensor_msgs::ImuConstPtr IMU_msg;
 
-// typedef pcl::PointXYZINormal Normal;
-struct Normal {
-    float A, B, C, D;
-};
-
+struct Normal { float A, B, C, D; };
 typedef std::vector<Normal> Normals;
 
 class Point;

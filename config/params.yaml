@@ -3,12 +3,12 @@ delta: 0.025     # Time delta that determines the size of used points for locali
 rate: 40       # Should be at least 1/delta (> 1/delta may use previously used points to localize)
 
 # Delays
-empty_lidar_time: 1       # Should be at least [FULL_TIME_ROTATION]
-real_time_delay: 0.1      # Should be at least [FULL_TIME_ROTATION] (without a modificated LiDAR driver)
+empty_lidar_time: 10      # Should be at least [FULL_ROTATION_TIME]
+real_time_delay: 0.5      # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
 # LiDAR
 full_rotation_time: 0.1
-min_dist: 3
+min_dist: 4
 ds_rate: 4
 
 # Topics

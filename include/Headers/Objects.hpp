@@ -89,7 +89,22 @@ class Point {
             return Eigen::Matrix<float, 3, 1>(this->x, this->y, this->z);
         }
 
-        friend Point operator*(const Eigen::Matrix<float, 3, 3> M, const Point& p);
+        Eigen::Vector3d cross(const Eigen::Vector3d& v) {
+            Eigen::Vector3d w = this->toEigen().cast<double> ();
+            
+            Eigen::Matrix3d Wx;
+            Wx << 0.0,-w[2],w[1],w[2],0.0,-w[0],-w[1],w[0],0.0;
+
+            return Wx * v;
+
+            // return Eigen::Vector3d(
+            //     w(1) * v(2) + w(2) * v(1),
+            //     w(2) * v(0) + w(0) * v(2),
+            //     w(0) * v(1) + w(1) * v(0)
+            // );
+        }
+
+        friend Point operator*(const Eigen::Matrix<float, 3, 3>&, const Point&);
         friend Point operator+(const Point& p, const Eigen::Matrix<float, 3, 1> v);
         friend Point operator-(const Point& p, const Eigen::Matrix<float, 3, 1> v);
         friend std::ostream& operator<< (std::ostream& out, const Point& p);
@@ -191,7 +206,7 @@ class State {
             this->nba = Eigen::Vector3f(0.,0.,0.);
         }
 
-        RotTransl I_Rt_L();
+        RotTransl I_Rt_L() const;
 
         void operator+= (const IMU& imu);
         friend RotTransl operator- (const State& st, const State& s0);
@@ -237,9 +252,10 @@ class Plane {
         bool is_plane;
         Point centroid;
         Normal n;
+        float distance;
         
         Plane(const PointType&, const PointTypes&, const std::vector<float>&);
-        bool on_plane(const PointType& p, float& res);
+        template <typename AbstractPoint> bool on_plane(const AbstractPoint& p, float& res);
 
     private:
         bool enough_points(const PointTypes&);
@@ -248,3 +264,6 @@ class Plane {
         void calculate_attributes(const PointType&, const PointTypes&);
         template<typename T> bool estimate_plane(Eigen::Matrix<T, 4, 1> &, const PointTypes &, const T &);
 };
+
+// struct Normal
+    Eigen::Matrix<double, 3, 1> operator* (const Eigen::Matrix<double, 3, 3>&, const Normal&);
