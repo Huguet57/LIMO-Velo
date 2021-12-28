@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
             rate = accum.refine_delta(t2);
             double t1 = t2 - accum.delta;
 
-            if (not mapping_online and map.exists()) {
+            if (mapping_online or (not mapping_online and map.exists())) {
                 // Integrate from t1 to t2
                 KF.propagate_to(t2);
 
