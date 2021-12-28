@@ -41,6 +41,7 @@ struct Params {
 
     int ds_rate;
     double min_dist;
+    int MAX_NUM_ITERS;
     
     std::string points_topic;
     std::string imus_topic;

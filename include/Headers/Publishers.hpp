@@ -61,7 +61,7 @@ class Publishers {
                 
             for (Plane plane : planes)
             {
-                Point point_world = X * plane.centroid;
+                Point point_world = X * X.I_Rt_L() * plane.centroid;
                 Normal n = plane.n;
 
                 geometry_msgs::Pose normalPose;

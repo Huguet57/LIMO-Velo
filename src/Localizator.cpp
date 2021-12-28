@@ -11,6 +11,8 @@
 #include "Headers/Mapper.hpp"
 #endif
 
+extern struct Params Config;
+
 // class Localizator
     // public:
         Localizator::Localizator() {
@@ -81,7 +83,6 @@
 
         void Localizator::init_IKFoM() {
             // Constants
-            int MAX_NUM_ITERS = 5;
             Eigen::VectorXf LIMITS = 0.001*Eigen::VectorXf::Ones(23);
 
             // Initialize IKFoM
@@ -92,7 +93,7 @@
                 IKFoM::df_dw,
                 IKFoM::h_share_model,
 
-                MAX_NUM_ITERS,
+                Config.MAX_NUM_ITERS,
                 LIMITS
             );
 
