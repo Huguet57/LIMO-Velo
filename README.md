@@ -1,11 +1,11 @@
 # LIMO-Velo (based on Fast-LIO2)
-##### A real-time, direct and LM-detached LIO SLAM.
+## A real-time, direct and LM-detached LIO SLAM.
 Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. 
 
 ![Perfomance of the algorithm](./config/docs/img/Performance_at_BCNs_Forum.gif)
 
 ## 0. Cloning the repository
-When cloning the repository, we also need to clone its corresponding submodules. Hence we will use the ``--recurse-submodules`` tag.
+When cloning the repository, we also need to clone the [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) submodules. Hence we will use the ``--recurse-submodules`` tag.
 
 ``git clone --recurse-submodules https://github.com/Huguet57/LIMO-Velo.git``
 
