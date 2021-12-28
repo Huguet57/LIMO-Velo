@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
     nh.param<double>("delta", Config.delta, 0.025);
     nh.param<int>("rate", Config.rate, (int) 1./Config.delta);
     nh.param<int>("ds_rate", Config.ds_rate, 4);
+    nh.param<int>("MAX_NUM_ITERS", Config.MAX_NUM_ITERS, 3);
     nh.param<double>("min_dist", Config.min_dist, 3.);
     nh.param<double>("full_rotation_time", Config.full_rotation_time, 0.1);
     nh.param<double>("empty_lidar_time", Config.empty_lidar_time, 20.);
@@ -48,13 +49,21 @@ int main(int argc, char** argv) {
 
     ros::Rate rate(Config.rate);
 
-    while (ros::ok()) {
-        if (accum.BUFFER_I.size() > 0) {
-            // Should be t2 = ros::Time::now() - delay
-            double t2 = accum.BUFFER_I.front().time - Config.real_time_delay; 
-            double t1 = t2 - Config.delta;
+    bool mapping_online = true;
 
-            if (map.exists()) {
+    while (ros::ok()) {
+        
+        if (accum.ready()) {
+
+            // Should be t2 = ros::Time::now() - delay
+            double latest_imu_time = accum.BUFFER_I.front().time;
+            double t2 = latest_imu_time - Config.real_time_delay; 
+
+            // Refine delta if need to be
+            rate = accum.refine_delta(t2);
+            double t1 = t2 - accum.delta;
+
+            if (not mapping_online and map.exists()) {
                 // Integrate from t1 to t2
                 KF.propagate_to(t2);
 
@@ -72,14 +81,20 @@ int main(int argc, char** argv) {
                 // Publish compensated
                 PointCloud global_compensated = Xt2 * Xt2.I_Rt_L() * compensated;
                 publish.pointcloud(global_compensated);
+
+                // Map at the same time (online)
+                if (mapping_online) {
+                    map.add(global_compensated, t2);
+                    publish.full_pointcloud(global_compensated);
+                }
             }
             
-            // Add updated points to map
-            if (map.hasToMap(t2)) {
+            // Add updated points to map (offline)
+            if (not mapping_online and map.hasToMap(t2)) {
                 PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
                 PointCloud global_full_compensated = KF.latest_state() * KF.latest_state().I_Rt_L() * full_compensated;
                 
-                map.add(global_full_compensated);
+                map.add(global_full_compensated, t2);
                 publish.full_pointcloud(global_full_compensated);
             }
 
