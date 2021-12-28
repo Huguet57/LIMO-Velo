@@ -39,15 +39,13 @@ extern struct Params Config;
                 if (++ds_counter%Config.ds_rate == 0 and Config.min_dist < dist(p))
                     downsampled->points.push_back(p);
 
-            return *downsampled;
-
-            // PointCloud::Ptr filtered(new PointCloud());
-            // filtered->header = downsampled->header;
-            // pcl::VoxelGrid<PointType> filter;
-            // filter.setInputCloud (downsampled);
-            // filter.setLeafSize (0.05f, 0.05f, 0.05f);
-            // filter.filter (*filtered);
-            // return *filtered;
+            PointCloud::Ptr filtered(new PointCloud());
+            filtered->header = downsampled->header;
+            pcl::VoxelGrid<PointType> filter;
+            filter.setInputCloud (downsampled);
+            filter.setLeafSize (0.5f, 0.5f, 0.5f);
+            filter.filter (*filtered);
+            return *filtered;
         }
 
         void PointCloudProcessor::add2Buffer(const PointCloud& pcl, Buffer<Point>& BUFFER_L) {
