@@ -19,9 +19,11 @@ extern struct Params Config;
             this->init_tree();
         }
 
-        void Mapper::add(PointCloud& pcl, bool downsample) {
+        void Mapper::add(PointCloud& pcl, double time, bool downsample) {
             // If map doesn't exist, build it.
             if (pcl.size() == 0) return;
+            this->last_map_time = time;
+
             if (not this->exists()) this->build_tree(pcl);
             else this->add_points(pcl, downsample);
         }

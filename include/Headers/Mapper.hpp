@@ -17,7 +17,7 @@ class Mapper {
         bool exists();
         int size();
 
-        void add(PointCloud&, bool downsample=false);        
+        void add(PointCloud&, double time, bool downsample=false);        
         void add(const State&, PointCloud&, bool downsample=false);        
         Planes match(const State&, const PointCloud&);
         bool hasToMap(double t);
