@@ -11,6 +11,8 @@
 #include "Headers/Mapper.hpp"
 #endif
 
+extern struct Params Config;
+
 // class Accumulator
     // public:
         // Receive from topics
@@ -74,4 +76,44 @@
             IMUs imus = this->get(this->BUFFER_I, t1, t2);
             imus.push_back(this->get_next_imu(t2));
             return imus;
+        }
+
+        //////////////////////////
+
+        bool Accumulator::ready() {
+            // Only check it once
+            if (this->is_ready) return true;
+            
+            // Ready if there's enough IMUs to fit the delay
+            if (this->enough_imus()) {
+                this->set_initial_time();
+                return this->is_ready = true;
+            }
+
+            return this->is_ready = false;
+        }
+
+        ros::Rate Accumulator::refine_delta(double t) {
+            // Heuristic: every second, divide by 2 delta
+            if (t - this->initial_time < 1) this->delta = 0.1; 
+            else if (t - this->initial_time < 2) this->delta = 0.05; 
+            else if (t - this->initial_time < 3) this->delta = 0.025; 
+            else this->delta = 0.01; 
+            
+            return ros::Rate((int) 1./this->delta);
+        }
+
+    // private:
+
+        bool Accumulator::enough_imus() {
+            int IMU_RATE = 400;
+            int Nimus = this->BUFFER_I.size();
+            return Nimus > Config.real_time_delay*IMU_RATE;
+        }
+
+        void Accumulator::set_initial_time() {
+            if (this->BUFFER_I.size() < 1) return;
+            double latest_imu_time = this->BUFFER_I.front().time;
+
+            this->initial_time = latest_imu_time - Config.real_time_delay;
         }

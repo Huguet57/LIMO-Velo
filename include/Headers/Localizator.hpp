@@ -6,6 +6,9 @@
 #endif
 
 class Localizator {
+    
+    // Variables
+
     public:
         PointCloud points2match;
         double last_time_integrated = -1;
@@ -13,6 +16,8 @@ class Localizator {
     private:
         esekfom::esekf<state_ikfom, 12, input_ikfom> IKFoM_KF;
     
+    // Methods
+
     public:
         Localizator();
         void update(const PointCloud&);
@@ -25,16 +30,16 @@ class Localizator {
         void init_IKFoM();
         void init_IKFoM_state();
         void IKFoM_update(double&);
+        
         void propagate(const IMU& imu);
         const state_ikfom& get_x() const;
 
     // Singleton pattern
+
     public:
         static Localizator& getInstance();
     
     private:
-        // Localizator() = default;
-
         // Delete copy/move so extra instances can't be created/moved.
         Localizator(const Localizator&) = delete;
         Localizator& operator=(const Localizator&) = delete;

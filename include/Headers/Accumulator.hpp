@@ -4,6 +4,9 @@ class Accumulator {
         Buffer<IMU> BUFFER_I;
         Buffer<State> BUFFER_X;
 
+        double initial_time;
+        double delta;
+
         // Receive from topics
         void receive_lidar(const PointCloud_msg&);
         void receive_imu(const IMU_msg&);
@@ -14,6 +17,8 @@ class Accumulator {
         void empty_lidar(TimeType);
 
         ///////////////////////////////////////////////////
+
+        // Get content given time intervals
 
         IMU get_next_imu(double t2);
         State get_prev_state(double t1);
@@ -36,7 +41,12 @@ class Accumulator {
             return Algorithms::binary_search(imus, states.front().time, false);
         }
 
+        bool ready();
+        ros::Rate refine_delta(double t);
+
     private:
+        bool is_ready = false;
+
         template <typename ContentType>
         std::deque<ContentType> get(Buffer<ContentType>& source, double t1, double t2) {
             std::deque<ContentType> result;
@@ -51,6 +61,10 @@ class Accumulator {
 
             return result;
         }
+
+        bool enough_imus();
+        void set_initial_time();
+
 
     // Singleton pattern
     public:
