@@ -1,3 +1,6 @@
+# Mapping
+mapping_online: true
+
 # Delays
 empty_lidar_time: 10      # Should be at least [FULL_ROTATION_TIME]
 real_time_delay: 0.5      # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)

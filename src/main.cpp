@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
     ros::NodeHandle nh;
 
     // Get YAML parameters
+    bool mapping_online;
     nh.param<double>("delta", Config.delta, 0.025);
     nh.param<int>("rate", Config.rate, (int) 1./Config.delta);
     nh.param<int>("ds_rate", Config.ds_rate, 4);
@@ -28,6 +29,7 @@ int main(int argc, char** argv) {
     nh.param<double>("real_time_delay", Config.real_time_delay, 1.);
     nh.param<std::string>("points_topic", Config.points_topic, "/velodyne_points");
     nh.param<std::string>("imus_topic", Config.imus_topic, "/vectornav/IMU");
+    nh.param<bool>("mapping_online", mapping_online, true);
     
     // Objects
     Publishers publish(nh);
@@ -48,8 +50,6 @@ int main(int argc, char** argv) {
     );
 
     ros::Rate rate(Config.rate);
-
-    bool mapping_online = true;
 
     while (ros::ok()) {
         
