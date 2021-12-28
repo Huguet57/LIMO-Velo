@@ -95,9 +95,9 @@ extern struct Params Config;
 
         ros::Rate Accumulator::refine_delta(double t) {
             // Heuristic: every second, divide by 2 delta
-            if (t - this->initial_time < 1) this->delta = 0.1; 
-            else if (t - this->initial_time < 2) this->delta = 0.05; 
-            else if (t - this->initial_time < 3) this->delta = 0.025; 
+            if (t - this->initial_time < 0.5) this->delta = 0.1; 
+            else if (t - this->initial_time < 1.0) this->delta = 0.05; 
+            else if (t - this->initial_time < 1.25) this->delta = 0.025; 
             else this->delta = 0.01; 
             
             return ros::Rate((int) 1./this->delta);
