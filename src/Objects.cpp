@@ -69,7 +69,7 @@ template class Buffer<State>;
         }
 
         RotTransl operator- (const State& st, const State& s0) {
-            Eigen::Matrix3f dR = st.R*s0.R.transpose();
+            Eigen::Matrix3f dR = s0.R.transpose()*st.R;
             Eigen::Vector3f dt = st.pos - s0.pos;
             return RotTransl(dR, dt);
         }
@@ -111,8 +111,10 @@ template class Buffer<State>;
             float dt = imu.time - time;
             this->propagate_f(imu, dt);
 
-            // Update last time
+            // Update last controls
             this->time = imu.time;
+            this->a = imu.a;
+            this->w = imu.w;
         }
 
 // class RotTransl

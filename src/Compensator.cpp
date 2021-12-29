@@ -28,10 +28,10 @@
                 output.t1_t2(points, imus, path_taken, t1, t2);
                 output.states(path_taken);
 
-                std::cout << "States:" << std::endl;
-                for (const State& s : states) std::cout << s.time << " " << s.pos.transpose() << " " << s.R.eulerAngles(2, 1, 0)(0) << std::endl;
-                std::cout << "Integrated:" << std::endl;
-                for (const State& s : path_taken) std::cout << s.time << " " << s.pos.transpose() << " " << s.R.eulerAngles(2, 1, 0)(0) << std::endl;
+                // std::cout << "States:" << std::endl;
+                // for (const State& s : states) std::cout << s.time << " " << s.pos.transpose() << " " << s.R.eulerAngles(2, 1, 0)(0) << std::endl;
+                // std::cout << "Integrated:" << std::endl;
+                // for (const State& s : path_taken) std::cout << s.time << " " << s.pos.transpose() << " " << s.R.eulerAngles(2, 1, 0)(0) << std::endl;
             }
 
             // Compensated pointcloud given a path
@@ -89,7 +89,7 @@
             
             // Define state and point iterators
             int Xp = states.size() - 1;
-            State& Xtj = states[Xp];
+            State Xtj = states[Xp];
             int Lp = points.size() - 1;
 
             // Compensate tj points to t2 frame
@@ -98,14 +98,20 @@
 
             while (Xt1.time <= Xtj.time) {
                 // Get rotation-translation pairs
-                RotTransl t2_T_tj = Xt2 - Xtj;
+                RotTransl t2_T_tj = Xtj - Xt2;
                 RotTransl I_T_L = Xtj.I_Rt_L();
 
                 // Find all points with time > Xtj.time 
                 while (0 <= Lp and Xtj.time < points[Lp].time) {
+                    
+                    // double dt = points[Lp].time - Xtj.time;
+                    // t2_T_tj.R *= SO3Math::Exp(Eigen::Vector3f(Xtj.w - Xtj.bw), dt);
+                    // t2_T_tj.t += Xtj.vel*dt + 0.5*(Xtj.R*(Xtj.a - Xtj.ba) - Xtj.g)*dt*dt; 
+
                     Point p_L_tj = points[Lp--];
                     Point t2_p_L_tj = I_T_L.inv() * t2_T_tj * I_T_L * p_L_tj;
 
+                    // *result += p_L_tj;                       // Not compensated
                     *result += t2_p_L_tj;                       // LiDAR frame
                     // *result += Xt2 * I_T_L * t2_p_L_tj;      // Global frame
                 }

@@ -52,18 +52,22 @@ int main(int argc, char** argv) {
     ros::Rate rate(Config.rate);
 
     double last_full_mapped = -1;
+    double clock = -1;
 
     while (ros::ok()) {
         
         if (accum.ready()) {
 
             // Should be t2 = ros::Time::now() - delay
-            double latest_imu_time = accum.BUFFER_I.front().time;
-            double t2 = latest_imu_time - Config.real_time_delay; 
+            // double latest_imu_time = accum.BUFFER_I.front().time;
+            if (clock < 0) clock = accum.initial_time;
+            double t2 = clock; // - Config.real_time_delay; 
 
             // Refine delta if need to be
             rate = accum.refine_delta(t2);
             double t1 = t2 - accum.delta;
+
+            clock += accum.delta;
 
             State Xt2(0.);
 
@@ -79,6 +83,7 @@ int main(int argc, char** argv) {
                 // Localize points in map
                 KF.update(compensated);
                 Xt2 = KF.latest_state();
+                Xt2.time = t2;
                 accum.BUFFER_X.push(Xt2);
                 publish.state(Xt2, false);
 
@@ -102,12 +107,8 @@ int main(int argc, char** argv) {
                 
                 // map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);
-
-                ROS_INFO("Full mapped");
                 last_full_mapped = t2;
             }
-
-            ROS_WARN("Map size: %d", map.size());
 
             // Empty too old LiDAR points
             accum.empty_lidar(t2 - Config.empty_lidar_time);

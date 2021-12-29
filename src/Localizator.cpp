@@ -25,7 +25,7 @@ extern struct Params Config;
             this->points2match = points;
             
             double solve_H_time = 0;
-            this->IKFoM_update(solve_H_time);
+            return this->IKFoM_update(solve_H_time);
         }
 
         void Localizator::calculate_H(const state_ikfom& s, const Planes& matches, Eigen::MatrixXd& H, Eigen::VectorXd& h) {

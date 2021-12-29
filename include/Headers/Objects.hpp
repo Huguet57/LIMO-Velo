@@ -151,8 +151,10 @@ class State {
         Eigen::Matrix3f RLI;
         Eigen::Vector3f tLI;
 
-        // Last time
+        // Last controls
         TimeType time;
+        Eigen::Vector3f a;
+        Eigen::Vector3f w;
 
         // Noises
         Eigen::Vector3f nw;
@@ -182,6 +184,8 @@ class State {
             this->nba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
+            this->a = Eigen::Vector3f(0., 0., 0.);
+            this->w = Eigen::Vector3f(0., 0., 0.);
         }
 
         State(double time) {
@@ -199,6 +203,8 @@ class State {
             this->ba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
+            this->a = Eigen::Vector3f(0., 0., 0.);
+            this->w = Eigen::Vector3f(0., 0., 0.);
 
             this->nw = Eigen::Vector3f(0.,0.,0.);
             this->na = Eigen::Vector3f(0.,0.,0.);
