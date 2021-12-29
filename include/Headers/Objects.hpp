@@ -134,7 +134,7 @@ class IMU {
             this->time = imu.header.stamp.toSec();
         }
 
-        IMU(const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time) {
+        IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time) {
             this->a = a;
             this->w = w;
             this->time = time;
@@ -190,8 +190,8 @@ class State {
             this->nba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
-            this->a = Eigen::Vector3f(0., 0., -9.81);
-            this->w = Eigen::Vector3f(0., 0., 0.);
+            this->a = Eigen::Vector3f(0.,0.,-9.81);
+            this->w = Eigen::Vector3f(0.,0.,0.);
         }
 
         State(double time) {
@@ -209,8 +209,8 @@ class State {
             this->ba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
-            this->a = Eigen::Vector3f(0., 0., -9.81);
-            this->w = Eigen::Vector3f(0., 0., 0.);
+            this->a = Eigen::Vector3f(0.,0.,-9.81);
+            this->w = Eigen::Vector3f(0.,0.,0.);
 
             this->nw = Eigen::Vector3f(0.,0.,0.);
             this->na = Eigen::Vector3f(0.,0.,0.);

@@ -96,6 +96,7 @@
                 
                 // Find all points with time > Xnow.time 
                 while (0 <= Lp and Xnow.time < points[Lp].time) {
+
                     // Integrate up to point time
                     Point p_L_tj = points[Lp--];
                     XtLp += IMU (XtLp.a, XtLp.w, p_L_tj.time);

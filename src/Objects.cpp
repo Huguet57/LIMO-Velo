@@ -113,8 +113,8 @@ template class Buffer<State>;
 
             // Update last controls
             this->time = imu.time;
-            this->a = 0.5*this->a + 0.5*imu.a;
-            this->w = 0.5*this->w + 0.5*imu.w;
+            this->a = 0.5*this->a + 0.5*imu.a;  // Exponential mean (noisy inputs)
+            this->w = 0.5*this->w + 0.5*imu.w;  // Exponential mean (noisy inputs)
         }
 
 // class RotTransl
