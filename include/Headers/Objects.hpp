@@ -134,6 +134,12 @@ class IMU {
             this->time = imu.header.stamp.toSec();
         }
 
+        IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time) {
+            this->a = a;
+            this->w = w;
+            this->time = time;
+        }
+
         friend std::ostream& operator<< (std::ostream& out, const IMU& imu);
 };
 
@@ -151,8 +157,10 @@ class State {
         Eigen::Matrix3f RLI;
         Eigen::Vector3f tLI;
 
-        // Last time
+        // Last controls
         TimeType time;
+        Eigen::Vector3f a;
+        Eigen::Vector3f w;
 
         // Noises
         Eigen::Vector3f nw;
@@ -182,6 +190,8 @@ class State {
             this->nba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
+            this->a = Eigen::Vector3f(0.,0.,-9.81);
+            this->w = Eigen::Vector3f(0.,0.,0.);
         }
 
         State(double time) {
@@ -199,6 +209,8 @@ class State {
             this->ba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
+            this->a = Eigen::Vector3f(0.,0.,-9.81);
+            this->w = Eigen::Vector3f(0.,0.,0.);
 
             this->nw = Eigen::Vector3f(0.,0.,0.);
             this->na = Eigen::Vector3f(0.,0.,0.);

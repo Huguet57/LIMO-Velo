@@ -86,15 +86,21 @@
             result->header.stamp = Conversions::sec2Microsec(Xt2.time);
 
             while (Xt1.time <= Xtj.time) {
-                // Get rotation-translation pairs
-                RotTransl t2_T_tj = Xt2 - Xtj;
-                RotTransl I_T_L = Xtj.I_Rt_L();
+                
+                State XtLp = Xtj;
 
                 // Find all points with time > Xtj.time 
                 while (0 <= Lp and Xtj.time < points[Lp].time) {
+                    // Integrate up to point time
                     Point p_L_tj = points[Lp--];
-                    Point t2_p_L_tj = I_T_L.inv() * t2_T_tj * I_T_L * p_L_tj;
+                    XtLp += IMU (XtLp.a, XtLp.w, p_L_tj.time);
 
+                    // Get rotation-translation pairs
+                    RotTransl t2_T_tj = XtLp - Xt2;
+                    RotTransl I_T_L = XtLp.I_Rt_L();
+
+                    // Transport and add to result
+                    Point t2_p_L_tj = I_T_L.inv() * t2_T_tj * I_T_L * p_L_tj;
                     *result += t2_p_L_tj;                       // LiDAR frame
                     // *result += Xt2 * I_T_L * t2_p_L_tj;      // Global frame
                 }
