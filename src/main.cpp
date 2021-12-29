@@ -75,6 +75,7 @@ int main(int argc, char** argv) {
                 // Localize points in map
                 KF.update(compensated);
                 State Xt2 = KF.latest_state();
+                Xt2.time = t2;
                 accum.BUFFER_X.push(Xt2);
                 publish.state(Xt2, false);
 
@@ -91,14 +92,13 @@ int main(int argc, char** argv) {
             
             // Add updated points to map (offline)
             if (not mapping_online and map.hasToMap(t2)) {
-                PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                PointCloud global_full_compensated = KF.latest_state() * KF.latest_state().I_Rt_L() * full_compensated;
-                
+                PointCloud global_full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2, true);
+
                 map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);
             }
 
-            // Empty too old LiDARs
+            // Empty too old LiDAR points
             accum.empty_lidar(t2 - Config.empty_lidar_time);
         }
 
