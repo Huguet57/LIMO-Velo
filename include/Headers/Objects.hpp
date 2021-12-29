@@ -190,7 +190,7 @@ class State {
             this->nba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
-            this->a = Eigen::Vector3f(0., 0., 0.);
+            this->a = Eigen::Vector3f(0., 0., -9.81);
             this->w = Eigen::Vector3f(0., 0., 0.);
         }
 
@@ -209,7 +209,7 @@ class State {
             this->ba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
-            this->a = Eigen::Vector3f(0., 0., 0.);
+            this->a = Eigen::Vector3f(0., 0., -9.81);
             this->w = Eigen::Vector3f(0., 0., 0.);
 
             this->nw = Eigen::Vector3f(0.,0.,0.);

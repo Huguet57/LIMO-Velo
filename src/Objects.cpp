@@ -113,8 +113,8 @@ template class Buffer<State>;
 
             // Update last controls
             this->time = imu.time;
-            this->a = imu.a;
-            this->w = imu.w;
+            this->a = 0.5*this->a + 0.5*imu.a;
+            this->w = 0.5*this->w + 0.5*imu.w;
         }
 
 // class RotTransl
