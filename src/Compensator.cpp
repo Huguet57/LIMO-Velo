@@ -24,7 +24,7 @@
             States path_taken = this->integrate_imus(states, imus, t1, t2);
 
             // Compensated pointcloud given a path
-            return this->compensate(path_taken, points, true);
+            return this->compensate(path_taken, points, global);
         }
 
         States Compensator::integrate_imus(double t1, double t2) {
