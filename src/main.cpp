@@ -51,6 +51,8 @@ int main(int argc, char** argv) {
 
     ros::Rate rate(Config.rate);
 
+    double last_full_mapped = -1;
+
     while (ros::ok()) {
         
         if (accum.ready()) {
@@ -63,6 +65,8 @@ int main(int argc, char** argv) {
             rate = accum.refine_delta(t2);
             double t1 = t2 - accum.delta;
 
+            State Xt2(0.);
+
             if (mapping_online or (not mapping_online and map.exists())) {
                 // Integrate from t1 to t2
                 KF.propagate_to(t2);
@@ -74,7 +78,7 @@ int main(int argc, char** argv) {
 
                 // Localize points in map
                 KF.update(compensated);
-                State Xt2 = KF.latest_state();
+                Xt2 = KF.latest_state();
                 accum.BUFFER_X.push(Xt2);
                 publish.state(Xt2, false);
 
@@ -85,20 +89,27 @@ int main(int argc, char** argv) {
                 // Map at the same time (online)
                 if (mapping_online) {
                     map.add(global_compensated, t2, false);
-                    publish.full_pointcloud(global_compensated);
+                    // publish.full_pointcloud(global_compensated);
                 }
             }
             
             // Add updated points to map (offline)
-            if (not mapping_online and map.hasToMap(t2)) {
+            // if (not mapping_online and map.hasToMap(t2)) {
+            if (last_full_mapped < 0) last_full_mapped = t2;
+            if (t2 - last_full_mapped > 0.1) {
                 PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                PointCloud global_full_compensated = KF.latest_state() * KF.latest_state().I_Rt_L() * full_compensated;
+                PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
                 
-                map.add(global_full_compensated, t2, true);
+                // map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);
+
+                ROS_INFO("Full mapped");
+                last_full_mapped = t2;
             }
 
-            // Empty too old LiDARs
+            ROS_WARN("Map size: %d", map.size());
+
+            // Empty too old LiDAR points
             accum.empty_lidar(t2 - Config.empty_lidar_time);
         }
 

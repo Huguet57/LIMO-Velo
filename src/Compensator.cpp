@@ -23,6 +23,17 @@
             IMUs imus = Accumulator::getInstance().get_imus(states.front().time, t2);
             States path_taken = this->integrate_imus(states, imus, t1, t2);
 
+            if (t2 - t1 > 0.09) {
+                output.t1_t2(points, imus, states, t1, t2);
+                output.t1_t2(points, imus, path_taken, t1, t2);
+                output.states(path_taken);
+
+                std::cout << "States:" << std::endl;
+                for (const State& s : states) std::cout << s.time << " " << s.pos.transpose() << " " << s.R.eulerAngles(2, 1, 0)(0) << std::endl;
+                std::cout << "Integrated:" << std::endl;
+                for (const State& s : path_taken) std::cout << s.time << " " << s.pos.transpose() << " " << s.R.eulerAngles(2, 1, 0)(0) << std::endl;
+            }
+
             // Compensated pointcloud given a path
             return this->compensate(path_taken, points);
         }

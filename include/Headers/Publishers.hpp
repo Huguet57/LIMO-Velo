@@ -1,6 +1,7 @@
 class Publishers {
     public:
         ros::Publisher state_pub;
+        ros::Publisher states_pub;
         ros::Publisher vel_pub;
         ros::Publisher yaw_pub;
         ros::Publisher pcl_pub;
@@ -13,6 +14,8 @@ class Publishers {
 
         Publishers(ros::NodeHandle& nh) {
             this->state_pub = nh.advertise<nav_msgs::Odometry>("/limovelo/state", 1000); 
+            this->states_pub = nh.advertise<geometry_msgs::PoseArray>("/limovelo/states", 1000); 
+
             this->vel_pub = nh.advertise<nav_msgs::Odometry>("/limovelo/vel", 1000); 
             this->yaw_pub = nh.advertise<std_msgs::Float32>("/limovelo/yaw", 1000); 
             
@@ -27,6 +30,10 @@ class Publishers {
             if (not only_couts) publish_pos(state);
             if (not only_couts) publish_vels(state);
             if (couts) cout_state(state);
+        }
+
+        void states(const States& states) {
+            publish_states(states);
         }
 
         void planes(const State& X, const Planes& planes) {
@@ -112,6 +119,30 @@ class Publishers {
             yaw.data = std::atan2(siny_cosp, cosy_cosp);
 
             this->yaw_pub.publish(yaw);
+        }
+
+        void publish_states(const States& states) {
+            geometry_msgs::PoseArray msg;
+            msg.header.frame_id = "map";
+            msg.header.stamp = ros::Time(states.back().time);
+
+            for (const State& state : states) {
+                geometry_msgs::Pose pose;
+
+                pose.position.x = state.pos(0);
+                pose.position.y = state.pos(1);
+                pose.position.z = state.pos(2);
+
+                Eigen::Quaternionf q(state.R * state.I_Rt_L().R);
+                pose.orientation.x = q.x();
+                pose.orientation.y = q.y();
+                pose.orientation.z = q.z();
+                pose.orientation.w = q.w();
+
+                msg.poses.push_back(pose);
+            }
+
+            this->states_pub.publish(msg);
         }
 
         void publish_pos(const State& state) {
