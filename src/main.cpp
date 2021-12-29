@@ -54,6 +54,9 @@ int main(int argc, char** argv) {
     double last_full_mapped = -1;
     double clock = -1;
 
+    PointCloud last_global_full_compensated;
+    PointCloud global_full_compensated;
+
     while (ros::ok()) {
         
         if (accum.ready()) {
@@ -95,22 +98,39 @@ int main(int argc, char** argv) {
                 if (mapping_online) {
                     // map.add(global_compensated, t2, false);
                     // publish.full_pointcloud(global_compensated);
+
+                    // global_full_compensated += global_compensated;
                 }
             }
             
             // Add updated points to map (offline)
             // if (not mapping_online and map.hasToMap(t2)) {
             if (last_full_mapped < 0) last_full_mapped = t2;
-            if (t2 - last_full_mapped > 0.1) {
-                PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
+            if (t2 - last_full_mapped > 0.099) {
+                PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2, true);
+                PointCloud global_full_compensated = full_compensated;
                 
-                // KF.update(full_compensated);
-                
-                PointCloud global_full_compensated = KF.latest_state() * KF.latest_state().I_Rt_L() * full_compensated;
-                
+                /*
+                States states = accum.get_states(t2 - 0.1, t2);
+
+                for (auto state : states) {
+                    double fake_t2 = state.time;
+                    double fake_t1 = fake_t2 - accum.delta;
+
+                    Points fake_points = accum.get_points(fake_t1, fake_t2);
+                    States fake_path_taken = comp.integrate_imus(fake_t1, fake_t2);
+                    PointCloud fake_compensated = comp.compensate(fake_path_taken, fake_points);
+
+                    global_full_compensated += state * state.I_Rt_L() * fake_compensated;
+                }
+                */
+
                 map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);
                 last_full_mapped = t2;
+
+                // last_global_full_compensated = global_full_compensated;
+                global_full_compensated.clear();
             }
 
             // Empty too old LiDAR points

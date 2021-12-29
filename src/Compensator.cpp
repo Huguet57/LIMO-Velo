@@ -13,7 +13,7 @@
 
 // class Compensator
     // public:
-        PointCloud Compensator::compensate(double t1, double t2) {
+        PointCloud Compensator::compensate(double t1, double t2, bool global) {
             // Points from t1 to t2
             Points points = Accumulator::getInstance().get_points(t1, t2);
             if (points.empty()) return PointCloud();
@@ -24,8 +24,8 @@
             States path_taken = this->integrate_imus(states, imus, t1, t2);
 
             if (t2 - t1 > 0.09) {
-                output.t1_t2(points, imus, states, t1, t2);
-                output.t1_t2(points, imus, path_taken, t1, t2);
+                // output.t1_t2(points, imus, states, t1, t2);
+                // output.t1_t2(points, imus, path_taken, t1, t2);
                 output.states(path_taken);
 
                 // std::cout << "States:" << std::endl;
@@ -35,7 +35,7 @@
             }
 
             // Compensated pointcloud given a path
-            return this->compensate(path_taken, points);
+            return this->compensate(path_taken, points, true);
         }
 
         States Compensator::integrate_imus(double t1, double t2) {
@@ -82,13 +82,18 @@
             return integrated_states;
         }
 
-        PointCloud Compensator::compensate(States& states, Points& points) {
+        PointCloud Compensator::compensate(States& states, Points& points, bool global) {
             // Get start and end states
             const State& Xt1 = states.front();
             const State& Xt2 = states.back();
             
+            if (states.size() < 2) {
+                ROS_ERROR("LOL states < 2");
+                return PointCloud();
+            }
+
             // Define state and point iterators
-            int Xp = states.size() - 1;
+            int Xp = states.size() - 2;
             State Xtj = states[Xp];
             int Lp = points.size() - 1;
 
@@ -96,31 +101,37 @@
             PointCloud::Ptr result(new PointCloud());
             result->header.stamp = Conversions::sec2Microsec(Xt2.time);
 
-            while (Xt1.time <= Xtj.time) {
-                
-                State XtLp = Xtj;
+            State XtLp = Xtj;
+            State Xnow = Xtj;
+            State Xnext = Xt2;
 
-                // Find all points with time > Xtj.time 
-                while (0 <= Lp and Xtj.time < points[Lp].time) {
+            while (Xt1.time <= Xnow.time) {
+                
+                // Find all points with time > Xnow.time 
+                while (0 <= Lp and Xnow.time < points[Lp].time) {
                     // Integrate up to point time
                     XtLp += IMU (XtLp.a, XtLp.w, points[Lp].time);
 
                     // Get rotation-translation pairs
-                    RotTransl t2_T_tj = XtLp - Xt2;
+                    RotTransl t2_T_tj = XtLp - Xnext;
                     RotTransl I_T_L = XtLp.I_Rt_L();
 
-                    // Transport point to Xt2
+                    // Transport point to Xnext
                     Point p_L_tj = points[Lp--];
                     Point t2_p_L_tj = I_T_L.inv() * t2_T_tj * I_T_L * p_L_tj;
 
-                    // *result += p_L_tj;                       // Not compensated
-                    *result += t2_p_L_tj;                       // LiDAR frame
-                    // *result += Xt2 * I_T_L * t2_p_L_tj;      // Global frame
+                    // *result += p_L_tj;                         // Not compensated
+                    if (not global) *result += t2_p_L_tj;         // LiDAR frame
+                    else *result += Xnext * I_T_L * t2_p_L_tj;      // Global frame
                 }
 
+                Xnext = Xnow;
+
                 // Depropagate state feeding IMUs in inverse order
-                if (Xp > 0) Xtj = states[--Xp];
+                if (Xp > 0) Xnow = states[--Xp];
                 else break;
+
+                XtLp = Xnow;
             }
 
             return *result;

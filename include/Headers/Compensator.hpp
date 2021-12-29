@@ -29,8 +29,8 @@ class Compensator {
         }
 
         // Main constructor
-        PointCloud compensate(double t1, double t2);
-        PointCloud compensate(States& states, Points& points);
+        PointCloud compensate(double t1, double t2, bool global=false);
+        PointCloud compensate(States& states, Points& points, bool global=false);
         
         States integrate_imus(double t1, double t2);
 
