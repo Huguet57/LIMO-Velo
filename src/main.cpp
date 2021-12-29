@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
 
                 // Map at the same time (online)
                 if (mapping_online) {
-                    map.add(global_compensated, t2, false);
+                    // map.add(global_compensated, t2, false);
                     // publish.full_pointcloud(global_compensated);
                 }
             }
@@ -103,9 +103,12 @@ int main(int argc, char** argv) {
             if (last_full_mapped < 0) last_full_mapped = t2;
             if (t2 - last_full_mapped > 0.1) {
                 PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
                 
-                // map.add(global_full_compensated, t2, true);
+                // KF.update(full_compensated);
+                
+                PointCloud global_full_compensated = KF.latest_state() * KF.latest_state().I_Rt_L() * full_compensated;
+                
+                map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);
                 last_full_mapped = t2;
             }

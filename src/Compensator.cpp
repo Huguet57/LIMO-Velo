@@ -97,17 +97,19 @@
             result->header.stamp = Conversions::sec2Microsec(Xt2.time);
 
             while (Xt1.time <= Xtj.time) {
-                // Get rotation-translation pairs
-                RotTransl t2_T_tj = Xtj - Xt2;
-                RotTransl I_T_L = Xtj.I_Rt_L();
+                
+                State XtLp = Xtj;
 
                 // Find all points with time > Xtj.time 
                 while (0 <= Lp and Xtj.time < points[Lp].time) {
-                    
-                    // double dt = points[Lp].time - Xtj.time;
-                    // t2_T_tj.R *= SO3Math::Exp(Eigen::Vector3f(Xtj.w - Xtj.bw), dt);
-                    // t2_T_tj.t += Xtj.vel*dt + 0.5*(Xtj.R*(Xtj.a - Xtj.ba) - Xtj.g)*dt*dt; 
+                    // Integrate up to point time
+                    XtLp += IMU (XtLp.a, XtLp.w, points[Lp].time);
 
+                    // Get rotation-translation pairs
+                    RotTransl t2_T_tj = XtLp - Xt2;
+                    RotTransl I_T_L = XtLp.I_Rt_L();
+
+                    // Transport point to Xt2
                     Point p_L_tj = points[Lp--];
                     Point t2_p_L_tj = I_T_L.inv() * t2_T_tj * I_T_L * p_L_tj;
 

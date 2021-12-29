@@ -134,6 +134,12 @@ class IMU {
             this->time = imu.header.stamp.toSec();
         }
 
+        IMU(const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time) {
+            this->a = a;
+            this->w = w;
+            this->time = time;
+        }
+
         friend std::ostream& operator<< (std::ostream& out, const IMU& imu);
 };
 
