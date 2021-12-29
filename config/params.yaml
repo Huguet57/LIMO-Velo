@@ -1,5 +1,5 @@
 # Mapping
-mapping_online: true
+mapping_online: false
 
 # Delays
 empty_lidar_time: 10      # Should be at least [FULL_ROTATION_TIME]

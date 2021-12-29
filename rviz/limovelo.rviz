@@ -5,11 +5,9 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /States1
-        - /States1/Shape1
-        - /Mapper2
+        - /State1/Shape1
       Splitter Ratio: 0.5
-    Tree Height: 388
+    Tree Height: 363
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -54,14 +52,14 @@ Visualization Manager:
           Value: true
         Value: true
       Enabled: true
-      Keep: 20
-      Name: States
+      Keep: 50
+      Name: State
       Position Tolerance: 0.10000000149011612
       Queue Size: 10
       Shape:
         Alpha: 1
-        Axes Length: 3
-        Axes Radius: 0.05000000074505806
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
         Color: 255; 25; 0
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
@@ -99,6 +97,34 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 0.4000000059604645
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: z
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 20
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Min Color: 0; 0; 0
+      Name: Mapper (Accum)
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 1
+      Size (m): 0.019999999552965164
+      Style: Points
+      Topic: /limovelo/full_pcl
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -115,7 +141,7 @@ Visualization Manager:
       Invert Rainbow: true
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
-      Name: Mapper
+      Name: Mapper (Single)
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
@@ -144,51 +170,6 @@ Visualization Manager:
       Topic: /limovelo/planes
       Unreliable: false
       Value: false
-    - Alpha: 1
-      Arrow Length: 0.05000000074505806
-      Axes Length: 0.30000001192092896
-      Axes Radius: 0.10000000149011612
-      Class: rviz/PoseArray
-      Color: 255; 25; 0
-      Enabled: true
-      Head Length: 0.07000000029802322
-      Head Radius: 0.029999999329447746
-      Name: PoseArray
-      Queue Size: 10
-      Shaft Length: 0.23000000417232513
-      Shaft Radius: 0.009999999776482582
-      Shape: Axes
-      Topic: /limovelo/states
-      Unreliable: false
-      Value: true
-    - Alpha: 0.4000000059604645
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: z
-      Class: rviz/PointCloud2
-      Color: 255; 255; 255
-      Color Transformer: Intensity
-      Decay Time: 420
-      Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: Mapper
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 1
-      Size (m): 0.019999999552965164
-      Style: Points
-      Topic: /limovelo/full_pcl
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: true
   Enabled: true
   Global Options:
     Background Color: 0; 0; 0
@@ -217,7 +198,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 48.38882827758789
+      Distance: 65.06787872314453
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -225,17 +206,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 21.865234375
-        Y: 3.34849214553833
-        Z: 0.1320989429950714
+        X: 12.060389518737793
+        Y: -5.958249568939209
+        Z: 5.705751895904541
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: true
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8997967839241028
+      Pitch: 0.7547966241836548
       Target Frame: <Fixed Frame>
-      Yaw: 1.7795116901397705
+      Yaw: 1.9995120763778687
     Saved: ~
 Window Geometry:
   Displays:
@@ -253,5 +234,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1053
-  X: 1456
-  Y: 57
+  X: 313
+  Y: 27

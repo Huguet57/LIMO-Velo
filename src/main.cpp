@@ -51,28 +51,17 @@ int main(int argc, char** argv) {
 
     ros::Rate rate(Config.rate);
 
-    double last_full_mapped = -1;
-    double clock = -1;
-
-    PointCloud last_global_full_compensated;
-    PointCloud global_full_compensated;
-
     while (ros::ok()) {
         
         if (accum.ready()) {
 
             // Should be t2 = ros::Time::now() - delay
-            // double latest_imu_time = accum.BUFFER_I.front().time;
-            if (clock < 0) clock = accum.initial_time;
-            double t2 = clock; // - Config.real_time_delay; 
+            double latest_imu_time = accum.BUFFER_I.front().time;
+            double t2 = latest_imu_time - Config.real_time_delay; 
 
             // Refine delta if need to be
             rate = accum.refine_delta(t2);
             double t1 = t2 - accum.delta;
-
-            clock += accum.delta;
-
-            State Xt2(0.);
 
             if (mapping_online or (not mapping_online and map.exists())) {
                 // Integrate from t1 to t2
@@ -85,7 +74,7 @@ int main(int argc, char** argv) {
 
                 // Localize points in map
                 KF.update(compensated);
-                Xt2 = KF.latest_state();
+                State Xt2 = KF.latest_state();
                 Xt2.time = t2;
                 accum.BUFFER_X.push(Xt2);
                 publish.state(Xt2, false);
@@ -96,41 +85,17 @@ int main(int argc, char** argv) {
 
                 // Map at the same time (online)
                 if (mapping_online) {
-                    // map.add(global_compensated, t2, false);
-                    // publish.full_pointcloud(global_compensated);
-
-                    // global_full_compensated += global_compensated;
+                    map.add(global_compensated, t2, false);
+                    publish.full_pointcloud(global_compensated);
                 }
             }
             
             // Add updated points to map (offline)
-            // if (not mapping_online and map.hasToMap(t2)) {
-            if (last_full_mapped < 0) last_full_mapped = t2;
-            if (t2 - last_full_mapped > 0.099) {
-                PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2, true);
-                PointCloud global_full_compensated = full_compensated;
-                
-                /*
-                States states = accum.get_states(t2 - 0.1, t2);
-
-                for (auto state : states) {
-                    double fake_t2 = state.time;
-                    double fake_t1 = fake_t2 - accum.delta;
-
-                    Points fake_points = accum.get_points(fake_t1, fake_t2);
-                    States fake_path_taken = comp.integrate_imus(fake_t1, fake_t2);
-                    PointCloud fake_compensated = comp.compensate(fake_path_taken, fake_points);
-
-                    global_full_compensated += state * state.I_Rt_L() * fake_compensated;
-                }
-                */
+            if (not mapping_online and map.hasToMap(t2)) {
+                PointCloud global_full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2, true);
 
                 map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);
-                last_full_mapped = t2;
-
-                // last_global_full_compensated = global_full_compensated;
-                global_full_compensated.clear();
             }
 
             // Empty too old LiDAR points
