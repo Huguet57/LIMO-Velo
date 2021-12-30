@@ -80,9 +80,8 @@ extern struct Params Config;
             PointType global_p = (X * offsets * Point(p)).toPCL();
 
             // Find k nearest points
-            const int NUM_MATCH_POINTS = 5;
-            vector<float> pointSearchSqDis(NUM_MATCH_POINTS);
-            this->map->Nearest_Search(global_p, NUM_MATCH_POINTS, near_points, pointSearchSqDis);
+            vector<float> pointSearchSqDis(Config.NUM_MATCH_POINTS);
+            this->map->Nearest_Search(global_p, Config.NUM_MATCH_POINTS, near_points, pointSearchSqDis);
 
             // Fit a plane to them
             return Plane(p, near_points, pointSearchSqDis);

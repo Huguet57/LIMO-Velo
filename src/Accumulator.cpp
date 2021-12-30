@@ -74,7 +74,7 @@ extern struct Params Config;
                 if (t1 > x.time) return x;
 
             // If not a state found, push an empty one in t1
-            this->BUFFER_X.push(State(t1));
+            this->add(State(t1), t1);
             return this->BUFFER_X.front();
         }
 
@@ -137,9 +137,7 @@ extern struct Params Config;
         void Accumulator::push(const Point& point) { this->BUFFER_L.push(point); }
 
         bool Accumulator::enough_imus() {
-            int IMU_RATE = 400;
-            int Nimus = this->BUFFER_I.size();
-            return Nimus > Config.real_time_delay*IMU_RATE;
+            return this->BUFFER_I.size() > Config.real_time_delay*Config.imu_rate;
         }
 
         void Accumulator::set_initial_time() {

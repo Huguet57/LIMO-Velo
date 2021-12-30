@@ -37,14 +37,34 @@ struct HeuristicParams {
 };
 
 struct Params {
+    bool mapping_online;
+    bool real_time;
+
+    bool estimate_extrinsics;
+    std::vector<float> initial_gravity;
+    std::vector<float> I_Rotation_L;
+    std::vector<float> I_Translation_L;
+
     double empty_lidar_time;
     double real_time_delay;
+
     double full_rotation_time;
+    double imu_rate;
 
     int ds_rate;
     double min_dist;
+
     int MAX_NUM_ITERS;
-    
+    std::vector<double> LIMITS;
+    int NUM_MATCH_POINTS;
+    double MAX_DIST_PLANE;
+
+    double cov_acc;
+    double cov_gyro;
+    double cov_bias_acc;
+    double cov_bias_gyro;
+    double LiDAR_noise;
+
     std::string points_topic;
     std::string imus_topic;
 
@@ -59,7 +79,7 @@ namespace velodyne_ros {
       uint16_t ring;
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
-}  // namespace velodyne_ros
+}
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_ros::Point,
     (float, x, x)

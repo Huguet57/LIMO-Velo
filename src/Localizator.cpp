@@ -40,20 +40,17 @@ extern struct Params Config;
                 Normal n = match.n;
 
                 // Rotation matrices
-                State S(s, 0.);
-                Eigen::Matrix3d R = s.rot.toRotationMatrix();
-                Eigen::Matrix3d Rinv = s.rot.conjugate().toRotationMatrix();
-                Eigen::Matrix3d R_L_I = s.offset_R_L_I.toRotationMatrix();
-                Eigen::Matrix3f R_L_If = R_L_I.template cast<float>();
+                State S = State(s, 0.);
+                Eigen::Matrix3d R_inv = s.rot.conjugate().toRotationMatrix();
+                Eigen::Matrix3d I_R_L_inv = s.offset_R_L_I.conjugate().toRotationMatrix();
 
                 // Calculate H (:= dh/dx)
-                Eigen::Vector3d C = (Rinv * n);
-                Eigen::Vector3d B = (p_lidar_x).cross(R_L_I.transpose() * C);
+                Eigen::Vector3d C = (R_inv * n);
+                Eigen::Vector3d B = (p_lidar_x).cross(I_R_L_inv * C);
                 Eigen::Vector3d A = (S.I_Rt_L() * p_lidar_x).cross(C);
                 
-                bool extr_est = false;
                 H.block<1, 6>(i,0) << n.A, n.B, n.C, A(0), A(1), A(2);
-                if (extr_est) H.block<1, 6>(i,6) << B(0), B(1), B(2), C(0), C(1), C(2);
+                if (Config.estimate_extrinsics) H.block<1, 6>(i,6) << B(0), B(1), B(2), C(0), C(1), C(2);
 
                 // Measurement: distance to the closest plane
                 Point p = S * S.I_Rt_L() * match.centroid;
@@ -82,9 +79,6 @@ extern struct Params Config;
         }
 
         void Localizator::init_IKFoM() {
-            // Constants
-            Eigen::VectorXf LIMITS = 0.001*Eigen::VectorXf::Ones(23);
-
             // Initialize IKFoM
             this->IKFoM_KF.init_dyn_share(
                 // TODO: change to private functions instead of "IKFoM::"
@@ -94,7 +88,7 @@ extern struct Params Config;
                 IKFoM::h_share_model,
 
                 Config.MAX_NUM_ITERS,
-                LIMITS
+                Config.LIMITS
             );
 
             // Initialize state
@@ -102,15 +96,15 @@ extern struct Params Config;
         }
 
         void Localizator::IKFoM_update(double& solve_H_time) {
-            this->IKFoM_KF.update_iterated_dyn_share_modified(0.001, solve_H_time);
+            this->IKFoM_KF.update_iterated_dyn_share_modified(Config.LiDAR_noise, solve_H_time);
         }
 
         void Localizator::init_IKFoM_state() {
             state_ikfom init_state = this->IKFoM_KF.get_x();
-            init_state.grav = S2(Eigen::Vector3d (0.,0.,+9.807));
-            init_state.bg  = Eigen::Vector3d(0.,0.,0.);
-            init_state.offset_R_L_I = SO3(Eigen::Matrix3d(Eigen::Vector3d(1,-1,-1).asDiagonal()));
-            init_state.offset_T_L_I = Eigen::Vector3d(0.9, 0., 0.);
+            init_state.grav = S2(-Eigen::Vector3f (Config.initial_gravity.data()).cast<double>());
+            init_state.bg = Eigen::Vector3d(0.,0.,0.);
+            init_state.offset_R_L_I = SO3(Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3).cast<double>());
+            init_state.offset_T_L_I = Eigen::Vector3f(Config.I_Translation_L.data()).cast<double>();
             this->IKFoM_KF.change_x(init_state);
 
             esekfom::esekf<state_ikfom, 12, input_ikfom>::cov init_P = this->IKFoM_KF.get_P();
@@ -133,29 +127,11 @@ extern struct Params Config;
             in.acc = imu.a.cast<double>();
             in.gyro = imu.w.cast<double>();
 
-            Eigen::Matrix<double, 12, 12> Q;
-            Q.setIdentity();
-
-            Q(0,0) = 6.01e-4;
-            Q(1,1) = 6.01e-4;
-            Q(2,2) = 6.01e-4;
-            
-            Q(3,3) = 1.53e-2;
-            Q(4,4) = 1.53e-2;
-            Q(5,5) = 1.53e-2;
-            
-            Q(6,6) = 3.38e-4;
-            Q(7,7) = 3.38e-4;
-            Q(8,8) = 3.38e-4;
-            
-            Q(9,9) = 1.54e-5;
-            Q(10,10) = 1.54e-5;
-            Q(11,11) = 1.54e-5;
-            
-            // Q.block<3, 3>(0, 0).diagonal() = Eigen::Vector3d::Constant(6.01e-4); // cov_gyr;
-            // Q.block<3, 3>(3, 3).diagonal() = Eigen::Vector3d::Constant(1.53e-2); // cov_acc;
-            // Q.block<3, 3>(6, 6).diagonal() = Eigen::Vector3d::Constant(3.38e-4); // cov_bias_gyr;
-            // Q.block<3, 3>(9, 9).diagonal() = Eigen::Vector3d::Constant(1.54e-5); // cov_bias_acc;
+            Eigen::Matrix<double, 12, 12> Q = Eigen::Matrix<double, 12, 12>::Identity();
+            Q.block<3, 3>(0, 0) = Config.cov_gyro * Eigen::Matrix<double, 3, 3>::Identity();
+            Q.block<3, 3>(3, 3) = Config.cov_acc * Eigen::Matrix<double, 3, 3>::Identity();
+            Q.block<3, 3>(6, 6) = Config.cov_bias_gyro * Eigen::Matrix<double, 3, 3>::Identity();
+            Q.block<3, 3>(9, 9) = Config.cov_bias_acc * Eigen::Matrix<double, 3, 3>::Identity();
 
             double dt = imu.time - this->last_time_integrated;
             this->last_time_integrated = imu.time;

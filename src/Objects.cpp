@@ -11,6 +11,8 @@
 #include "Headers/Mapper.hpp"
 #endif
 
+extern struct Params Config;
+
 // class Buffer
 template class Buffer<IMU>;
 template class Buffer<Point>;
@@ -154,19 +156,16 @@ template class Buffer<State>;
             // Calculate residue
             res = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
             return std::fabs(res < 0.1f);
-
-            // float s = 1 - 0.9 * fabs(res) / sqrt(dist); // TODO: Why divide by dist?
-            // return s > 0.9;
         }
 
     // private:
         bool Plane::enough_points(const PointTypes& points_near) {
-            return this->is_plane = points_near.size() >= this->NUM_MATCH_POINTS;
+            return this->is_plane = points_near.size() >= Config.NUM_MATCH_POINTS;
         }
 
         bool Plane::points_close_enough(const std::vector<float>& sq_dists) {
             if (sq_dists.size() < 1) return this->is_plane = false;
-            return this->is_plane = sq_dists.back() < MAX_DIST*MAX_DIST;
+            return this->is_plane = sq_dists.back() < Config.MAX_DIST_PLANE*Config.MAX_DIST_PLANE;
         }
 
         void Plane::calculate_attributes(const PointType& p, const PointTypes& points) {
@@ -189,16 +188,14 @@ template class Buffer<State>;
         }
 
         template<typename T>
-        bool Plane::estimate_plane(Eigen::Matrix<T, 4, 1> &pca_result, const PointTypes &point, const T &threshold)
-        {
-            int N = this->NUM_MATCH_POINTS;
-            Eigen::Matrix<T, 5, 3> A;
-            Eigen::Matrix<T, 5, 1> b;
+        bool Plane::estimate_plane(Eigen::Matrix<T, 4, 1> &pca_result, const PointTypes &point, const T &threshold) {
+            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> A(Config.NUM_MATCH_POINTS, 3);
+            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> b(Config.NUM_MATCH_POINTS, 1);
             A.setZero();
             b.setOnes();
             b *= -1.0f;
 
-            for (int j = 0; j < N; j++)
+            for (int j = 0; j < Config.NUM_MATCH_POINTS; j++)
             {
                 A(j,0) = point[j].x;
                 A(j,1) = point[j].y;
@@ -213,7 +210,7 @@ template class Buffer<State>;
             pca_result(2) = normvec(2) / n;
             pca_result(3) = 1.0 / n;
 
-            for (int j = 0; j < N; j++)
+            for (int j = 0; j < Config.NUM_MATCH_POINTS; j++)
             {
                 if (fabs(pca_result(0) * point[j].x + pca_result(1) * point[j].y + pca_result(2) * point[j].z + pca_result(3)) > threshold)
                 {

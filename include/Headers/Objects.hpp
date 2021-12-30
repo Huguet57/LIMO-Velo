@@ -1,3 +1,5 @@
+extern struct Params Config;
+
 template <typename ContentType>
 class Buffer {
     public:
@@ -92,16 +94,11 @@ class Point {
         Eigen::Vector3d cross(const Eigen::Vector3d& v) {
             Eigen::Vector3d w = this->toEigen().cast<double> ();
             
-            Eigen::Matrix3d Wx;
-            Wx << 0.0,-w[2],w[1],w[2],0.0,-w[0],-w[1],w[0],0.0;
-
-            return Wx * v;
-
-            // return Eigen::Vector3d(
-            //     w(1) * v(2) + w(2) * v(1),
-            //     w(2) * v(0) + w(0) * v(2),
-            //     w(0) * v(1) + w(1) * v(0)
-            // );
+            return Eigen::Vector3d(
+                w(1) * v(2) - w(2) * v(1),
+                w(2) * v(0) - w(0) * v(2),
+                w(0) * v(1) - w(1) * v(0)
+            );
         }
 
         friend Point operator*(const Eigen::Matrix<float, 3, 3>&, const Point&);
@@ -168,8 +165,6 @@ class State {
         Eigen::Vector3f nbw;
         Eigen::Vector3f nba;
 
-        /////////////////////
-
         State(const state_ikfom& s, double time) {
             this->R = s.rot.toRotationMatrix().cast<float>();
             this->pos = s.pos.cast<float>();
@@ -195,13 +190,15 @@ class State {
         }
 
         State(double time) {
+            Eigen::Vector3f init_g = Eigen::Map<Eigen::Vector3f>(Config.initial_gravity.data(), 3);
+            Eigen::Vector3f I_t_L = Eigen::Map<Eigen::Vector3f>(Config.I_Translation_L.data(), 3);
+            Eigen::Matrix3f I_R_L = Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3);
+
             this->R = Eigen::Matrix3f::Identity();
-            this->g = Eigen::Vector3f(0.,0.,-9.807);
-            
-            // Xaloc's custom LiDAR-IMU offsets
-            this->RLI = Eigen::Matrix3f::Identity();
-            this->RLI(1,1) = this->RLI(2,2) = -1;
-            this->tLI = Eigen::Vector3f(0.9,0.,0.);
+            this->g = init_g;
+
+            this->RLI = I_R_L;
+            this->tLI = I_t_L;
 
             this->pos = Eigen::Vector3f(0.,0.,0.);
             this->vel = Eigen::Vector3f(0.,0.,0.);
@@ -209,7 +206,7 @@ class State {
             this->ba = Eigen::Vector3f(0.,0.,0.);
 
             this->time = time;
-            this->a = Eigen::Vector3f(0.,0.,-9.81);
+            this->a = init_g;
             this->w = Eigen::Vector3f(0.,0.,0.);
 
             this->nw = Eigen::Vector3f(0.,0.,0.);
@@ -256,10 +253,6 @@ class RotTransl {
 };
 
 class Plane {
-    private:
-        int NUM_MATCH_POINTS = 5;
-        const float MAX_DIST = 2.;
-
     public:
         bool is_plane;
         Point centroid;
