@@ -2,7 +2,13 @@
 ## A real-time, direct and LM-detached LIO SLAM.
 Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. 
 
-![Perfomance of the algorithm](./config/docs/img/Performance_at_BCNs_Forum.gif)
+![Perfomance of the algorithm](./config/docs/img/Localization.gif)
+
+## TODO list
+- [ ] Interpolation and smoothing of states when mapping offline
+- [ ] Check quality vs. other SOTA algorithms
+- [ ] Add degeneracy detection and correction
+- [ ] Try to add a module for removing dynamic objects such as people or vehicles
 
 ## 0. Cloning the repository
 When cloning the repository, we also need to clone the [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) submodules. Hence we will use the ``--recurse-submodules`` tag.
@@ -23,3 +29,8 @@ To adapt LIMO-Velo to our own hardware infrastructure, a [YAML](https://yaml.org
 
 ## 4. Modifying the LiDAR driver to get true real-time performance
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
+
+## References
+- [IKFoM](https://github.com/hku-mars/IKFoM): Iterated Kalman Filters on Manifolds
+- [ikd-Tree](https://github.com/hku-mars/ikd-Tree): Incremental KD-Tree for Robotic Applications
+- [FAST-LIO2](https://github.com/hku-mars/FAST_LIO): Fast and Direct LIO SLAM

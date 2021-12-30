@@ -1,6 +1,6 @@
 # Online/Offline
 mapping_online: false
-real_time: false
+real_time: true
 
 # Topics
 points_topic: "/velodyne_points"
@@ -20,12 +20,12 @@ I_Rotation_L: [
 # Delays
 LiDAR_noise: 0.001
 empty_lidar_time: 0.1      # Should be at least [FULL_ROTATION_TIME]
-real_time_delay: 0.1      # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
+real_time_delay: 0.1       # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
 # LiDAR
 full_rotation_time: 0.1
 min_dist: 4
-ds_rate: 2
+ds_rate: 4
 
 # IMU
 imu_rate: 400
