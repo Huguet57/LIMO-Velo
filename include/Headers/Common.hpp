@@ -31,6 +31,11 @@
 #include "ikd_Tree.h"
 #endif
 
+struct HeuristicParams {
+    std::vector<double> times;
+    std::vector<double> deltas;
+};
+
 struct Params {
     double delta;
     int rate;
@@ -45,6 +50,8 @@ struct Params {
     
     std::string points_topic;
     std::string imus_topic;
+
+    HeuristicParams Heuristic;
 };
 
 namespace velodyne_ros {

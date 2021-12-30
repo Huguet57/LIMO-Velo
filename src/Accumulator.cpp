@@ -94,12 +94,23 @@ extern struct Params Config;
         }
 
         ros::Rate Accumulator::refine_delta(double t) {
-            // Heuristic: every second, divide by 2 delta
-            if (t - this->initial_time < 0.5) this->delta = 0.1; 
-            else if (t - this->initial_time < 1.0) this->delta = 0.05; 
-            else if (t - this->initial_time < 1.5) this->delta = 0.025; 
-            else this->delta = 0.01; 
-            
+            assert(("There has to be exactly one more delta value than time delimiters", Config.Heuristic.times.size() + 1 == Config.Heuristic.deltas.size()));
+
+            // Interpret Heuristic
+            if (t - this->initial_time >= Config.Heuristic.times.back()) {
+                this->delta = Config.Heuristic.deltas.back();
+            } else {
+                for (int k = 0; k < Config.Heuristic.times.size(); ++k) {
+                    double Ht = Config.Heuristic.times[k];
+                    double Hd = Config.Heuristic.deltas[k];
+
+                    if (t - this->initial_time < Ht) {
+                        this->delta = Hd;
+                        break;
+                    }
+                }
+            }
+
             return ros::Rate((int) 1./this->delta);
         }
 

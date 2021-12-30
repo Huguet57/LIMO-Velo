@@ -30,7 +30,9 @@ int main(int argc, char** argv) {
     nh.param<std::string>("points_topic", Config.points_topic, "/velodyne_points");
     nh.param<std::string>("imus_topic", Config.imus_topic, "/vectornav/IMU");
     nh.param<bool>("mapping_online", mapping_online, true);
-    
+    nh.param<std::vector<double>>("/Heuristic/times", Config.Heuristic.times, {1.});
+    nh.param<std::vector<double>>("/Heuristic/deltas", Config.Heuristic.deltas, {0.1, 0.01});
+
     // Objects
     Publishers publish(nh);
     Accumulator& accum = Accumulator::getInstance();

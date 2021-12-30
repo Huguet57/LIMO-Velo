@@ -2,8 +2,8 @@
 mapping_online: false
 
 # Delays
-empty_lidar_time: 10      # Should be at least [FULL_ROTATION_TIME]
-real_time_delay: 0.5      # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
+empty_lidar_time: 0.1      # Should be at least [FULL_ROTATION_TIME]
+real_time_delay: 0.1      # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
 # LiDAR
 full_rotation_time: 0.1
@@ -13,3 +13,8 @@ ds_rate: 4
 # Topics
 points_topic: "/velodyne_points"
 imus_topic: "/vectornav/IMU"
+
+# Delta refinement
+Heuristic:
+    times: [0.5, 0.75]
+    deltas: [0.1, 0.05, 0.01]
