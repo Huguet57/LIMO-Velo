@@ -52,7 +52,7 @@
                 bool last_state = Xp == states.size() - 1;
 
                 // Integrate up until the next known state
-                while (Ip < imus.size() and integrated_state.time < next_state.time) {
+                while (Ip < imus.size() and integrated_state.time <= next_state.time) {
                     if (integrated_state.time >= t1)
                         integrated_states.push_back(integrated_state);
                     
@@ -98,22 +98,23 @@
                 while (0 <= Lp and Xnow.time < points[Lp].time) {
 
                     // Integrate up to point time
-                    Point p_L_tj = points[Lp--];
-                    XtLp += IMU (XtLp.a, XtLp.w, p_L_tj.time);
+                    Point p_L_tLp = points[Lp--];
+                    XtLp += IMU (XtLp.a, XtLp.w, p_L_tLp.time);
 
                     // Get rotation-translation pairs
-                    RotTransl t2_T_tj = XtLp - Xnext;
+                    RotTransl tnext_T_tLp = XtLp - Xnext;
                     RotTransl I_T_L = Xnext.I_Rt_L();
 
                     // Transport point to Xnext and add it
-                    Point t2_p_L_tj = I_T_L.inv() * t2_T_tj * I_T_L * p_L_tj;
-                    if (not global) *result += t2_p_L_tj;         // LiDAR frame
-                    else *result += Xnext * I_T_L * t2_p_L_tj;    // Global frame
+                    Point tnext_p_L_tLp = I_T_L.inv() * tnext_T_tLp * I_T_L * p_L_tLp;
+                    if (not global) *result += tnext_p_L_tLp;         // LiDAR frame
+                    else *result += Xnext * I_T_L * tnext_p_L_tLp;    // Global frame
                 }
 
                 // Iterate
                 if (Xp > 0) {
-                    Xnext = Xnow;
+                    if (global) Xnext = Xnow;
+                    else Xnext = Xt2;
                     Xnow = states[--Xp];
                     XtLp = Xnow;
                 } else {
