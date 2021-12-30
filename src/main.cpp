@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
     nh.param<bool>("mapping_online", Config.mapping_online, true);
     nh.param<bool>("real_time", Config.real_time, true);
     nh.param<bool>("estimate_extrinsics", Config.estimate_extrinsics, false);
+    nh.param<bool>("print_extrinsics", Config.print_extrinsics, false);
     nh.param<int>("ds_rate", Config.ds_rate, 4);
     nh.param<int>("MAX_NUM_ITERS", Config.MAX_NUM_ITERS, 3);
     nh.param<std::vector<double>>("LIMITS", Config.LIMITS, std::vector<double> (23, 0.001));
@@ -115,6 +116,8 @@ int main(int argc, char** argv) {
             // Add updated points to map (offline)
             if (not Config.mapping_online and map.hasToMap(t2)) {
                 PointCloud global_full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2, true);
+
+                if (Config.print_extrinsics) publish.extrinsics(KF.latest_state());
 
                 map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);

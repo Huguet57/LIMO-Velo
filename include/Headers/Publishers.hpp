@@ -58,8 +58,20 @@ class Publishers {
             cout_t1_t2(points, imus, states, t1, t2);
         }
 
+        void extrinsics(const State& state) {
+            this->cout_extrinsics(state);
+        }
+
     private:
         bool only_couts;
+
+        void cout_extrinsics(const State& state) {
+            std::cout << "t:" << std::endl;
+            std::cout << state.I_Rt_L().t.transpose() << std::endl;
+            std::cout << "R:" << std::endl;
+            std::cout << state.I_Rt_L().R << std::endl;
+            std::cout << "-----------" << std::endl;
+        }
 
         void publish_planes(const State& X, const Planes& planes) {
             geometry_msgs::PoseArray normalPoseArray;

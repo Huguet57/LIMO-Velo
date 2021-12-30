@@ -41,6 +41,7 @@ struct Params {
     bool real_time;
 
     bool estimate_extrinsics;
+    bool print_extrinsics;
     std::vector<float> initial_gravity;
     std::vector<float> I_Rotation_L;
     std::vector<float> I_Translation_L;
