@@ -1,9 +1,10 @@
-# Mapping
+# Online/Offline
 mapping_online: false
+real_time: false
 
 # Delays
-empty_lidar_time: 0.1      # Should be at least [FULL_ROTATION_TIME]
-real_time_delay: 0.1      # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
+empty_lidar_time: 0.5      # Should be at least [FULL_ROTATION_TIME]
+real_time_delay: 0.2      # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
 # LiDAR
 full_rotation_time: 0.1
@@ -16,5 +17,5 @@ imus_topic: "/vectornav/IMU"
 
 # Delta refinement
 Heuristic:
-    times: [0.5, 0.75]
-    deltas: [0.1, 0.05, 0.01]
+    times: [0.5, 1.0, 1.25]
+    deltas: [0.1, 0.05, 0.025, 0.01]

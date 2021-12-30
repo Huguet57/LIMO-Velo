@@ -37,9 +37,6 @@ struct HeuristicParams {
 };
 
 struct Params {
-    double delta;
-    int rate;
-    
     double empty_lidar_time;
     double real_time_delay;
     double full_rotation_time;

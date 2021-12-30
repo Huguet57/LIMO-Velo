@@ -18,9 +18,7 @@ int main(int argc, char** argv) {
     ros::NodeHandle nh;
 
     // Get YAML parameters
-    bool mapping_online;
-    nh.param<double>("delta", Config.delta, 0.025);
-    nh.param<int>("rate", Config.rate, (int) 1./Config.delta);
+    bool mapping_online, real_time;
     nh.param<int>("ds_rate", Config.ds_rate, 4);
     nh.param<int>("MAX_NUM_ITERS", Config.MAX_NUM_ITERS, 3);
     nh.param<double>("min_dist", Config.min_dist, 3.);
@@ -30,13 +28,14 @@ int main(int argc, char** argv) {
     nh.param<std::string>("points_topic", Config.points_topic, "/velodyne_points");
     nh.param<std::string>("imus_topic", Config.imus_topic, "/vectornav/IMU");
     nh.param<bool>("mapping_online", mapping_online, true);
+    nh.param<bool>("real_time", real_time, true);
     nh.param<std::vector<double>>("/Heuristic/times", Config.Heuristic.times, {1.});
     nh.param<std::vector<double>>("/Heuristic/deltas", Config.Heuristic.deltas, {0.1, 0.01});
 
     // Objects
     Publishers publish(nh);
     Accumulator& accum = Accumulator::getInstance();
-    Compensator comp(publish, Config.delta);
+    Compensator comp(publish);
     Mapper& map = Mapper::getInstance();
     Localizator& KF = Localizator::getInstance();
 
@@ -51,15 +50,25 @@ int main(int argc, char** argv) {
         &Accumulator::receive_imu, &accum
     );
 
-    ros::Rate rate(Config.rate);
+    ros::Rate rate(10);
+
+    // If not real time, define an artificial clock
+    double clock = -1;
 
     while (ros::ok()) {
         
         if (accum.ready()) {
-
-            // Should be t2 = ros::Time::now() - delay
-            double latest_imu_time = accum.BUFFER_I.front().time;
-            double t2 = latest_imu_time - Config.real_time_delay; 
+            
+            double t2;
+            if (real_time) {
+                // Should be t2 = ros::Time::now() - delay
+                double latest_imu_time = accum.BUFFER_I.front().time;
+                t2 = latest_imu_time - Config.real_time_delay; 
+            } else {
+                if (clock < 0) clock = accum.initial_time;
+                t2 = clock - Config.real_time_delay; 
+                clock += accum.delta;
+            }
 
             // Refine delta if need to be
             rate = accum.refine_delta(t2);

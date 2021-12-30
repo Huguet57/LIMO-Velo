@@ -71,6 +71,7 @@
             return integrated_states;
         }
 
+        // TODO: try to replicate the one from Fast-LIO2
         PointCloud Compensator::compensate(States& states, Points& points, bool global) {
             if (states.size() < 2) return PointCloud();
 
