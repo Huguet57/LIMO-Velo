@@ -7,6 +7,11 @@ class Accumulator {
         double initial_time;
         double delta;
 
+        // Add to buffer
+        void add(State, double time=-1);
+        void add(IMU, double time=-1);
+        void add(Point, double time=-1);
+
         // Receive from topics
         void receive_lidar(const PointCloud_msg&);
         void receive_imu(const IMU_msg&);
@@ -46,6 +51,10 @@ class Accumulator {
 
     private:
         bool is_ready = false;
+
+        void push(const State&);
+        void push(const IMU&);
+        void push(const Point&);
 
         template <typename ContentType>
         std::deque<ContentType> get(Buffer<ContentType>& source, double t1, double t2) {

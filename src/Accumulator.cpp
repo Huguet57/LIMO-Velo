@@ -15,6 +15,22 @@ extern struct Params Config;
 
 // class Accumulator
     // public:
+        // Add content to buffer
+        void Accumulator::add(State cnt, double time) {
+            if (time > 0) cnt.time = time;
+            this->push(cnt);
+        }
+
+        void Accumulator::add(IMU cnt, double time) {
+            if (time > 0) cnt.time = time;
+            this->push(cnt);
+        }
+
+        void Accumulator::add(Point cnt, double time) {
+            if (time > 0) cnt.time = time;
+            this->push(cnt);
+        }
+
         // Receive from topics
         void Accumulator::receive_lidar(const PointCloud_msg& msg) {
             PointCloudProcessor processed(msg, this->BUFFER_L);
@@ -22,7 +38,7 @@ extern struct Params Config;
 
         void Accumulator::receive_imu(const IMU_msg& msg) {
             IMU imu(msg);
-            this->BUFFER_I.push(imu);
+            this->add(imu);
         }
 
         // Empty buffers
@@ -115,6 +131,10 @@ extern struct Params Config;
         }
 
     // private:
+
+        void Accumulator::push(const State& state) { this->BUFFER_X.push(state); }
+        void Accumulator::push(const IMU& imu) { this->BUFFER_I.push(imu); }
+        void Accumulator::push(const Point& point) { this->BUFFER_L.push(point); }
 
         bool Accumulator::enough_imus() {
             int IMU_RATE = 400;

@@ -77,8 +77,7 @@ int main(int argc, char** argv) {
                 // Localize points in map
                 KF.update(compensated);
                 State Xt2 = KF.latest_state();
-                Xt2.time = t2;
-                accum.BUFFER_X.push(Xt2);
+                accum.add(Xt2, t2);
                 publish.state(Xt2, false);
 
                 // Publish compensated
