@@ -39,6 +39,7 @@ MAX_NUM_ITERS: 3
 # LIMITS: [0.001] * 23
 NUM_MATCH_POINTS: 5
 MAX_DIST_PLANE: 2.0
+PLANES_THRESHOLD: 1.e-1
 
 # Delta refinement
 Heuristic:
