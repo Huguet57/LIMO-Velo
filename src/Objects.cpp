@@ -155,7 +155,7 @@ template class Buffer<State>;
         bool Plane::on_plane(const AbstractPoint& p, float& res) {
             // Calculate residue
             res = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
-            return std::fabs(res < 0.1f);
+            return std::fabs(res < Config.PLANES_THRESHOLD);
         }
 
     // private:
@@ -170,7 +170,7 @@ template class Buffer<State>;
 
         void Plane::calculate_attributes(const PointType& p, const PointTypes& points) {
             Eigen::Vector4f normal_ampl;
-            if (this->is_plane = this->estimate_plane(normal_ampl, points, 0.1f)) {
+            if (this->is_plane = this->estimate_plane(normal_ampl, points, Config.PLANES_THRESHOLD)) {
                 // Centroid
                 this->centroid.x = p.x;
                 this->centroid.y = p.y;

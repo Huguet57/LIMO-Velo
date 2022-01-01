@@ -113,7 +113,9 @@ extern struct Params Config;
             assert(("There has to be exactly one more delta value than time delimiters", Config.Heuristic.times.size() + 1 == Config.Heuristic.deltas.size()));
 
             // Interpret Heuristic
-            if (t - this->initial_time >= Config.Heuristic.times.back()) {
+            if (Config.Heuristic.times.empty()) {
+                this->delta = Config.Heuristic.deltas.back();
+            } else if (t - this->initial_time >= Config.Heuristic.times.back()) {
                 this->delta = Config.Heuristic.deltas.back();
             } else {
                 for (int k = 0; k < Config.Heuristic.times.size(); ++k) {

@@ -27,6 +27,7 @@ int main(int argc, char** argv) {
     nh.param<std::vector<double>>("LIMITS", Config.LIMITS, std::vector<double> (23, 0.001));
     nh.param<int>("NUM_MATCH_POINTS", Config.NUM_MATCH_POINTS, 5);
     nh.param<double>("MAX_DIST_PLANE", Config.MAX_DIST_PLANE, 2.0);
+    nh.param<float>("PLANES_THRESHOLD", Config.PLANES_THRESHOLD, 0.1f);
     nh.param<double>("LiDAR_noise", Config.LiDAR_noise, 0.001);
     nh.param<double>("min_dist", Config.min_dist, 3.);
     nh.param<double>("imu_rate", Config.imu_rate, 400);
@@ -61,6 +62,11 @@ int main(int argc, char** argv) {
     ros::Subscriber imu_sub = nh.subscribe(
         Config.imus_topic, 1000,
         &Accumulator::receive_imu, &accum
+    );
+
+    ros::Subscriber tfs_sub = nh.subscribe(
+        "/tf", 1000,
+        &Publishers::receive_tf, &publish
     );
 
     ros::Rate rate(10);
@@ -101,6 +107,11 @@ int main(int argc, char** argv) {
                 State Xt2 = KF.latest_state();
                 accum.add(Xt2, t2);
                 publish.state(Xt2, false);
+                publish.tf(Xt2);
+
+                // Publish planes
+                Planes matches = map.match(Xt2, compensated);
+                publish.planes(Xt2, matches);
 
                 // Publish compensated
                 PointCloud global_compensated = Xt2 * Xt2.I_Rt_L() * compensated;
