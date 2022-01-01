@@ -18,7 +18,10 @@ extern struct Params Config;
         PointCloudProcessor::PointCloudProcessor(const PointCloud_msg& msg, Buffer<Point>& BUFFER_L) {
             PointCloud::Ptr raw_pcl(new PointCloud());
             pcl::fromROSMsg(*msg, *raw_pcl);
-            
+
+            bool is_usable = this->check_and_fix(raw_pcl);
+            if (not is_usable) return;
+
             PointCloud downsample_points = this->downsample(raw_pcl);
             this->sort_points(downsample_points.points);
             this->add2Buffer(downsample_points, BUFFER_L);
@@ -30,14 +33,31 @@ extern struct Params Config;
             return std::sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
         }
 
+        bool PointCloudProcessor::check_and_fix(PointCloud::Ptr& pcl) {
+            if (pcl->size() < 1) return false;
+
+            // Fix 'time' field, turn it to relative time
+            if (pcl->points.front().time == pcl->points.back().time) {
+                for (PointType& p : pcl->points) p.time = 0;
+             } else if (pcl->points.back().time > 1e9) {
+                for (PointType& p : pcl->points)
+                    p.time -= Conversions::microsec2Sec(pcl->header.stamp);
+            }
+
+            return true;
+        }
+
         PointCloud PointCloudProcessor::downsample(const PointCloud::Ptr& pcl) {
             PointCloud::Ptr downsampled(new PointCloud());
             downsampled->points.reserve(pcl->points.size()/Config.ds_rate);
             downsampled->header = pcl->header;
             int ds_counter = 0;
-            for (PointType p : pcl->points)
-                if (++ds_counter%Config.ds_rate == 0 and Config.min_dist < dist(p))
-                    downsampled->points.push_back(p);
+
+            for (PointType p : pcl->points) {
+                bool downsample_point = Config.ds_rate <= 1 or ds_counter%Config.ds_rate == 0; 
+                if (downsample_point and Config.min_dist < dist(p)) downsampled->points.push_back(p);
+                ++ds_counter;
+            }
 
             return *downsampled;
 
@@ -52,6 +72,7 @@ extern struct Params Config;
         }
 
         void PointCloudProcessor::add2Buffer(const PointCloud& pcl, Buffer<Point>& BUFFER_L) {
+            if (pcl.size() < 1) return;
             double begin_time = Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time; 
             for (PointType p : pcl.points) BUFFER_L.push(Point(p, begin_time));
         }
