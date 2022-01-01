@@ -8,6 +8,15 @@
 // Data Structures
 #include <deque>
 #include <vector>
+// TF library
+#include <tf/transform_datatypes.h>
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
+#include <tf2_msgs/TFMessage.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/Transform.h>
+#include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/Quaternion.h>
 // ROS messages
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
@@ -59,6 +68,7 @@ struct Params {
     std::vector<double> LIMITS;
     int NUM_MATCH_POINTS;
     double MAX_DIST_PLANE;
+    float PLANES_THRESHOLD;
 
     double cov_acc;
     double cov_gyro;

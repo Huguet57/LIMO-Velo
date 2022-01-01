@@ -1,31 +1,31 @@
 # Online/Offline
 mapping_online: false
-real_time: true
+real_time: false
 
 # Topics
-points_topic: "/velodyne_points"
-imus_topic: "/vectornav/IMU"
+points_topic: "/kitti/velo/pointcloud"
+imus_topic: "/kitti/oxts/imu"
 
 # Extrinsics
 estimate_extrinsics: false
 print_extrinsics: false
-initial_gravity: [0.0, 0.0, -9.807]
-I_Translation_L: [1.25, 0.0, 0.0]
+initial_gravity: [0.0, 0.0, +9.807]
+I_Translation_L: [-8.086759e-01, 3.195559e-01, -7.997231e-01]
 I_Rotation_L: [
-     1.0,  0.0,  0.0,
-     0.0, -1.0,  0.0,
-     0.0,  0.0, -1.0
+  9.999976e-01, 7.553071e-04, -2.035826e-03,
+  -7.854027e-04, 9.998898e-01, -1.482298e-02,
+  2.024406e-03, 1.482454e-02, 9.998881e-01
 ]
 
 # Delays
 LiDAR_noise: 0.001
-empty_lidar_time: 0.1      # Should be at least [FULL_ROTATION_TIME]
-real_time_delay: 0.1       # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
+empty_lidar_time: 0.1       # Should be at least [FULL_ROTATION_TIME]
+real_time_delay: 0.1        # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
 # LiDAR
 full_rotation_time: 0.1
 min_dist: 4
-ds_rate: 4
+ds_rate: 32
 
 # IMU
 imu_rate: 400
