@@ -66,6 +66,10 @@ template class Buffer<State>;
             );
         }
 
+        RotTransl State::inv() const {
+            return RotTransl(*this).inv();
+        }
+
         void State::operator+= (const IMU& imu) {
             this->update(imu);
         }
@@ -149,6 +153,10 @@ template class Buffer<State>;
             
             // Given close points, return normal of plane
             this->calculate_attributes(p, points);
+        }
+
+        float Plane::dist_to_plane(const Point& p) {
+            return n.A * p.x + n.B * p.y + n.C * p.z + n.D;
         }
 
         template <typename AbstractPoint>

@@ -226,6 +226,7 @@ class State {
         }
 
         RotTransl I_Rt_L() const;
+        RotTransl inv() const;
 
         void operator+= (const IMU& imu);
         friend RotTransl operator- (const State& st, const State& s0);
@@ -254,7 +255,10 @@ class RotTransl {
         }
 
         RotTransl inv() {
-            return RotTransl(this->R.transpose(), -this->t);
+            return RotTransl(
+                this->R.transpose(),
+                -this->R.transpose()*this->t
+            );
         }
 
         friend RotTransl operator* (const RotTransl&, const RotTransl&);
@@ -270,6 +274,7 @@ class Plane {
         float distance;
         
         Plane(const PointType&, const PointVector&, const std::vector<float>&);
+        float dist_to_plane(const Point&);
         template <typename AbstractPoint> bool on_plane(const AbstractPoint& p, float& res);
 
     private:

@@ -32,30 +32,30 @@ extern struct Params Config;
             int Nmatches = matches.size();
             H = Eigen::MatrixXd::Zero(Nmatches, 12);
             h.resize(Nmatches);
+            State S(s, 0.);
 
             // For each match, calculate its derivative and distance
             for (int i = 0; i < matches.size(); ++i) {
                 Plane match = matches[i];
-                Point p_lidar_x = match.centroid;
+                Point p_lidar = match.centroid;
+                Point p_imu = S.I_Rt_L() * match.centroid;
                 Normal n = match.n;
 
                 // Rotation matrices
-                State S = State(s, 0.);
                 Eigen::Matrix3d R_inv = s.rot.conjugate().toRotationMatrix();
                 Eigen::Matrix3d I_R_L_inv = s.offset_R_L_I.conjugate().toRotationMatrix();
 
                 // Calculate H (:= dh/dx)
                 Eigen::Vector3d C = (R_inv * n);
-                Eigen::Vector3d B = (p_lidar_x).cross(I_R_L_inv * C);
-                Eigen::Vector3d A = (S.I_Rt_L() * p_lidar_x).cross(C);
+                Eigen::Vector3d B = (p_lidar).cross(I_R_L_inv * C);
+                Eigen::Vector3d A = (p_imu).cross(C);
                 
                 H.block<1, 6>(i,0) << n.A, n.B, n.C, A(0), A(1), A(2);
                 if (Config.estimate_extrinsics) H.block<1, 6>(i,6) << B(0), B(1), B(2), C(0), C(1), C(2);
 
                 // Measurement: distance to the closest plane
                 Point p = S * S.I_Rt_L() * match.centroid;
-                double distance = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
-                h(i) = -distance;
+                h(i) = -match.dist_to_plane(p);
             }
         }
 
