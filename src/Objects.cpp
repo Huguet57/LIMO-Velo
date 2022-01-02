@@ -39,6 +39,7 @@ template class Buffer<State>;
                 << p.x << ", y="
                 << p.y << ", z="
                 << p.z << ", t="
+                << std::setprecision(16)
                 << p.time
                 << ")";
 
@@ -160,10 +161,9 @@ template class Buffer<State>;
         }
 
         template <typename AbstractPoint>
-        bool Plane::on_plane(const AbstractPoint& p, float& res) {
-            // Calculate residue
-            res = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
-            return std::fabs(res < Config.PLANES_THRESHOLD);
+        bool Plane::on_plane(const AbstractPoint& p) {
+            float pd2 = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
+            return std::fabs(pd2) < Config.PLANES_THRESHOLD;
         }
 
     // private:
@@ -189,9 +189,6 @@ template class Buffer<State>;
                 this->n.B = normal_ampl(1);
                 this->n.C = normal_ampl(2);
                 this->n.D = normal_ampl(3);
-
-                // Distance
-                this->on_plane(this->centroid, this->distance);
             }
         }
 

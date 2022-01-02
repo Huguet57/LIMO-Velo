@@ -275,7 +275,7 @@ class Plane {
         
         Plane(const PointType&, const PointVector&, const std::vector<float>&);
         float dist_to_plane(const Point&);
-        template <typename AbstractPoint> bool on_plane(const AbstractPoint& p, float& res);
+        template <typename AbstractPoint> bool on_plane(const AbstractPoint&);
 
     private:
         bool enough_points(const PointVector&);
