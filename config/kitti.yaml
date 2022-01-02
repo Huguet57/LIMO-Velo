@@ -25,7 +25,7 @@ real_time_delay: 0.1        # Should be at least [FULL_ROTATION_TIME] (without a
 # LiDAR
 full_rotation_time: 0.1
 min_dist: 4
-ds_rate: 32
+ds_rate: 16
 
 # IMU
 imu_rate: 400
@@ -38,10 +38,10 @@ covariance_bias_acceleration: 3.38e-4
 MAX_NUM_ITERS: 3
 # LIMITS: [0.001] * 23
 NUM_MATCH_POINTS: 5
-MAX_DIST_PLANE: 2.0
+MAX_DIST_PLANE: 5.0
 PLANES_THRESHOLD: 1.e-1
 
 # Delta refinement
 Heuristic:
-    times: [0.5, 1.0, 1.25]
-    deltas: [0.1, 0.05, 0.025, 0.01]
+    times: [1.0]
+    deltas: [0.1, 0.005]

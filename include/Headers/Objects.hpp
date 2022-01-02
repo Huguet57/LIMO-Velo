@@ -47,6 +47,7 @@ class Point {
         float y;
         float z;
         TimeType time;
+        float intensity;
 
         Point() {}
 
@@ -54,28 +55,36 @@ class Point {
             this->x = p.x;
             this->y = p.y;
             this->z = p.z;
+
             this->time = p.time;
+            this->intensity = p.intensity;
         }
 
         Point(const PointType& p, double begin_time) {
             this->x = p.x;
             this->y = p.y;
             this->z = p.z;
+
             this->time = begin_time + p.time;
+            this->intensity = p.intensity;
         }
 
         Point(float x, float y, float z, double time=0) {
             this->x = x;
             this->y = y;
             this->z = z;
+
             this->time = time;
+            this->intensity = 0.f;
         }
 
-        Point(const Eigen::Matrix<float, 3, 1>& p, double t) {
+        Point(const Eigen::Matrix<float, 3, 1>& p, const Point& attributes) {
             this->x = p(0);
             this->y = p(1);
             this->z = p(2);
-            this->time = t;
+
+            this->time = attributes.time;
+            this->intensity = attributes.intensity;
         }
 
         PointType toPCL() const {
@@ -84,6 +93,7 @@ class Point {
             p.y = this->y;
             p.z = this->z;
             p.time = this->time;
+            p.intensity = this->intensity;
             return p;
         }
 

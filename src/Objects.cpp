@@ -22,12 +22,12 @@ template class Buffer<State>;
     // public:
         Point operator*(const Eigen::Matrix<float, 3, 3>& R, const Point& p) {
             Eigen::Matrix<float, 3, 1> moved_p = R*p.toEigen();
-            return Point(moved_p, p.time);
+            return Point(moved_p, p);
         }
 
         Point operator+(const Point& p, const Eigen::Matrix<float, 3, 1> v) {
             Eigen::Matrix<float, 3, 1> moved_p = p.toEigen() + v;
-            return Point(moved_p, p.time);
+            return Point(moved_p, p);
         }
 
         Point operator-(const Point& p, const Eigen::Matrix<float, 3, 1> v) {
@@ -131,7 +131,7 @@ template class Buffer<State>;
         Point operator* (const RotTransl& RT, const Point& p) {
             return Point(
                 RT.R*p.toEigen() + RT.t,
-                p.time
+                p  // attributes
             );
         }
 
