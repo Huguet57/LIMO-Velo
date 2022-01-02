@@ -7,6 +7,7 @@ class PointCloudProcessor {
         PointCloudProcessor(const PointCloud_msg&, Buffer<Point>&);
 
     private:
+        bool check_and_fix(PointCloud::Ptr&);
         PointCloud downsample(const PointCloud::Ptr&);
         void add2Buffer(const PointCloud&, Buffer<Point>&);
         static bool time_sort(const PointType&, const PointType&);
