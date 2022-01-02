@@ -10,7 +10,7 @@ class Mapper {
         double last_map_time = -1;
 
     private:
-        KD_TREE<PointType>::Ptr map;
+        KD_TREE<Point>::Ptr map;
 
     public:
         Mapper();

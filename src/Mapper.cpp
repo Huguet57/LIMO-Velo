@@ -58,15 +58,17 @@ extern struct Params Config;
 
     // private:
         void Mapper::init_tree() {  // TODO: (const KDTREE_OPTIONS& options) {
-            this->map = KD_TREE<PointType>::Ptr (new KD_TREE<PointType>(0.3, 0.6, 0.2));
+            this->map = KD_TREE<Point>::Ptr (new KD_TREE<Point>(0.3, 0.6, 0.2));
         }
 
         void Mapper::build_tree(PointCloud& pcl) {
-            this->map->Build(pcl.points);
+            PointVector pts; for (PointType p : pcl.points) pts.push_back(Point(p));
+            this->map->Build(pts);
         }
 
         void Mapper::add_points(PointCloud& pcl, bool downsample) {
-            this->map->Add_Points(pcl.points, downsample);
+            PointVector pts; for (PointType p : pcl.points) pts.push_back(Point(p));
+            this->map->Add_Points(pts, downsample);
         }
 
         bool Mapper::exists_tree() {
@@ -75,9 +77,9 @@ extern struct Params Config;
 
         Plane Mapper::match_plane(const State& X, const PointType& p) {
             // Transport the point to the global frame
-            PointTypes near_points;
+            PointVector near_points;
             RotTransl offsets = X.I_Rt_L();
-            PointType global_p = (X * offsets * Point(p)).toPCL();
+            Point global_p = X * offsets * Point(p);
 
             // Find k nearest points
             vector<float> pointSearchSqDis(Config.NUM_MATCH_POINTS);

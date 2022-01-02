@@ -115,6 +115,7 @@ class Point;
 class IMU;
 class State;
 typedef std::deque<Point> Points;
+typedef std::vector<Point, Eigen::aligned_allocator<Point>> PointVector;
 typedef std::deque<IMU> IMUs;
 typedef std::deque<State> States;
 

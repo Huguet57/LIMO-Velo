@@ -143,7 +143,7 @@ template class Buffer<State>;
 
 // class Plane
     // public:
-        Plane::Plane(const PointType& p, const PointTypes& points, const std::vector<float>& sq_dists) {
+        Plane::Plane(const PointType& p, const PointVector& points, const std::vector<float>& sq_dists) {
             if (not enough_points(points)) return;
             if (not points_close_enough(sq_dists)) return;
             
@@ -159,7 +159,7 @@ template class Buffer<State>;
         }
 
     // private:
-        bool Plane::enough_points(const PointTypes& points_near) {
+        bool Plane::enough_points(const PointVector& points_near) {
             return this->is_plane = points_near.size() >= Config.NUM_MATCH_POINTS;
         }
 
@@ -168,7 +168,7 @@ template class Buffer<State>;
             return this->is_plane = sq_dists.back() < Config.MAX_DIST_PLANE*Config.MAX_DIST_PLANE;
         }
 
-        void Plane::calculate_attributes(const PointType& p, const PointTypes& points) {
+        void Plane::calculate_attributes(const PointType& p, const PointVector& points) {
             Eigen::Vector4f normal_ampl;
             if (this->is_plane = this->estimate_plane(normal_ampl, points, Config.PLANES_THRESHOLD)) {
                 // Centroid
@@ -188,7 +188,7 @@ template class Buffer<State>;
         }
 
         template<typename T>
-        bool Plane::estimate_plane(Eigen::Matrix<T, 4, 1> &pca_result, const PointTypes &point, const T &threshold) {
+        bool Plane::estimate_plane(Eigen::Matrix<T, 4, 1> &pca_result, const PointVector &point, const T &threshold) {
             Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> A(Config.NUM_MATCH_POINTS, 3);
             Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> b(Config.NUM_MATCH_POINTS, 1);
             A.setZero();

@@ -269,15 +269,15 @@ class Plane {
         Normal n;
         float distance;
         
-        Plane(const PointType&, const PointTypes&, const std::vector<float>&);
+        Plane(const PointType&, const PointVector&, const std::vector<float>&);
         template <typename AbstractPoint> bool on_plane(const AbstractPoint& p, float& res);
 
     private:
-        bool enough_points(const PointTypes&);
+        bool enough_points(const PointVector&);
         bool points_close_enough(const std::vector<float>&);
 
-        void calculate_attributes(const PointType&, const PointTypes&);
-        template<typename T> bool estimate_plane(Eigen::Matrix<T, 4, 1> &, const PointTypes &, const T &);
+        void calculate_attributes(const PointType&, const PointVector&);
+        template<typename T> bool estimate_plane(Eigen::Matrix<T, 4, 1> &, const PointVector &, const T &);
 };
 
 // struct Normal
