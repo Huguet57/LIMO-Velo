@@ -16,13 +16,13 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 ### Testing
 - [ ] Check quality vs. other SOTA algorithms
   
-  - [x] **KITTI** (City/Residential/Road) - No problems in 26/41 recordings.
+  - [x] **KITTI** (City/Residential/Road) - No problems in 29/41 recordings.
     - Descriptions of problematic recordings:
       
-      - Non-static beggining (9)
-      - Feature-less context (8)
-      - Other vehicles (1)
-      - High frequencies (1)
+      - Feature-less context (7)
+      - High frequencies (6)
+      - Non-static beggining (6)
+      - Other vehicles (2)
 
   - [ ] (Find more datasets)
   - [ ] Compare with other SOTA algorithms
