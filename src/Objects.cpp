@@ -196,7 +196,7 @@ template class Buffer<State>;
 // class Match
     // public:
         bool Match::is_chosen() {
-            return this->FAST_LIO_HEURISTIC();
+            return this->plane.is_plane;
         }
 
     // private:

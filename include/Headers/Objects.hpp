@@ -156,11 +156,6 @@ class Point {
             this->intensity = point_attributes.intensity;
             this->range = point_attributes.range;
         }
-
-        void cross() {
-            
-        }
-
 };
 
 class IMU {
