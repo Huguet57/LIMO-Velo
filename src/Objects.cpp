@@ -148,22 +148,21 @@ template class Buffer<State>;
 
 // class Plane
     // public:
-        Plane::Plane(const PointType& p, const PointVector& points, const std::vector<float>& sq_dists) {
+        Plane::Plane(const PointVector& points, const std::vector<float>& sq_dists) {
             if (not enough_points(points)) return;
             if (not points_close_enough(sq_dists)) return;
             
             // Given close points, return normal of plane
-            this->calculate_attributes(p, points);
+            this->fit_plane(points);
         }
 
-        float Plane::dist_to_plane(const Point& p) {
+        float Plane::dist_to_plane(const Point& p) const {
             return n.A * p.x + n.B * p.y + n.C * p.z + n.D;
         }
 
         template <typename AbstractPoint>
         bool Plane::on_plane(const AbstractPoint& p) {
-            float pd2 = n.A * p.x + n.B * p.y + n.C * p.z + n.D;
-            return std::fabs(pd2) < Config.PLANES_THRESHOLD;
+            return std::fabs(this->dist_to_plane(p)) < Config.PLANES_THRESHOLD;
         }
 
     // private:
@@ -176,59 +175,32 @@ template class Buffer<State>;
             return this->is_plane = sq_dists.back() < Config.MAX_DIST_PLANE*Config.MAX_DIST_PLANE;
         }
 
-        void Plane::calculate_attributes(const PointType& p, const PointVector& points) {
-            Eigen::Vector4f normal_ampl;
-            if (this->is_plane = this->estimate_plane(normal_ampl, points, Config.PLANES_THRESHOLD)) {
-                // Centroid
-                this->centroid.x = p.x;
-                this->centroid.y = p.y;
-                this->centroid.z = p.z;
-
-                // Normal
-                this->n.A = normal_ampl(0);
-                this->n.B = normal_ampl(1);
-                this->n.C = normal_ampl(2);
-                this->n.D = normal_ampl(3);
+        void Plane::fit_plane(const PointVector& points) {
+            // Estimate plane
+            Eigen::Vector4f ABCD = R3Math::estimate_plane(points);
+            this->is_plane = R3Math::is_plane(ABCD, points, Config.PLANES_THRESHOLD);
+            
+            // Calculate attributes of plane
+            if (this->is_plane) {
+                this->centroid = R3Math::centroid(points);
+                this->n = Normal(ABCD);
             }
         }
 
-        template<typename T>
-        bool Plane::estimate_plane(Eigen::Matrix<T, 4, 1> &pca_result, const PointVector &point, const T &threshold) {
-            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> A(Config.NUM_MATCH_POINTS, 3);
-            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> b(Config.NUM_MATCH_POINTS, 1);
-            A.setZero();
-            b.setOnes();
-            b *= -1.0f;
-
-            for (int j = 0; j < Config.NUM_MATCH_POINTS; j++)
-            {
-                A(j,0) = point[j].x;
-                A(j,1) = point[j].y;
-                A(j,2) = point[j].z;
-            }
-
-            Eigen::Matrix<T, 3, 1> normvec = A.colPivHouseholderQr().solve(b);
-
-            T n = normvec.norm();
-            pca_result(0) = normvec(0) / n;
-            pca_result(1) = normvec(1) / n;
-            pca_result(2) = normvec(2) / n;
-            pca_result(3) = 1.0 / n;
-
-            for (int j = 0; j < Config.NUM_MATCH_POINTS; j++)
-            {
-                if (fabs(pca_result(0) * point[j].x + pca_result(1) * point[j].y + pca_result(2) * point[j].z + pca_result(3)) > threshold)
-                {
-                    return false;
-                }
-            }
-            return true;
+// class Normal
+    // public:
+        Eigen::Matrix<double, 3, 1> operator* (const Eigen::Matrix<double, 3, 3>& R, const Normal& n) {
+            return R * n.vect().cast<double> ();
         }
 
-// struct Normal
-    Eigen::Matrix<double, 3, 1> operator* (const Eigen::Matrix<double, 3, 3>& R, const Normal& n) {
-        double A = (double) n.A;
-        double B = (double) n.B;
-        double C = (double) n.C;
-        return R * Eigen::Vector3d(A, B, C);
-    }
+// class Match
+    // public:
+        bool Match::is_chosen() {
+            return this->FAST_LIO_HEURISTIC();
+        }
+
+    // private:
+        bool Match::FAST_LIO_HEURISTIC() {
+            float s = 1 - 0.9 * std::fabs(this->distance) / std::sqrt(this->point.range);
+            return s > 0.9;
+        }

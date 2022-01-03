@@ -143,20 +143,21 @@ typedef sensor_msgs::PointCloud2::ConstPtr PointCloud_msg;
 typedef sensor_msgs::ImuConstPtr IMU_msg;
 typedef double TimeType;
 
-struct Normal { float A, B, C, D; };
-typedef std::vector<Normal> Normals;
-
 class Point;
 class IMU;
 class State;
+class RotTransl;
 typedef std::deque<Point> Points;
 typedef std::vector<Point, Eigen::aligned_allocator<Point>> PointVector;
 typedef std::deque<IMU> IMUs;
 typedef std::deque<State> States;
 
-class RotTransl;
+class Normal;
 class Plane;
+class Match;
+typedef std::vector<Normal> Normals;
 typedef std::vector<Plane> Planes;
+typedef std::vector<Match> Matches;
 
 class Localizator;
 class Mapper;

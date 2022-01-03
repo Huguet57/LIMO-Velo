@@ -52,6 +52,12 @@ namespace SO3Math {
 
 }
 
+namespace R3Math {
+    Eigen::Matrix<float, 4, 1> estimate_plane(const PointVector&);
+    bool is_plane(const Eigen::Matrix<float, 4, 1>&, const PointVector&, const float&);
+    Point centroid(const PointVector&);
+}
+
 template <class TimeT = std::chrono::microseconds,
           class ClockT = std::chrono::steady_clock>
 class Timer

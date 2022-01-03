@@ -108,16 +108,16 @@ int main(int argc, char** argv) {
                 PointCloud compensated = comp.compensate(path_taken, points);
                 if (compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
+                // Publish matches before optimization
+                Matches matches = map.match(KF.latest_state(), compensated);
+                // publish.matches(KF.latest_state(), matches);
+
                 // Localize points in map
                 KF.update(compensated);
                 State Xt2 = KF.latest_state();
                 accum.add(Xt2, t2);
                 publish.state(Xt2, false);
                 publish.tf(Xt2);
-
-                // Publish planes
-                Planes matches = map.match(Xt2, compensated);
-                publish.planes(Xt2, matches);
 
                 // Publish compensated
                 PointCloud global_compensated = Xt2 * Xt2.I_Rt_L() * compensated;

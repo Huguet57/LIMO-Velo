@@ -36,15 +36,15 @@ extern struct Params Config;
             return this->exists_tree();
         }
 
-        Planes Mapper::match(const State& X, const PointCloud& points) {            
-            Planes matches;
+        Matches Mapper::match(const State& X, const PointCloud& points) {            
+            Matches matches;
             if (not this->exists()) return matches;
             matches.reserve(points.size());
 
             for (PointType p : points) {
                 // Direct approach: we match the point with a plane on the map
-                Plane matched_plane = this->match_plane(X, p);
-                if (matched_plane.is_plane) matches.push_back(matched_plane);
+                Match match = this->match_plane(X, p);
+                if (match.is_chosen()) matches.push_back(match);
             }
 
             return matches;
@@ -75,7 +75,7 @@ extern struct Params Config;
             return this->map->size() > 0;
         }
 
-        Plane Mapper::match_plane(const State& X, const PointType& p) {
+        Match Mapper::match_plane(const State& X, const PointType& p) {
             // Transport the point to the global frame
             PointVector near_points;
             RotTransl offsets = X.I_Rt_L();
@@ -86,5 +86,8 @@ extern struct Params Config;
             this->map->Nearest_Search(global_p, Config.NUM_MATCH_POINTS, near_points, pointSearchSqDis);
 
             // Fit a plane to them
-            return Plane(p, near_points, pointSearchSqDis);
+            return Match(
+                global_p,
+                Plane (near_points, pointSearchSqDis)
+            );
         }

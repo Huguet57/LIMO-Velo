@@ -21,7 +21,7 @@ class Localizator {
     public:
         Localizator();
         void update(const PointCloud&);
-        void calculate_H(const state_ikfom&, const Planes&, Eigen::MatrixXd& H, Eigen::VectorXd& h);
+        void calculate_H(const state_ikfom&, const Matches&, Eigen::MatrixXd& H, Eigen::VectorXd& h);
         
         void propagate_to(double t);
         State latest_state();

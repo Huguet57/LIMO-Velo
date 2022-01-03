@@ -19,7 +19,7 @@ class Mapper {
 
         void add(PointCloud&, double time, bool downsample=false);        
         void add(const State&, PointCloud&, bool downsample=false);        
-        Planes match(const State&, const PointCloud&);
+        Matches match(const State&, const PointCloud&);
         bool hasToMap(double t);
 
     private:
@@ -28,7 +28,7 @@ class Mapper {
         bool exists_tree();
 
         void add_points(PointCloud&, bool downsample=false);
-        Plane match_plane(const State&, const PointType&);
+        Match match_plane(const State&, const PointType&);
 
     // Singleton pattern
     public:

@@ -28,7 +28,7 @@ extern struct Params Config;
             return this->IKFoM_update(solve_H_time);
         }
 
-        void Localizator::calculate_H(const state_ikfom& s, const Planes& matches, Eigen::MatrixXd& H, Eigen::VectorXd& h) {
+        void Localizator::calculate_H(const state_ikfom& s, const Matches& matches, Eigen::MatrixXd& H, Eigen::VectorXd& h) {
             int Nmatches = matches.size();
             H = Eigen::MatrixXd::Zero(Nmatches, 12);
             h.resize(Nmatches);
@@ -36,10 +36,10 @@ extern struct Params Config;
 
             // For each match, calculate its derivative and distance
             for (int i = 0; i < matches.size(); ++i) {
-                Plane match = matches[i];
-                Point p_lidar = match.centroid;
-                Point p_imu = S.I_Rt_L() * match.centroid;
-                Normal n = match.n;
+                Match match = matches[i];
+                Point p_lidar = S.I_Rt_L().inv() * S.inv() * match.point;
+                Point p_imu = S.I_Rt_L() * p_lidar;
+                Normal n = match.plane.n;
 
                 // Rotation matrices
                 Eigen::Matrix3d R_inv = s.rot.conjugate().toRotationMatrix();
@@ -54,8 +54,7 @@ extern struct Params Config;
                 if (Config.estimate_extrinsics) H.block<1, 6>(i,6) << B(0), B(1), B(2), C(0), C(1), C(2);
 
                 // Measurement: distance to the closest plane
-                Point p = S * S.I_Rt_L() * match.centroid;
-                h(i) = -match.dist_to_plane(p);
+                h(i) = -match.distance;
             }
         }
 

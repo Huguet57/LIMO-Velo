@@ -52,13 +52,13 @@ class Point {
 
         Point() {}
 
-        template <typename AbstractPoint>
-        Point(const AbstractPoint& p) {
-            this->x = p.x;
-            this->y = p.y;
-            this->z = p.z;
+        Point(const hesai_ros::Point& p) {
+            this->set_XYZ(p);
+            this->set_attributes(p);
+        }
 
-            // Attributes specific to PointType
+        Point(const velodyne_ros::Point& p) {
+            this->set_XYZ(p);
             this->set_attributes(p);
         }
 
@@ -70,26 +70,13 @@ class Point {
             this->time += begin_time;
         }
 
-        void set_attributes(const velodyne_ros::Point& p) {
-            this->time = (double) p.time;
-            this->intensity = p.intensity;
-            this->range = this->norm();
+        Point(const Eigen::Matrix<float, 3, 1>& p) {
+            this->set_XYZ(p);
         }
 
-        void set_attributes(const hesai_ros::Point& p) {
-            this->time = p.timestamp;
-            this->intensity = p.intensity;
-            this->range = this->norm();
-        }
-
-        Point(const Eigen::Matrix<float, 3, 1>& p, const Point& attributes) {
-            this->x = p(0);
-            this->y = p(1);
-            this->z = p(2);
-
-            this->time = attributes.time;
-            this->intensity = attributes.intensity;
-            this->range = attributes.range;
+        // Delegate constructor
+        Point(const Eigen::Matrix<float, 3, 1>& p, const Point& attributes) : Point(p) {
+            this->set_attributes(attributes);
         }
 
         #if LIDAR_TYPE == VELODYNE
@@ -124,12 +111,7 @@ class Point {
 
         Eigen::Vector3d cross(const Eigen::Vector3d& v) {
             Eigen::Vector3d w = this->toEigen().cast<double> ();
-            
-            return Eigen::Vector3d(
-                w(1) * v(2) - w(2) * v(1),
-                w(2) * v(0) - w(0) * v(2),
-                w(0) * v(1) - w(1) * v(0)
-            );
+            return w.cross(v);
         }
 
         friend Point operator*(const Eigen::Matrix<float, 3, 3>&, const Point&);
@@ -138,6 +120,46 @@ class Point {
         friend std::ostream& operator<< (std::ostream& out, const Point& p);
 
     private:
+
+        void set_XYZ(const velodyne_ros::Point& p) {
+            this->x = p.x;
+            this->y = p.y;
+            this->z = p.z;
+        }
+
+        void set_XYZ(const hesai_ros::Point& p) {
+            this->x = p.x;
+            this->y = p.y;
+            this->z = p.z;
+        }
+
+        void set_XYZ(const Eigen::Matrix<float, 3, 1>& p) {
+            this->x = p(0);
+            this->y = p(1);
+            this->z = p(2);
+        }
+
+        void set_attributes(const velodyne_ros::Point& p) {
+            this->time = (double) p.time;
+            this->intensity = p.intensity;
+            this->range = this->norm();
+        }
+
+        void set_attributes(const hesai_ros::Point& p) {
+            this->time = p.timestamp;
+            this->intensity = p.intensity;
+            this->range = this->norm();
+        }
+
+        void set_attributes(const Point& point_attributes) {
+            this->time = point_attributes.time;
+            this->intensity = point_attributes.intensity;
+            this->range = point_attributes.range;
+        }
+
+        void cross() {
+            
+        }
 
 };
 
@@ -290,24 +312,65 @@ class RotTransl {
         friend PointCloud operator* (const RotTransl&, const PointCloud&);
 };
 
+class Normal {
+    public:
+        float A, B, C, D;
+
+        Normal() {}
+        
+        Normal(const Eigen::Matrix<float, 4, 1>& ABCD) {
+            this->A = ABCD(0);
+            this->B = ABCD(1);
+            this->C = ABCD(2);
+            this->D = ABCD(3);
+        }
+
+        Eigen::Matrix<float, 3, 1> vect() const {
+            return Eigen::Matrix<float, 3, 1> (
+                this->A,
+                this->B,
+                this->C
+            );
+        }
+
+        friend Eigen::Matrix<double, 3, 1> operator* (const Eigen::Matrix<double, 3, 3>&, const Normal&);    
+};
+
 class Plane {
     public:
         bool is_plane;
         Point centroid;
         Normal n;
-        float distance;
         
-        Plane(const PointType&, const PointVector&, const std::vector<float>&);
-        float dist_to_plane(const Point&);
-        template <typename AbstractPoint> bool on_plane(const AbstractPoint&);
+        Plane() {}
+        Plane(const PointVector&, const std::vector<float>&);
+        float dist_to_plane(const Point&) const;
+    
+    template <typename AbstractPoint>
+        bool on_plane(const AbstractPoint&);
 
     private:
         bool enough_points(const PointVector&);
         bool points_close_enough(const std::vector<float>&);
-
-        void calculate_attributes(const PointType&, const PointVector&);
-        template<typename T> bool estimate_plane(Eigen::Matrix<T, 4, 1> &, const PointVector &, const T &);
+        void fit_plane(const PointVector&);
 };
 
-// struct Normal
-    Eigen::Matrix<double, 3, 1> operator* (const Eigen::Matrix<double, 3, 3>&, const Normal&);
+class Match {
+    public:
+        Point point;
+        Plane plane;
+        float distance;
+
+        Match(const Point& p, const Plane& H) {
+            this->point = p;
+            this->plane = H;
+
+            // Distance to optimize
+            this->distance = H.dist_to_plane(p);
+        }
+
+        bool is_chosen();
+
+    private:
+        bool FAST_LIO_HEURISTIC();
+};
