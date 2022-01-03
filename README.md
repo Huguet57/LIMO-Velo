@@ -5,10 +5,35 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 ![Perfomance of the algorithm](./config/docs/img/Localization.gif)
 
 ## TODO list
-- [ ] Interpolation and smoothing of states when mapping offline
+### Fixes
+- [ ] Find the compensation bug (big deltas underdeliver)
+- [ ] Find mapping offline bug (probably related to compensation's)
+- [ ] Initialize IMU measurements
+- [ ] Downsample matches (to avoid overfitting)
+- [ ] Improve computation cost
+- [ ] Check if need to add point in map
+
+### Testing
 - [ ] Check quality vs. other SOTA algorithms
+  
+  - [x] **KITTI** (City/Residential/Road) - No problems in 26/41 recordings.
+    - Descriptions of problematic recordings:
+      
+      - Non-static beggining (9)
+      - Feature-less context (8)
+      - Other vehicles (1)
+      - High frequencies (1)
+
+  - [ ] (Find more datasets)
+  - [ ] Compare with other SOTA algorithms
+
+### New features
+- [ ] Interpolation and smoothing of states when mapping offline
+- [ ] Erase unused (potentially dangerous) points in the map
 - [ ] Add degeneracy detection and correction
 - [ ] Try to add a module for removing dynamic objects such as people or vehicles
+
+---
 
 ## 0. Cloning the repository
 When cloning the repository, we also need to clone the [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) submodules. Hence we will use the ``--recurse-submodules`` tag.
