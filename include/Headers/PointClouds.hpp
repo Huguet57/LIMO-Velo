@@ -9,7 +9,6 @@ class PointCloudProcessor {
     private:
         Points to_points(const PointCloud::Ptr&);
         Points downsample(const Points&);
-        void add2Buffer(const Points&);
         static bool time_sort(const Point&, const Point&);
         void sort_points(Points&);
 };
