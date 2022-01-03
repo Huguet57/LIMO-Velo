@@ -11,6 +11,7 @@ class Accumulator {
         void add(State, double time=-1);
         void add(IMU, double time=-1);
         void add(Point, double time=-1);
+        void add(Points);
 
         // Receive from topics
         void receive_lidar(const PointCloud_msg&);
@@ -73,7 +74,6 @@ class Accumulator {
 
         bool enough_imus();
         void set_initial_time();
-
 
     // Singleton pattern
     public:

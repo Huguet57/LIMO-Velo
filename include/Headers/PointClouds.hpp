@@ -4,14 +4,13 @@ class PointCloudProcessor {
 
     public:
         Points points;
-        PointCloudProcessor(const PointCloud_msg&, Buffer<Point>&);
+        PointCloudProcessor(const PointCloud_msg&);
 
     private:
-        bool check_and_fix(PointCloud::Ptr&);
-        PointCloud downsample(const PointCloud::Ptr&);
-        void add2Buffer(const PointCloud&, Buffer<Point>&);
-        static bool time_sort(const PointType&, const PointType&);
-        void sort_points(std::vector<PointType, Eigen::aligned_allocator<PointType>>&);
+        Points to_points(const PointCloud::Ptr&);
+        Points downsample(const Points&);
+        static bool time_sort(const Point&, const Point&);
+        void sort_points(Points&);
 };
 
 void operator+= (PointCloud&, const Point&);

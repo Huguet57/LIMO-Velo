@@ -26,8 +26,10 @@ int main(int argc, char** argv) {
     nh.param<int>("MAX_NUM_ITERS", Config.MAX_NUM_ITERS, 3);
     nh.param<std::vector<double>>("LIMITS", Config.LIMITS, std::vector<double> (23, 0.001));
     nh.param<int>("NUM_MATCH_POINTS", Config.NUM_MATCH_POINTS, 5);
+    nh.param<int>("MAX_POINTS2MATCH", Config.MAX_POINTS2MATCH, 10);
     nh.param<double>("MAX_DIST_PLANE", Config.MAX_DIST_PLANE, 2.0);
     nh.param<float>("PLANES_THRESHOLD", Config.PLANES_THRESHOLD, 0.1f);
+    nh.param<float>("PLANES_CHOOSE_CONSTANT", Config.PLANES_CHOOSE_CONSTANT, 9.0f);
     nh.param<double>("LiDAR_noise", Config.LiDAR_noise, 0.001);
     nh.param<double>("min_dist", Config.min_dist, 3.);
     nh.param<double>("imu_rate", Config.imu_rate, 400);
@@ -38,6 +40,9 @@ int main(int argc, char** argv) {
     nh.param<double>("covariance_acceleration", Config.cov_acc, 1e-2);
     nh.param<double>("covariance_bias_gyroscope", Config.cov_bias_gyro, 1e-5);
     nh.param<double>("covariance_bias_acceleration", Config.cov_bias_acc, 1e-4);
+    nh.param<double>("wx_MULTIPLIER", Config.wx_MULTIPLIER, 1);
+    nh.param<double>("wy_MULTIPLIER", Config.wy_MULTIPLIER, 1);
+    nh.param<double>("wz_MULTIPLIER", Config.wz_MULTIPLIER, 1);
     nh.param<std::string>("points_topic", Config.points_topic, "/velodyne_points");
     nh.param<std::string>("imus_topic", Config.imus_topic, "/vectornav/IMU");
     nh.param<std::vector<double>>("/Heuristic/times", Config.Heuristic.times, {1.});
@@ -76,7 +81,7 @@ int main(int argc, char** argv) {
 
     while (ros::ok()) {
         
-        if (accum.ready()) {
+        while (accum.ready()) {
             
             double t2;
             if (Config.real_time) {
@@ -101,6 +106,7 @@ int main(int argc, char** argv) {
                 Points points = accum.get_points(t1, t2);
                 States path_taken = comp.integrate_imus(t1, t2);
                 PointCloud compensated = comp.compensate(path_taken, points);
+                if (compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
                 // Localize points in map
                 KF.update(compensated);
@@ -136,6 +142,9 @@ int main(int argc, char** argv) {
 
             // Empty too old LiDAR points
             accum.empty_lidar(t2 - Config.empty_lidar_time);
+
+            // Trick to call break in the middle of the program
+            break;
         }
 
         ros::spinOnce();

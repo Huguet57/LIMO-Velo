@@ -15,73 +15,53 @@ extern struct Params Config;
 
 // class PointCloudProcessor
     // public:
-        PointCloudProcessor::PointCloudProcessor(const PointCloud_msg& msg, Buffer<Point>& BUFFER_L) {
+        PointCloudProcessor::PointCloudProcessor(const PointCloud_msg& msg) {
             PointCloud::Ptr raw_pcl(new PointCloud());
             pcl::fromROSMsg(*msg, *raw_pcl);
+            if (raw_pcl->empty()) return;
 
-            bool is_usable = this->check_and_fix(raw_pcl);
-            if (not is_usable) return;
-
-            PointCloud downsample_points = this->downsample(raw_pcl);
-            this->sort_points(downsample_points.points);
-            this->add2Buffer(downsample_points, BUFFER_L);
+            Points points = this->to_points(raw_pcl);
+            Points downsample_points = this->downsample(points);
+            
+            this->sort_points(downsample_points);
+            this->points = downsample_points;
         }
 
     // private:
-        template <typename AbstractPoint>
-        double dist(const AbstractPoint& p) {
-            return std::sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
+        Points PointCloudProcessor::to_points(const PointCloud::Ptr& pcl) {
+            Points pts;
+            double begin_time;
+
+            #if LIDAR_TYPE == VELODYNE
+                begin_time = Conversions::microsec2Sec(pcl->header.stamp);
+                begin_time -= pcl->points.back().time;
+            #elif LIDAR_TYPE == HESAI
+                begin_time = 0.;
+            #else
+                ROS_ERROR("INVALID LiDAR TYPE");
+            #endif
+
+            for (PointType p : pcl->points) pts.push_back(Point (p, begin_time));
+            return pts;
         }
 
-        bool PointCloudProcessor::check_and_fix(PointCloud::Ptr& pcl) {
-            if (pcl->size() < 1) return false;
-
-            // Fix 'time' field, turn it to relative time
-            if (pcl->points.front().time == pcl->points.back().time) {
-                for (PointType& p : pcl->points) p.time = 0;
-             } else if (pcl->points.back().time > 1e9) {
-                for (PointType& p : pcl->points)
-                    p.time -= Conversions::microsec2Sec(pcl->header.stamp);
-            }
-
-            return true;
-        }
-
-        PointCloud PointCloudProcessor::downsample(const PointCloud::Ptr& pcl) {
-            PointCloud::Ptr downsampled(new PointCloud());
-            downsampled->points.reserve(pcl->points.size()/Config.ds_rate);
-            downsampled->header = pcl->header;
+        Points PointCloudProcessor::downsample(const Points& points) {
+            Points downsampled;
             int ds_counter = 0;
 
-            for (PointType p : pcl->points) {
-                bool downsample_point = Config.ds_rate <= 1 or ds_counter%Config.ds_rate == 0; 
-                if (downsample_point and Config.min_dist < dist(p)) downsampled->points.push_back(p);
-                ++ds_counter;
+            for (Point p : points) {
+                bool downsample_point = Config.ds_rate <= 1 or ++ds_counter%Config.ds_rate == 0; 
+                if (downsample_point and Config.min_dist < p.norm()) downsampled.push_back(p);
             }
 
-            return *downsampled;
-
-            // PointCloud::Ptr filtered(new PointCloud());
-            // filtered->header = downsampled->header;
-            // pcl::VoxelGrid<PointType> filter;
-            // filter.setInputCloud (downsampled);
-            // filter.setLeafSize (0.5f, 0.5f, 0.5f);
-            // filter.filter (*filtered);
-
-            // return *filtered;
+            return downsampled;
         }
 
-        void PointCloudProcessor::add2Buffer(const PointCloud& pcl, Buffer<Point>& BUFFER_L) {
-            if (pcl.size() < 1) return;
-            double begin_time = Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time; 
-            for (PointType p : pcl.points) BUFFER_L.push(Point(p, begin_time));
-        }
-
-        bool PointCloudProcessor::time_sort(const PointType& a, const PointType& b) {
+        bool PointCloudProcessor::time_sort(const Point& a, const Point& b) {
             return a.time < b.time;
         }
 
-        void PointCloudProcessor::sort_points(std::vector<PointType, Eigen::aligned_allocator<PointType>>& points) {
+        void PointCloudProcessor::sort_points(Points& points) {
             std::sort(points.begin(), points.end(), this->time_sort);
         }
 
