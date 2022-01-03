@@ -48,6 +48,7 @@ class Point {
         float z;
         TimeType time;
         float intensity;
+        float range;
 
         Point() {}
 
@@ -72,11 +73,13 @@ class Point {
         void set_attributes(const velodyne_ros::Point& p) {
             this->time = (double) p.time;
             this->intensity = p.intensity;
+            this->range = this->norm();
         }
 
         void set_attributes(const hesai_ros::Point& p) {
             this->time = p.timestamp;
             this->intensity = p.intensity;
+            this->range = this->norm();
         }
 
         Point(const Eigen::Matrix<float, 3, 1>& p, const Point& attributes) {
@@ -86,6 +89,7 @@ class Point {
 
             this->time = attributes.time;
             this->intensity = attributes.intensity;
+            this->range = attributes.range;
         }
 
         #if LIDAR_TYPE == VELODYNE
