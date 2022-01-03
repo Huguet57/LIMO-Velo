@@ -51,31 +51,32 @@ class Point {
 
         Point() {}
 
-        Point(const PointType& p) {
+        template <typename AbstractPoint>
+        Point(const AbstractPoint& p) {
             this->x = p.x;
             this->y = p.y;
             this->z = p.z;
 
-            this->time = p.time;
+            // Attributes specific to PointType
+            this->set_attributes(p);
+        }
+
+        // Delegate constructor for HESAI (absolute time)
+        Point(const hesai_ros::Point& p, double begin_time) : Point (p) {}
+        
+        // Delegate constructor for Velodyne (relative time)
+        Point(const velodyne_ros::Point& p, double begin_time) : Point (p) {
+            this->time += begin_time;
+        }
+
+        void set_attributes(const velodyne_ros::Point& p) {
+            this->time = (double) p.time;
             this->intensity = p.intensity;
         }
 
-        Point(const PointType& p, double begin_time) {
-            this->x = p.x;
-            this->y = p.y;
-            this->z = p.z;
-
-            this->time = begin_time + p.time;
+        void set_attributes(const hesai_ros::Point& p) {
+            this->time = p.timestamp;
             this->intensity = p.intensity;
-        }
-
-        Point(float x, float y, float z, double time=0) {
-            this->x = x;
-            this->y = y;
-            this->z = z;
-
-            this->time = time;
-            this->intensity = 0.f;
         }
 
         Point(const Eigen::Matrix<float, 3, 1>& p, const Point& attributes) {
@@ -87,18 +88,34 @@ class Point {
             this->intensity = attributes.intensity;
         }
 
-        PointType toPCL() const {
-            PointType p;
-            p.x = this->x;
-            p.y = this->y;
-            p.z = this->z;
-            p.time = this->time;
-            p.intensity = this->intensity;
-            return p;
-        }
+        #if LIDAR_TYPE == VELODYNE
+            velodyne_ros::Point toPCL() const {
+                velodyne_ros::Point p;
+                p.x = this->x;
+                p.y = this->y;
+                p.z = this->z;
+                p.time = (float) this->time;    // TODO?: Not relative time
+                p.intensity = this->intensity;
+                return p;
+            }
+        #elif LIDAR_TYPE == HESAI
+            hesai_ros::Point toPCL() const {
+                hesai_ros::Point p;
+                p.x = this->x;
+                p.y = this->y;
+                p.z = this->z;
+                p.timestamp = this->time;
+                p.intensity = this->intensity;
+                return p;
+            }
+        #endif
 
         Eigen::Matrix<float, 3, 1> toEigen() const {
             return Eigen::Matrix<float, 3, 1>(this->x, this->y, this->z);
+        }
+
+        float norm() const {
+            return this->toEigen().norm(); 
         }
 
         Eigen::Vector3d cross(const Eigen::Vector3d& v) {
@@ -115,6 +132,9 @@ class Point {
         friend Point operator+(const Point& p, const Eigen::Matrix<float, 3, 1> v);
         friend Point operator-(const Point& p, const Eigen::Matrix<float, 3, 1> v);
         friend std::ostream& operator<< (std::ostream& out, const Point& p);
+
+    private:
+
 };
 
 class IMU {

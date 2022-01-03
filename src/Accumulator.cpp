@@ -31,9 +31,14 @@ extern struct Params Config;
             this->push(cnt);
         }
 
+        void Accumulator::add(Points points) {
+            for (Point p : points) this->push(p);
+        }
+
         // Receive from topics
         void Accumulator::receive_lidar(const PointCloud_msg& msg) {
-            PointCloudProcessor processed(msg, this->BUFFER_L);
+            PointCloudProcessor processed(msg);
+            this->add(processed.points);
         }
 
         void Accumulator::receive_imu(const IMU_msg& msg) {

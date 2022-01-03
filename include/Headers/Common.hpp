@@ -40,6 +40,11 @@
 #include "ikd_Tree.h"
 #endif
 
+// Define the LiDAR type for the compiler
+#define VELODYNE 0
+#define HESAI 1
+#define LIDAR_TYPE VELODYNE
+
 struct HeuristicParams {
     std::vector<double> times;
     std::vector<double> deltas;
@@ -65,10 +70,16 @@ struct Params {
     double min_dist;
 
     int MAX_NUM_ITERS;
+    int MAX_POINTS2MATCH;
     std::vector<double> LIMITS;
     int NUM_MATCH_POINTS;
     double MAX_DIST_PLANE;
     float PLANES_THRESHOLD;
+    float PLANES_CHOOSE_CONSTANT;
+
+    double wx_MULTIPLIER;
+    double wy_MULTIPLIER;
+    double wz_MULTIPLIER;
 
     double cov_acc;
     double cov_gyro;
@@ -92,6 +103,16 @@ namespace velodyne_ros {
   };
 }
 
+namespace hesai_ros {
+    struct Point {
+        PCL_ADD_POINT4D
+        uint8_t intensity;
+        double timestamp;
+        uint16_t ring;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    } EIGEN_ALIGN16;
+}
+
 POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_ros::Point,
     (float, x, x)
     (float, y, y)
@@ -101,12 +122,26 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_ros::Point,
     (std::uint16_t, ring, ring)
 )
 
-typedef double TimeType;
-typedef velodyne_ros::Point PointType;
+POINT_CLOUD_REGISTER_POINT_STRUCT(hesai_ros::Point,
+    (float, x, x)
+    (float, y, y)
+    (float, z, z)
+    (std::uint8_t, intensity, intensity)
+    (double, timestamp, timestamp)
+    (std::uint16_t, ring, ring)
+)
+
+#if LIDAR_TYPE == VELODYNE
+    typedef velodyne_ros::Point PointType;
+#elif LIDAR_TYPE == HESAI
+    typedef hesai_ros::Point PointType;
+#endif
+
 typedef std::vector<PointType, Eigen::aligned_allocator<PointType> > PointTypes;
 typedef pcl::PointCloud<PointType> PointCloud;
 typedef sensor_msgs::PointCloud2::ConstPtr PointCloud_msg;
 typedef sensor_msgs::ImuConstPtr IMU_msg;
+typedef double TimeType;
 
 struct Normal { float A, B, C, D; };
 typedef std::vector<Normal> Normals;
