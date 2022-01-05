@@ -108,6 +108,16 @@ int main(int argc, char** argv) {
                 PointCloud compensated = comp.compensate(path_taken, points);
                 if (compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
+                // Downsample what we use to localize
+                PointCloud downsampled_compensated;
+                PointCloud::Ptr compensated_ptr(new PointCloud());
+                *compensated_ptr = compensated;
+                pcl::VoxelGrid<PointType> filter;
+                filter.setInputCloud(compensated_ptr);
+                filter.setLeafSize(0.5, 0.5, 0.5);
+                filter.filter(downsampled_compensated);
+                compensated = downsampled_compensated;
+
                 // Publish matches before optimization
                 Matches matches = map.match(KF.latest_state(), compensated);
                 // publish.matches(KF.latest_state(), matches);
