@@ -25,7 +25,7 @@ real_time_delay: 0.5        # Should be at least [FULL_ROTATION_TIME] (without a
 # LiDAR
 full_rotation_time: 0.10
 min_dist: 4
-ds_rate: 16
+ds_rate: 64
 
 # IMU
 imu_rate: 1000

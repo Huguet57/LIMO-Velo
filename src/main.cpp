@@ -106,31 +106,22 @@ int main(int argc, char** argv) {
                 Points points = accum.get_points(t1, t2);
                 States path_taken = comp.integrate_imus(t1, t2);
                 PointCloud compensated = comp.compensate(path_taken, points);
-                if (compensated.size() < Config.MAX_POINTS2MATCH) break; 
-
-                // Downsample what we use to localize
-                PointCloud downsampled_compensated;
-                PointCloud::Ptr compensated_ptr(new PointCloud());
-                *compensated_ptr = compensated;
-                pcl::VoxelGrid<PointType> filter;
-                filter.setInputCloud(compensated_ptr);
-                filter.setLeafSize(0.5, 0.5, 0.5);
-                filter.filter(downsampled_compensated);
-                compensated = downsampled_compensated;
+                PointCloud ds_compensated = comp.downsample(compensated);
+                if (ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
                 // Publish matches before optimization
-                Matches matches = map.match(KF.latest_state(), compensated);
+                Matches matches = map.match(KF.latest_state(), ds_compensated);
                 // publish.matches(KF.latest_state(), matches);
 
                 // Localize points in map
-                KF.update(compensated);
+                KF.update(ds_compensated);
                 State Xt2 = KF.latest_state();
                 accum.add(Xt2, t2);
                 publish.state(Xt2, false);
                 publish.tf(Xt2);
 
                 // Publish compensated
-                PointCloud global_compensated = Xt2 * Xt2.I_Rt_L() * compensated;
+                PointCloud global_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
                 publish.pointcloud(global_compensated);
 
                 // Map at the same time (online)
