@@ -1,6 +1,6 @@
-kitti_2011_09_26_drive_0001_synced.bag (cas degenerat, comença en moviment)
-kitti_2011_09_26_drive_0009_synced.bag (comença en moviment) - Arreglo: ds_rate = 32
-kitti_2011_09_26_drive_0013_synced.bag (cas degenerat al final) - Arreglo: ?
+[OK] kitti_2011_09_26_drive_0001_synced.bag (cas degenerat, comença en moviment) - Arreglo: ds_rate = 4
+[OK] kitti_2011_09_26_drive_0009_synced.bag (comença en moviment) - Arreglo: ds_rate = 32
+[OK] kitti_2011_09_26_drive_0013_synced.bag (cas degenerat al final) - Arreglo: ?
 kitti_2011_09_26_drive_0015_synced.bag (cas degenerat, comença en moviment)
 kitti_2011_09_26_drive_0019_synced.bag (cas degenerat, comença en moviment, altes freqüències)
 *kitti_2011_09_26_drive_0022_synced.bag (reindexed, al segon 55 para l'input de punts)
@@ -14,7 +14,8 @@ kitti_2011_09_26_drive_0052_synced.bag (camió a prop es mou i es pensa que és 
 kitti_2011_09_26_drive_0086_synced.bag (deriva al final, paret de fulles - altes freqüències)
 *kitti_2011_09_26_drive_0093_synced.bag (/tf està malament)
 *kitti_2011_09_26_drive_0096_synced.bag (/tf està malament al final)
-kitti_2011_09_26_drive_0104_synced.bag (començament raro o deriva, comença en moviment)
+[OK] kitti_2011_09_26_drive_0104_synced.bag (començament raro o deriva, comença en moviment)
 *kitti_2011_09_26_drive_0119_synced.bag (too short to map)
 
 Not our fault: 6
+New successes: 4

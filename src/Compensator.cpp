@@ -71,6 +71,10 @@
             return integrated_states;
         }
 
+        PointCloud Compensator::downsample(const PointCloud& compensated) {
+            return this->voxelgrid_downsample(compensated);
+        }
+
         // TODO: try to replicate the one from Fast-LIO2
         PointCloud Compensator::compensate(States& states, Points& points, bool global) {
             if (states.size() < 2) return PointCloud();
@@ -124,4 +128,19 @@
             }
 
             return *result;
+        }
+
+        PointCloud Compensator::voxelgrid_downsample(const PointCloud& compensated) {
+            // Create a PointCloud pointer
+            PointCloud::Ptr compensated_ptr(new PointCloud());
+            *compensated_ptr = compensated;
+
+            // Downsample using a VoxelGrid
+            PointCloud downsampled_compensated;
+            pcl::VoxelGrid<PointType> filter;
+            filter.setInputCloud(compensated_ptr);
+            filter.setLeafSize(0.5, 0.5, 0.5);
+            filter.filter(downsampled_compensated);
+            
+            return downsampled_compensated;
         }
