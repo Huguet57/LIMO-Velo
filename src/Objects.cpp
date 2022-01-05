@@ -75,12 +75,6 @@ template class Buffer<State>;
             this->update(imu);
         }
 
-        RotTransl operator- (const State& st, const State& s0) {
-            Eigen::Matrix3f dR = s0.R.transpose()*st.R;
-            Eigen::Vector3f dt = st.pos - s0.pos;
-            return RotTransl(dR, dt);
-        }
-
         Point operator* (const State& X, const Point& p) {
             return RotTransl(X) * p;
         }

@@ -270,7 +270,6 @@ class State {
         RotTransl inv() const;
 
         void operator+= (const IMU& imu);
-        friend RotTransl operator- (const State& st, const State& s0);
         friend Point operator* (const State& X, const Point& p);
         friend RotTransl operator* (const State& X, const RotTransl& RT);
         friend PointCloud operator* (const State& X, const PointCloud& pcl);

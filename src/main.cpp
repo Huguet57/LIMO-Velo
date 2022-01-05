@@ -132,7 +132,8 @@ int main(int argc, char** argv) {
             
             // Add updated points to map (offline)
             if (not Config.mapping_online and map.hasToMap(t2)) {
-                PointCloud global_full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2, true);
+                PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
+                PointCloud global_full_compensated = KF.latest_state() * KF.latest_state().I_Rt_L() * full_compensated;
 
                 if (Config.print_extrinsics) publish.extrinsics(KF.latest_state());
 

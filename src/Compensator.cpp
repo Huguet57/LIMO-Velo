@@ -103,7 +103,7 @@
                     XtLp += IMU (XtLp.a, XtLp.w, p_L_tLp.time);
 
                     // Get rotation-translation pairs
-                    RotTransl tnext_T_tLp = XtLp - Xnext;
+                    RotTransl tnext_T_tLp = Xnext.inv() * XtLp;
                     RotTransl I_T_L = Xnext.I_Rt_L();
 
                     // Transport point to Xnext and add it
