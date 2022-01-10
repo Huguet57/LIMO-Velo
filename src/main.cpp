@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
 
                 // Map at the same time (online)
                 if (Config.mapping_online) {
-                    map.add(global_compensated, t2, false);
+                    map.add(global_compensated, t2, true);
                     publish.full_pointcloud(global_compensated);
                 }
             }
@@ -134,10 +134,13 @@ int main(int argc, char** argv) {
             // Add updated points to map (offline)
             if (not Config.mapping_online and map.hasToMap(t2)) {
                 PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                PointCloud global_full_compensated = KF.latest_state() * KF.latest_state().I_Rt_L() * full_compensated;
+                PointCloud full_ds_compensated = comp.downsample(full_compensated);
+                if (full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
-                if (Config.print_extrinsics) publish.extrinsics(KF.latest_state());
+                State Xt2 = KF.latest_state();
+                if (Config.print_extrinsics) publish.extrinsics(Xt2);
 
+                PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_ds_compensated;
                 map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);
             }
