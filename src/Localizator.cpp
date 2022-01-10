@@ -62,6 +62,9 @@ extern struct Params Config;
             if (this->last_time_integrated < 0) this->last_time_integrated = t;
             IMUs imus = Accumulator::getInstance().get_imus(this->last_time_integrated, t);
             for (IMU imu : imus) this->propagate(imu);
+            
+            // Propagate last known IMU to t 
+            this->propagate(IMU (imus.back().a, imus.back().w, t));
         }
 
         State Localizator::latest_state() {
