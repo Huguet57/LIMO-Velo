@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
     // Objects
     Publishers publish(nh);
     Accumulator& accum = Accumulator::getInstance();
-    Compensator comp = Compensator (publish);
+    Compensator comp = Compensator ();
     Mapper& map = Mapper::getInstance();
     Localizator& KF = Localizator::getInstance();
 
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
             }
 
             // Refine delta if need to be
-            rate = accum.refine_delta(t2);
+            rate = accum.refine_delta(Config.Heuristic, t2);
             double t1 = t2 - accum.delta;
 
             if (Config.mapping_online or (not Config.mapping_online and map.exists())) {
@@ -133,20 +133,22 @@ int main(int argc, char** argv) {
             
             // Add updated points to map (offline)
             if (not Config.mapping_online and map.hasToMap(t2)) {
-                PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                PointCloud full_ds_compensated = comp.downsample(full_compensated);
-                if (full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
-
                 State Xt2 = KF.latest_state();
+                PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
+                PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
+                PointCloud global_full_ds_compensated = comp.downsample(global_full_compensated);
+                
+                if (global_full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
                 if (Config.print_extrinsics) publish.extrinsics(Xt2);
 
-                PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_ds_compensated;
                 map.add(global_full_compensated, t2, true);
                 publish.full_pointcloud(global_full_compensated);
+                // map.add(global_full_ds_compensated, t2, true);
+                // publish.full_pointcloud(global_full_ds_compensated);
             }
 
             // Empty too old LiDAR points
-            accum.empty_lidar(t2 - Config.empty_lidar_time);
+            accum.clear_lidar(t2 - Config.empty_lidar_time);
 
             // Trick to call break in the middle of the program
             break;

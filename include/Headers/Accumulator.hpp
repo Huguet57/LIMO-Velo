@@ -18,16 +18,13 @@ class Accumulator {
         void receive_imu(const IMU_msg&);
         
         // Empty buffers
-        void empty_buffers();
-        void empty_buffers(TimeType);
-        void empty_lidar(TimeType);
+        void clear_buffers();
+        void clear_buffers(TimeType);
+        void clear_lidar(TimeType);
 
         ///////////////////////////////////////////////////
 
         // Get content given time intervals
-
-        IMU get_next_imu(double t2);
-        State get_prev_state(double t1);
 
         States get_states(double t1, double t2);
         Points get_points(double t1, double t2);
@@ -48,7 +45,7 @@ class Accumulator {
         }
 
         bool ready();
-        ros::Rate refine_delta(double t);
+        ros::Rate refine_delta(const HeuristicParams&, double t);
 
     private:
         bool is_ready = false;
@@ -62,7 +59,7 @@ class Accumulator {
             std::deque<ContentType> result;
             int k_t2 = before_t(source, t2);
 
-            // Get content between t1 from t2 sorted old to new
+            // Get content between t1 from t2 sorted new to old
             for (int k = k_t2; k < source.content.size(); ++k) {
                 ContentType cnt = source.content[k];
                 if (t1 >= cnt.time) break;
@@ -72,8 +69,40 @@ class Accumulator {
             return result;
         }
 
+        template <typename ContentType>
+        ContentType get_next(Buffer<ContentType>& source, double t) {
+            int k_t = before_t(source, t);
+
+            // Get rightest content left to t (sorted new to old)
+            for (int k = k_t; k < source.content.size(); ++k) {
+                ContentType cnt = source.content[k];
+                ContentType next_cnt = source.content[k - 1];
+                if (t >= cnt.time) return next_cnt;
+            }
+
+            // If not content found, push an empty one at t
+            this->add(ContentType(), t);
+            return source.front();
+        }
+
+        template <typename ContentType>
+        ContentType get_prev(Buffer<ContentType>& source, double t) {
+            int k_t = before_t(source, t) + 1;
+
+            // Get leftest State right to t (sorted new to old)
+            for (int k = k_t; k < source.content.size(); ++k) {
+                ContentType cnt = source.content[k];
+                if (t > cnt.time) return cnt;
+            }
+
+            // If not a state found, push an empty one at t
+            this->add(ContentType(), t);
+            return source.front();
+        }
+
         bool enough_imus();
         void set_initial_time();
+        double interpret_heuristic(const HeuristicParams&, double t);
 
     // Singleton pattern
     public:

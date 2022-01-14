@@ -28,7 +28,7 @@ class Mapper {
         bool exists_tree();
 
         void add_points(PointCloud&, bool downsample=false);
-        Match match_plane(const State&, const PointType&);
+        Match match_plane(const Point&);
 
     // Singleton pattern
     public:

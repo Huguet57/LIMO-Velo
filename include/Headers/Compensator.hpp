@@ -1,13 +1,6 @@
 class Compensator {
     public:
-        Publishers output;
-
         Compensator() {};
-        
-        Compensator(Publishers& pub)
-            : Compensator() {
-                this->output = pub;
-            };
 
         // Main constructor
         PointCloud compensate(double t1, double t2, bool global=false);

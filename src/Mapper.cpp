@@ -20,12 +20,13 @@ extern struct Params Config;
         }
 
         void Mapper::add(PointCloud& pcl, double time, bool downsample) {
-            // If map doesn't exist, build it.
-            if (pcl.size() == 0) return;
-            this->last_map_time = time;
+            if (pcl.empty()) return;
 
+            // If map doesn't exist, build it.
             if (not this->exists()) this->build_tree(pcl);
             else this->add_points(pcl, downsample);
+
+            this->last_map_time = time;
         }
 
         int Mapper::size() {
@@ -43,7 +44,7 @@ extern struct Params Config;
 
             for (PointType p : points) {
                 // Direct approach: we match the point with a plane on the map
-                Match match = this->match_plane(X, p);
+                Match match = this->match_plane(X * X.I_Rt_L() * Point(p));
                 if (match.is_chosen()) matches.push_back(match);
             }
 
@@ -52,8 +53,7 @@ extern struct Params Config;
 
         bool Mapper::hasToMap(double t) {
             if (this->last_map_time < 0) this->last_map_time = t;
-            else return t - this->last_map_time >= Config.full_rotation_time;
-            return false;
+            return t - this->last_map_time >= Config.full_rotation_time;
         }
 
     // private:
@@ -75,19 +75,12 @@ extern struct Params Config;
             return this->map->size() > 0;
         }
 
-        Match Mapper::match_plane(const State& X, const PointType& p) {
-            // Transport the point to the global frame
-            PointVector near_points;
-            RotTransl offsets = X.I_Rt_L();
-            Point global_p = X * offsets * Point(p);
-
+        Match Mapper::match_plane(const Point& p) {
             // Find k nearest points
+            PointVector near_points;
             vector<float> pointSearchSqDis(Config.NUM_MATCH_POINTS);
-            this->map->Nearest_Search(global_p, Config.NUM_MATCH_POINTS, near_points, pointSearchSqDis);
+            this->map->Nearest_Search(p, Config.NUM_MATCH_POINTS, near_points, pointSearchSqDis);
 
-            // Fit a plane to them
-            return Match(
-                global_p,
-                Plane (near_points, pointSearchSqDis)
-            );
+            // Construct a plane fitting between them
+            return Match(p, Plane (near_points, pointSearchSqDis));
         }

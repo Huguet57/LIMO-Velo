@@ -47,45 +47,25 @@ extern struct Params Config;
         }
 
         // Empty buffers
-        void Accumulator::empty_buffers() {
-            this->BUFFER_L.empty();
-            this->BUFFER_I.empty();
+        void Accumulator::clear_buffers() {
+            this->BUFFER_L.clear();
+            this->BUFFER_I.clear();
         }
 
-        void Accumulator::empty_buffers(TimeType t) {
-            this->BUFFER_L.empty(t);
-            this->BUFFER_I.empty(t);
+        void Accumulator::clear_buffers(TimeType t) {
+            this->BUFFER_L.clear(t);
+            this->BUFFER_I.clear(t);
         }
 
-        void Accumulator::empty_lidar(TimeType t) {
-            this->BUFFER_L.empty(t);
+        void Accumulator::clear_lidar(TimeType t) {
+            this->BUFFER_L.clear(t);
         }
 
         /////////////////////////////////
 
-        IMU Accumulator::get_next_imu(double t2) {
-            IMU last_imu = this->BUFFER_I.front();
-            for (IMU imu : this->BUFFER_I.content) {
-                if (t2 >= imu.time) return last_imu;
-                last_imu = imu;
-            }
-
-            // If not a state found, return the earliest (again)
-            return this->BUFFER_I.front();
-        }
-
-        State Accumulator::get_prev_state(double t1) {
-            for (State x : this->BUFFER_X.content)
-                if (t1 > x.time) return x;
-
-            // If not a state found, push an empty one in t1
-            this->add(State(t1), t1);
-            return this->BUFFER_X.front();
-        }
-
         States Accumulator::get_states(double t1, double t2) {
             States states = this->get(this->BUFFER_X, t1, t2);
-            states.push_front(this->get_prev_state(t1));
+            states.push_front(this->get_prev(this->BUFFER_X, t1));
             return states;
         }
 
@@ -95,7 +75,7 @@ extern struct Params Config;
 
         IMUs Accumulator::get_imus(double t1, double t2) {
             IMUs imus = this->get(this->BUFFER_I, t1, t2);
-            imus.push_back(this->get_next_imu(t2));
+            imus.push_back(this->get_next(this->BUFFER_I, t2));
             return imus;
         }
 
@@ -114,26 +94,9 @@ extern struct Params Config;
             return this->is_ready = false;
         }
 
-        ros::Rate Accumulator::refine_delta(double t) {
-            assert(("There has to be exactly one more delta value than time delimiters", Config.Heuristic.times.size() + 1 == Config.Heuristic.deltas.size()));
-
-            // Interpret Heuristic
-            if (Config.Heuristic.times.empty()) {
-                this->delta = Config.Heuristic.deltas.back();
-            } else if (t - this->initial_time >= Config.Heuristic.times.back()) {
-                this->delta = Config.Heuristic.deltas.back();
-            } else {
-                for (int k = 0; k < Config.Heuristic.times.size(); ++k) {
-                    double Ht = Config.Heuristic.times[k];
-                    double Hd = Config.Heuristic.deltas[k];
-
-                    if (t - this->initial_time < Ht) {
-                        this->delta = Hd;
-                        break;
-                    }
-                }
-            }
-
+        ros::Rate Accumulator::refine_delta(const HeuristicParams& heuristic, double t) {
+            assert(("There has to be exactly one more delta value than time delimiters", heuristic.times.size() + 1 == heuristic.deltas.size()));
+            this->delta = this->interpret_heuristic(heuristic, t);
             return ros::Rate((int) 1./this->delta);
         }
 
@@ -152,4 +115,15 @@ extern struct Params Config;
             double latest_imu_time = this->BUFFER_I.front().time;
 
             this->initial_time = latest_imu_time - Config.real_time_delay;
+        }
+
+        double Accumulator::interpret_heuristic(const HeuristicParams& heuristic, double t) {
+            // If is after last time
+            if (heuristic.times.empty()) return heuristic.deltas.back();
+            if (t - this->initial_time >= heuristic.times.back()) return heuristic.deltas.back();
+            
+            // If we have to find it in the list
+            for (int k = 0; k < heuristic.times.size(); ++k)
+                if (t - this->initial_time < heuristic.times[k])
+                    return heuristic.deltas[k];
         }

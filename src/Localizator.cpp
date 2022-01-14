@@ -22,10 +22,7 @@ extern struct Params Config;
         // Given points, update new position
         void Localizator::update(const PointCloud& points) {
             if (not Mapper::getInstance().exists()) return;
-            this->points2match = points;
-            
-            double solve_H_time = 0;
-            return this->IKFoM_update(solve_H_time);
+            return this->IKFoM_update(points);
         }
 
         void Localizator::calculate_H(const state_ikfom& s, const Matches& matches, Eigen::MatrixXd& H, Eigen::VectorXd& h) {
@@ -97,14 +94,16 @@ extern struct Params Config;
             this->init_IKFoM_state();
         }
 
-        void Localizator::IKFoM_update(double& solve_H_time) {
+        void Localizator::IKFoM_update(const PointCloud& points) {
+            double solve_H_time = 0;
+            this->points2match = points;            
             this->IKFoM_KF.update_iterated_dyn_share_modified(Config.LiDAR_noise, solve_H_time);
         }
 
         void Localizator::init_IKFoM_state() {
             state_ikfom init_state = this->IKFoM_KF.get_x();
             init_state.grav = S2(-Eigen::Vector3f (Config.initial_gravity.data()).cast<double>());
-            init_state.bg = Eigen::Vector3d(0.,0.,0.);
+            init_state.bg = Eigen::Vector3d::Zero();
             init_state.offset_R_L_I = SO3(Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3).cast<double>());
             init_state.offset_T_L_I = Eigen::Vector3f(Config.I_Translation_L.data()).cast<double>();
             this->IKFoM_KF.change_x(init_state);

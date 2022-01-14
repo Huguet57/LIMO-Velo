@@ -26,15 +26,19 @@ class Buffer {
             return this->content.back();
         }
         
-        void empty() {
-            this->content.empty();
+        bool empty() {
+            return this->content.empty();
         }
 
         int size() {
             return this->content.size();
         }
 
-        void empty(TimeType t) {
+        void clear() {
+            return this->content.clear();
+        }
+
+        void clear(TimeType t) {
             auto* buffer = &this->content;
             while (buffer->size() > 0 and t >= buffer->back().time)
                 this->pop_back();
@@ -164,7 +168,7 @@ class IMU {
         Eigen::Vector3f w;
         TimeType time;
 
-        IMU() {}
+        IMU() : IMU (Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), 0.) {}
         IMU(const sensor_msgs::ImuConstPtr& msg) : IMU(*msg) {}
 
         IMU(const sensor_msgs::Imu& imu) {
@@ -187,6 +191,8 @@ class IMU {
             this->w = w;
             this->time = time;
         }
+
+        IMU (double time) : IMU (Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), time) {}
 
         friend std::ostream& operator<< (std::ostream& out, const IMU& imu);
 };
@@ -216,28 +222,18 @@ class State {
         Eigen::Vector3f nbw;
         Eigen::Vector3f nba;
 
-        State(const state_ikfom& s, double time) {
+        State() : State (0.) {}
+
+        State(const state_ikfom& s, double time) : State (time) {
             this->R = s.rot.toRotationMatrix().cast<float>();
             this->pos = s.pos.cast<float>();
-
             this->vel = s.vel.cast<float>();
-            this->g = Eigen::Vector3f(0.,0.,-9.807); // TODO?
             
             this->bw = s.bg.cast<float>();
             this->ba = s.ba.cast<float>();
 
             this->RLI = s.offset_R_L_I.toRotationMatrix().cast<float>();
             this->tLI = s.offset_T_L_I.cast<float>();
-
-            // TODO?
-            this->nw = Eigen::Vector3f(0.,0.,0.);
-            this->na = Eigen::Vector3f(0.,0.,0.);
-            this->nbw = Eigen::Vector3f(0.,0.,0.);
-            this->nba = Eigen::Vector3f(0.,0.,0.);
-
-            this->time = time;
-            this->a = Eigen::Vector3f(0.,0.,-9.81);
-            this->w = Eigen::Vector3f(0.,0.,0.);
         }
 
         State(double time) {
@@ -251,19 +247,19 @@ class State {
             this->RLI = I_R_L;
             this->tLI = I_t_L;
 
-            this->pos = Eigen::Vector3f(0.,0.,0.);
-            this->vel = Eigen::Vector3f(0.,0.,0.);
-            this->bw = Eigen::Vector3f(0.,0.,0.);
-            this->ba = Eigen::Vector3f(0.,0.,0.);
+            this->pos = Eigen::Vector3f::Zero();
+            this->vel = Eigen::Vector3f::Zero();
+            this->bw = Eigen::Vector3f::Zero();
+            this->ba = Eigen::Vector3f::Zero();
 
             this->time = time;
             this->a = init_g;
-            this->w = Eigen::Vector3f(0.,0.,0.);
+            this->w = Eigen::Vector3f::Zero();
 
-            this->nw = Eigen::Vector3f(0.,0.,0.);
-            this->na = Eigen::Vector3f(0.,0.,0.);
-            this->nbw = Eigen::Vector3f(0.,0.,0.);
-            this->nba = Eigen::Vector3f(0.,0.,0.);
+            this->nw = Eigen::Vector3f::Zero();
+            this->na = Eigen::Vector3f::Zero();
+            this->nbw = Eigen::Vector3f::Zero();
+            this->nba = Eigen::Vector3f::Zero();
         }
 
         RotTransl I_Rt_L() const;
@@ -358,8 +354,6 @@ class Match {
         Match(const Point& p, const Plane& H) {
             this->point = p;
             this->plane = H;
-
-            // Distance to optimize
             this->distance = H.dist_to_plane(p);
         }
 

@@ -29,7 +29,7 @@ class Localizator {
     private:
         void init_IKFoM();
         void init_IKFoM_state();
-        void IKFoM_update(double&);
+        void IKFoM_update(const PointCloud&);
         
         void propagate(const IMU& imu);
         const state_ikfom& get_x() const;
