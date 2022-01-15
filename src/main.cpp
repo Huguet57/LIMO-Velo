@@ -78,12 +78,12 @@ int main(int argc, char** argv) {
 
     // If not real time, define an artificial clock
     double clock = -1;
+    double t2;
 
     while (ros::ok()) {
         
         while (accum.ready()) {
             
-            double t2;
             if (Config.real_time) {
                 // Should be t2 = ros::Time::now() - delay
                 double latest_imu_time = accum.BUFFER_I.front().time;
@@ -98,10 +98,10 @@ int main(int argc, char** argv) {
             rate = accum.refine_delta(Config.Heuristic, t2);
             double t1 = t2 - accum.delta;
 
-            if (Config.mapping_online or (not Config.mapping_online and map.exists())) {
-                // Integrate from t1 to t2
-                KF.propagate_to(t2);
+            // Integrate from t1 to t2
+            KF.propagate_to(t2);
 
+            if (Config.mapping_online or (not Config.mapping_online and map.exists())) {
                 // Compensated pointcloud given a path
                 Points points = accum.get_points(t1, t2);
                 States path_taken = comp.integrate_imus(t1, t2);
@@ -154,9 +154,16 @@ int main(int argc, char** argv) {
             break;
         }
 
+        // // Evaluate if ground truth is avaliable
+        // publish.log.evaluate();
+
+        if (accum.ended(t2)) break;
+
         ros::spinOnce();
         rate.sleep();
     }
+
+    ROS_ERROR("LIMOVelo out.");
 
     return 0;
 }

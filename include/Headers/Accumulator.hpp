@@ -45,6 +45,7 @@ class Accumulator {
         }
 
         bool ready();
+        bool ended(double);
         ros::Rate refine_delta(const HeuristicParams&, double t);
 
     private:
