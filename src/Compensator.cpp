@@ -72,7 +72,8 @@
         }
 
         PointCloud Compensator::downsample(const PointCloud& compensated) {
-            return this->voxelgrid_downsample(compensated);
+            // return this->voxelgrid_downsample(compensated);
+            return this->onion_downsample(compensated);
         }
 
         // TODO: try to replicate the one from Fast-LIO2
@@ -143,4 +144,26 @@
             filter.filter(downsampled_compensated);
             
             return downsampled_compensated;
+        }
+
+        PointCloud Compensator::onion_downsample(const PointCloud& pcl) {
+            PointCloud downsampled_pcl;
+            downsampled_pcl.header = pcl.header;
+            downsampled_pcl.points.reserve(pcl.size()/4);
+
+            for (int i = 0; i < pcl.size(); ++i) {
+                PointType ptype = pcl.points[i];
+                double range = Point (ptype).range;
+
+                if (0 < range and range < 4 and (256/Config.ds_rate <= 1 or i%(256/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
+                else if (4 < range and range < 6 and (64/Config.ds_rate <= 1 or i%(64/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
+                else if (6 < range and range < 9 and (32/Config.ds_rate <= 1 or i%(32/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
+                else if (9 < range and range < 12 and (16/Config.ds_rate <= 1 or i%(16/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
+                else if (12 < range and range < 22 and (8/Config.ds_rate <= 1 or i%(8/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
+                else if (22 < range and range < 30 and (4/Config.ds_rate <= 1 or i%(4/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
+                else if (30 < range and range < 50 and (2/Config.ds_rate <= 1 or i%(2/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
+                else if (range > 50) downsampled_pcl.points.push_back(ptype);
+            }
+
+            return downsampled_pcl;
         }

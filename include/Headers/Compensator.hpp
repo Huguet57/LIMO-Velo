@@ -12,4 +12,5 @@ class Compensator {
     private:
         States integrate_imus(States& states, const IMUs& imus, double t1, double t2);
         PointCloud voxelgrid_downsample(const PointCloud&);
+        PointCloud onion_downsample(const PointCloud&);
 };
