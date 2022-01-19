@@ -1,4 +1,4 @@
-# LIMO-Velo (based on Fast-LIO2)
+# LIMO-Velo [Alpha] (based on Fast-LIO2)
 ## A real-time, direct and LM-detached LIO SLAM.
 Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. 
 
@@ -6,26 +6,9 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 
 ## TODO list
 ### Fixes
-- [ ] Find the compensation bug (big deltas underdeliver)
-- [ ] Find mapping offline bug (probably related to compensation's)
 - [ ] Initialize IMU measurements
-- [ ] Downsample matches (to avoid overfitting)
 - [ ] Improve computation cost
 - [ ] Check if need to add point in map
-
-### Testing
-- [ ] Check quality vs. other SOTA algorithms
-  
-  - [x] **KITTI** (City/Residential/Road) - No problems in 29/41 recordings.
-    - Descriptions of problematic recordings:
-      
-      - Feature-less context (7)
-      - High frequencies (6)
-      - Non-static beggining (6)
-      - Other vehicles (2)
-
-  - [ ] (Find more datasets)
-  - [ ] Compare with other SOTA algorithms
 
 ### New features
 - [ ] Interpolation and smoothing of states when mapping offline
