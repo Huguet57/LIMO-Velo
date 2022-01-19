@@ -131,4 +131,6 @@ extern struct Params Config;
             for (int k = 0; k < heuristic.times.size(); ++k)
                 if (t - this->initial_time < heuristic.times[k])
                     return heuristic.deltas[k];
+
+            return heuristic.deltas.back();
         }

@@ -72,8 +72,8 @@
         }
 
         PointCloud Compensator::downsample(const PointCloud& compensated) {
-            // return this->voxelgrid_downsample(compensated);
-            return this->onion_downsample(compensated);
+            return this->voxelgrid_downsample(compensated);
+            // return this->onion_downsample(compensated);
         }
 
         // TODO: try to replicate the one from Fast-LIO2

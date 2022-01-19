@@ -109,10 +109,6 @@ int main(int argc, char** argv) {
                 PointCloud ds_compensated = comp.downsample(compensated);
                 if (ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
-                // Publish matches before optimization
-                Matches matches = map.match(KF.latest_state(), ds_compensated);
-                // publish.matches(KF.latest_state(), matches);
-
                 // Localize points in map
                 KF.update(ds_compensated);
                 State Xt2 = KF.latest_state();
@@ -137,14 +133,14 @@ int main(int argc, char** argv) {
                 PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
                 PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
                 PointCloud global_full_ds_compensated = comp.downsample(global_full_compensated);
-                
+
                 if (global_full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
                 if (Config.print_extrinsics) publish.extrinsics(Xt2);
 
-                map.add(global_full_compensated, t2, true);
-                publish.full_pointcloud(global_full_compensated);
-                // map.add(global_full_ds_compensated, t2, true);
-                // publish.full_pointcloud(global_full_ds_compensated);
+                // map.add(global_full_compensated, t2, true);
+                // publish.full_pointcloud(global_full_compensated);
+                map.add(global_full_ds_compensated, t2, true);
+                publish.full_pointcloud(global_full_ds_compensated);
             }
 
             // Empty too old LiDAR points
@@ -153,9 +149,6 @@ int main(int argc, char** argv) {
             // Trick to call break in the middle of the program
             break;
         }
-
-        // // Evaluate if ground truth is avaliable
-        // publish.log.evaluate();
 
         if (accum.ended(t2)) break;
 

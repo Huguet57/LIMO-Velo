@@ -41,7 +41,9 @@ extern struct Params Config;
             Matches matches;
             if (not this->exists()) return matches;
             matches.reserve(points.size());
-
+            
+            omp_set_num_threads(MP_PROC_NUM);
+            #pragma omp parallel for
             for (PointType p : points) {
                 // Direct approach: we match the point with a plane on the map
                 Match match = this->match_plane(X * X.I_Rt_L() * Point(p));
