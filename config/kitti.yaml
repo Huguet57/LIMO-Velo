@@ -43,8 +43,8 @@ PLANES_THRESHOLD: 1.e-1
 
 # Delta refinement
 Heuristic:
-  # times: [1.0, 2.0]
-  # deltas: [0.1, 0.025, 0.005]
+  times: [1.0, 2.0]
+  deltas: [0.1, 0.025, 0.01]
 
-  times: []
-  deltas: [0.1]
+  # times: []
+  # deltas: [0.1]
