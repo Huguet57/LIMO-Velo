@@ -9,6 +9,7 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 - [ ] Initialize IMU measurements
 - [ ] Rethink Voxelgrid filter, remove PointCloud objects where not needed.
 - [ ] Check if need to add point in map
+- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
 
 ### New features
 - [ ] Interpolation and smoothing of states when mapping offline
