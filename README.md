@@ -9,6 +9,7 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 - [ ] Initialize IMU measurements
 - [ ] Improve computation cost
 - [ ] Check if need to add point in map
+- [ ] Check if compensator works correctly (mapping online != offline)
 
 ### New features
 - [ ] Interpolation and smoothing of states when mapping offline
