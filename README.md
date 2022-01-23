@@ -9,7 +9,9 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 - [ ] Initialize IMU measurements
 - [ ] Rethink Voxelgrid filter, remove PointCloud objects where not needed.
 - [ ] Check if need to add point in map
-- [ ] Check if compensator works correctly (mapping online != offline)
+- [ ] Compensator does not work correctly (mapping online != offline)
+    - [ ] Doesn't compensate all points, the ones after the last IMU are ignored.
+    - [ ] Doesn't use well known states when compensating. Accumulating and mapping offline works way better.
 - [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
 
 ### New features
