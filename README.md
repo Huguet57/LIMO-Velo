@@ -7,9 +7,10 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 ## TODO list
 ### Fixes
 - [ ] Initialize IMU measurements
-- [ ] Improve computation cost
+- [ ] Rethink Voxelgrid filter, remove PointCloud objects where not needed.
 - [ ] Check if need to add point in map
 - [ ] Check if compensator works correctly (mapping online != offline)
+- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
 
 ### New features
 - [ ] Interpolation and smoothing of states when mapping offline
