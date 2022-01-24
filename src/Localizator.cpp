@@ -61,7 +61,7 @@ extern struct Params Config;
             for (IMU imu : imus) this->propagate(imu);
             
             // Propagate last known IMU to t 
-            this->propagate(IMU (imus.back().a, imus.back().w, t));
+            if (not imus.empty()) this->propagate(IMU (imus.back().a, imus.back().w, t));
         }
 
         State Localizator::latest_state() {

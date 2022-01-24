@@ -26,6 +26,9 @@ class Accumulator {
 
         // Get content given time intervals
 
+        State get_prev_state(double t);
+        IMU get_next_imu(double t);
+
         States get_states(double t1, double t2);
         Points get_points(double t1, double t2);
         IMUs get_imus(double t1, double t2);
@@ -38,10 +41,6 @@ class Accumulator {
         template <typename ArrayType>
         int before_t(const ArrayType& array, double t, bool desc=false) {
             return Algorithms::binary_search(array, t, desc);
-        }
-
-        int before_first_state(const IMUs& imus, const States& states) {
-            return Algorithms::binary_search(imus, states.front().time, false);
         }
 
         bool ready();
@@ -63,7 +62,7 @@ class Accumulator {
             // Get content between t1 from t2 sorted new to old
             for (int k = k_t2; k < source.content.size(); ++k) {
                 ContentType cnt = source.content[k];
-                if (t1 >= cnt.time) break;
+                if (t1 > cnt.time) break;
                 if (t2 >= cnt.time) result.push_front(cnt);
             }
 

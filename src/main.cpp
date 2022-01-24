@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
 
     // If not real time, define an artificial clock
     double clock = -1;
-    double t2;
+    double t2 = -1;
 
     while (ros::ok()) {
         
@@ -103,10 +103,9 @@ int main(int argc, char** argv) {
 
             if (Config.mapping_online or (not Config.mapping_online and map.exists())) {
                 // Compensated pointcloud given a path
-                Points points = accum.get_points(t1, t2);
-                States path_taken = comp.integrate_imus(t1, t2);
-                PointCloud compensated = comp.compensate(path_taken, points);
-                PointCloud ds_compensated = comp.downsample(compensated);
+                Points compensated = comp.compensate(t1, t2);
+                PointCloud _compensated; for (Point p : compensated) _compensated += p;
+                PointCloud ds_compensated = comp.downsample(_compensated);
                 if (ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
                 // Localize points in map
@@ -130,8 +129,9 @@ int main(int argc, char** argv) {
             // Add updated points to map (offline)
             if (not Config.mapping_online and map.hasToMap(t2)) {
                 State Xt2 = KF.latest_state();
-                PointCloud full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
+                Points full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
+                PointCloud _full_compensated; for (Point p : full_compensated) _full_compensated += p;
+                PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * _full_compensated;
                 PointCloud global_full_ds_compensated = comp.downsample(global_full_compensated);
 
                 if (global_full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 

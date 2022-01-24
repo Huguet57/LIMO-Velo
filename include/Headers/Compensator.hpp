@@ -3,14 +3,16 @@ class Compensator {
         Compensator() {};
 
         // Main constructor
-        PointCloud compensate(double t1, double t2, bool global=false);
-        PointCloud compensate(States& states, Points& points, bool global=false);
+        Points compensate(double t1, double t2);
+        Points compensate(const States& states, const State& Xt2, const Points& points);
         
-        States integrate_imus(double t1, double t2);
+        States path(double t1, double t2);
         PointCloud downsample(const PointCloud&);
 
     private:
-        States integrate_imus(States& states, const IMUs& imus, double t1, double t2);
+        State get_t2(const States&, double t2);
+        States upsample(const States&, const IMUs&);
+
         PointCloud voxelgrid_downsample(const PointCloud&);
         PointCloud onion_downsample(const PointCloud&);
 };

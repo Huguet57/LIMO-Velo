@@ -63,10 +63,16 @@ extern struct Params Config;
 
         /////////////////////////////////
 
+        State Accumulator::get_prev_state(double t) {
+            return this->get_prev(this->BUFFER_X, t);
+        }
+
+        IMU Accumulator::get_next_imu(double t) {
+            return this->get_next(this->BUFFER_I, t);
+        }
+
         States Accumulator::get_states(double t1, double t2) {
-            States states = this->get(this->BUFFER_X, t1, t2);
-            states.push_front(this->get_prev(this->BUFFER_X, t1));
-            return states;
+            return this->get(this->BUFFER_X, t1, t2);
         }
 
         Points Accumulator::get_points(double t1, double t2) {
@@ -74,9 +80,7 @@ extern struct Params Config;
         }
 
         IMUs Accumulator::get_imus(double t1, double t2) {
-            IMUs imus = this->get(this->BUFFER_I, t1, t2);
-            imus.push_back(this->get_next(this->BUFFER_I, t2));
-            return imus;
+            return this->get(this->BUFFER_I, t1, t2);
         }
 
         //////////////////////////
@@ -95,8 +99,9 @@ extern struct Params Config;
         }
 
         bool Accumulator::ended(double t) {
+            if (not this->ready()) return false;
             if (t - initial_time < 3) return false;
-            return this->ready() and this->get_imus(t - 3., t).size() < 2;
+            return this->get_imus(t - 3., t).size() < 2;
         }
 
         ros::Rate Accumulator::refine_delta(const HeuristicParams& heuristic, double t) {

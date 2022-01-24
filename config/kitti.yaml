@@ -1,5 +1,5 @@
 # Online/Offline
-mapping_online: false
+mapping_online: true
 real_time: false
 
 # Topics
