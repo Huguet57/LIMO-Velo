@@ -23,9 +23,7 @@
 
             // (Integrated) States surrounding t1 and t2
             States path_taken = this->path(t1, t2);
-            assert (not path_taken.size() < 2);
-
-            // ROS_INFO("Points: %d, path: %d", points.size(), path_taken.size());
+            assert (path_taken.size() >= 2);
 
             // Compensated pointcloud given a path
             State Xt2 = this->get_t2(path_taken, t2);
@@ -51,9 +49,9 @@
     // private:
         
         State Compensator::get_t2(const States& states, double t2) {            
-            int s = states.size();
-            assert (t2 >= states.front().time);
-            while (t2 >= states[--s].time);
+            int s = states.size() - 1;
+            assert (states.front().time <= t2);
+            while (t2 < states[s].time) --s;
             
             State Xt2 = states[s];
             Xt2 += IMU (Xt2.a, Xt2.w, t2);
@@ -61,14 +59,12 @@
         }
 
         /*
-            New upsample.
-
-                @Input:
-                    states: before t1 and to t2
-                    imus: before t1 and after t2
-                
-                @Output:
-                    upsampled_states (size := imus.size): before t1 and after t2
+            @Input:
+                states: before t1 and to t2
+                imus: before t1 and after t2
+            
+            @Output:
+                upsampled_states (size := imus.size): before t1 and after t2
         */
         States Compensator::upsample(const States& states, const IMUs& imus) {
             assert (imus.front().time <= states.front().time and states.back().time <= imus.back().time);
@@ -81,7 +77,9 @@
 
             // IMUs between two states
             while (s < states.size() - 1) {
-                while (u < imus.size() and int_state.time < states[s+1].time) {
+                upsampled_states.push_back(states[s]);
+
+                while (u < imus.size() and imus[u].time < states[s+1].time) {
                     int_state += imus[u++];
                     upsampled_states.push_back(int_state);
                 }
@@ -90,6 +88,8 @@
             }
 
             if (u >= imus.size()) u = imus.size() - 1;
+            upsampled_states.push_back(states.back());
+            int_state = states.back();
 
             // IMUs after last state
             while (int_state.time < imus.back().time) {
@@ -106,18 +106,16 @@
         }
 
         /*
-            New compensate.
-
-                @Input:
-                    states: path the car has taken (pre and post included)
-                    points: stamped points during path
-                @Output:
-                    compensated_points: compensated points ready to be transported by Xt2
-                
-                @Pseudocode:
-                    for each state:
-                        for each point between state and next_state:
-                            compensate point matching its time via integrating state's last IMU
+            @Input:
+                states: path the car has taken (pre and post included)
+                points: stamped points during path
+            @Output:
+                compensated_points: compensated points ready to be transported by Xt2
+            
+            @Pseudocode:
+                for each state:
+                    for each point between state and next_state:
+                        compensate point matching its time via integrating state's last IMU
         */
 
         Points Compensator::compensate(const States& states, const State& Xt2, const Points& points) {
