@@ -37,13 +37,13 @@ covariance_bias_gyroscope: 1.e-4
 covariance_bias_acceleration: 1.e-4
 
 # Localizator
-MAX_NUM_ITERS: 1
+MAX_NUM_ITERS: 3
 # LIMITS: [0.001] * 23
 NUM_MATCH_POINTS: 5
 MAX_DIST_PLANE: 2.23
 PLANES_THRESHOLD: 1.e-1
 degeneracy_threshold: 400.
-print_degeneracy_values: true
+print_degeneracy_values: false
 
 # Delta refinement
 Heuristic:

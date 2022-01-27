@@ -17,17 +17,17 @@ class Mapper {
         bool exists();
         int size();
 
-        void add(PointCloud&, double time, bool downsample=false);        
-        void add(const State&, PointCloud&, bool downsample=false);        
-        Matches match(const State&, const PointCloud&);
+        void add(Points&, double time, bool downsample=false);        
+        void add(const State&, Points&, bool downsample=false);        
+        Matches match(const State&, const Points&);
         bool hasToMap(double t);
 
     private:
         void init_tree();
-        void build_tree(PointCloud&);
+        void build_tree(Points&);
         bool exists_tree();
 
-        void add_points(PointCloud&, bool downsample=false);
+        void add_points(Points&, bool downsample=false);
         Match match_plane(const Point&);
 
     // Singleton pattern

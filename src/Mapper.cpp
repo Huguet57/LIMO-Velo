@@ -19,12 +19,12 @@ extern struct Params Config;
             this->init_tree();
         }
 
-        void Mapper::add(PointCloud& pcl, double time, bool downsample) {
-            if (pcl.empty()) return;
+        void Mapper::add(Points& points, double time, bool downsample) {
+            if (points.empty()) return;
 
             // If map doesn't exist, build it.
-            if (not this->exists()) this->build_tree(pcl);
-            else this->add_points(pcl, downsample);
+            if (not this->exists()) this->build_tree(points);
+            else this->add_points(points, downsample);
 
             this->last_map_time = time;
         }
@@ -37,16 +37,16 @@ extern struct Params Config;
             return this->exists_tree();
         }
 
-        Matches Mapper::match(const State& X, const PointCloud& points) {            
+        Matches Mapper::match(const State& X, const Points& points) {            
             Matches matches;
             if (not this->exists()) return matches;
             matches.reserve(points.size());
             
             omp_set_num_threads(MP_PROC_NUM);
             #pragma omp parallel for
-            for (PointType p : points) {
+            for (Point p : points) {
                 // Direct approach: we match the point with a plane on the map
-                Match match = this->match_plane(X * X.I_Rt_L() * Point(p));
+                Match match = this->match_plane(X * X.I_Rt_L() * p);
                 if (match.is_chosen()) matches.push_back(match);
             }
 
@@ -63,14 +63,14 @@ extern struct Params Config;
             this->map = KD_TREE<Point>::Ptr (new KD_TREE<Point>(0.3, 0.6, 0.2));
         }
 
-        void Mapper::build_tree(PointCloud& pcl) {
-            PointVector pts; for (PointType p : pcl.points) pts.push_back(Point(p));
-            this->map->Build(pts);
+        void Mapper::build_tree(Points& points) {
+            PointVector as_vector; for (Point p : points) as_vector.push_back(p);
+            this->map->Build(as_vector);
         }
 
-        void Mapper::add_points(PointCloud& pcl, bool downsample) {
-            PointVector pts; for (PointType p : pcl.points) pts.push_back(Point(p));
-            this->map->Add_Points(pts, downsample);
+        void Mapper::add_points(Points& points, bool downsample) {
+            PointVector as_vector; for (Point p : points) as_vector.push_back(p);
+            this->map->Add_Points(as_vector, downsample);
         }
 
         bool Mapper::exists_tree() {

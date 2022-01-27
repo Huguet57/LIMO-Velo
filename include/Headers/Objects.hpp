@@ -269,6 +269,7 @@ class State {
         friend Point operator* (const State& X, const Point& p);
         friend RotTransl operator* (const State& X, const RotTransl& RT);
         friend PointCloud operator* (const State& X, const PointCloud& pcl);
+        friend Points operator* (const State& X, const Points& points);
     private:
         // When propagating, we set noises = 0
         void propagate_f(IMU imu, float dt);
@@ -300,6 +301,7 @@ class RotTransl {
         friend RotTransl operator* (const RotTransl&, const RotTransl&);
         friend Point operator* (const RotTransl&, const Point& p);
         friend PointCloud operator* (const RotTransl&, const PointCloud&);
+        friend Points operator* (const RotTransl&, const Points&);
 };
 
 class Normal {

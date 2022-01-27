@@ -20,7 +20,7 @@ extern struct Params Config;
         }
 
         // Given points, update new position
-        void Localizator::update(const PointCloud& points) {
+        void Localizator::update(const Points& points) {
             if (not Mapper::getInstance().exists()) return;
             return this->IKFoM_update(points);
         }
@@ -94,7 +94,7 @@ extern struct Params Config;
             this->init_IKFoM_state();
         }
 
-        void Localizator::IKFoM_update(const PointCloud& points) {
+        void Localizator::IKFoM_update(const Points& points) {
             double solve_H_time = 0;
             this->points2match = points;            
             this->IKFoM_KF.update_iterated_dyn_share_modified(Config.LiDAR_noise, Config.degeneracy_threshold, solve_H_time, Config.print_degeneracy_values);

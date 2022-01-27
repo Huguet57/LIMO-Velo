@@ -106,8 +106,7 @@ int main(int argc, char** argv) {
             if (Config.mapping_online or (not Config.mapping_online and map.exists())) {
                 // Compensated pointcloud given a path
                 Points compensated = comp.compensate(t1, t2);
-                PointCloud _compensated; for (Point p : compensated) _compensated += p;
-                PointCloud ds_compensated = comp.downsample(_compensated);
+                Points ds_compensated = comp.downsample(compensated);
                 if (ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
                 // Localize points in map
@@ -118,7 +117,7 @@ int main(int argc, char** argv) {
                 publish.tf(Xt2);
 
                 // Publish compensated
-                PointCloud global_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
+                Points global_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
                 publish.pointcloud(global_compensated);
 
                 // Map at the same time (online)
@@ -132,15 +131,12 @@ int main(int argc, char** argv) {
             if (not Config.mapping_online and map.hasToMap(t2)) {
                 State Xt2 = KF.latest_state();
                 Points full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                PointCloud _full_compensated; for (Point p : full_compensated) _full_compensated += p;
-                PointCloud global_full_compensated = Xt2 * Xt2.I_Rt_L() * _full_compensated;
-                PointCloud global_full_ds_compensated = comp.downsample(global_full_compensated);
+                Points global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
+                Points global_full_ds_compensated = comp.downsample(global_full_compensated);
 
                 if (global_full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
                 if (Config.print_extrinsics) publish.extrinsics(Xt2);
 
-                // map.add(global_full_compensated, t2, true);
-                // publish.full_pointcloud(global_full_compensated);
                 map.add(global_full_ds_compensated, t2, true);
                 publish.full_pointcloud(global_full_ds_compensated);
             }

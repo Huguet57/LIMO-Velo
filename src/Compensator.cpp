@@ -25,7 +25,7 @@
             States path_taken = this->path(t1, t2);
             assert (path_taken.size() >= 2);
 
-            // Compensated pointcloud given a path
+            // Compensated points given a path
             State Xt2 = this->get_t2(path_taken, t2);
 
             return this->compensate(path_taken, Xt2, points);
@@ -100,9 +100,9 @@
             return upsampled_states;
         }
 
-        PointCloud Compensator::downsample(const PointCloud& compensated) {
-            return this->voxelgrid_downsample(compensated);
-            // return this->onion_downsample(compensated);
+        Points Compensator::downsample(const Points& points) {
+            return this->voxelgrid_downsample(points);
+            // return this->onion_downsample(points);
         }
 
         /*
@@ -143,39 +143,37 @@
             return t2_inv_ps;
         }
 
-        PointCloud Compensator::voxelgrid_downsample(const PointCloud& compensated) {
+        Points Compensator::voxelgrid_downsample(const Points& points) {
             // Create a PointCloud pointer
-            PointCloud::Ptr compensated_ptr(new PointCloud());
-            *compensated_ptr = compensated;
+            PointCloud::Ptr pcl_ptr(new PointCloud());
+            for (Point p : points) pcl_ptr->points.push_back(p.toPCL());
 
             // Downsample using a VoxelGrid
-            PointCloud downsampled_compensated;
+            PointCloud ds_pcl;
             pcl::VoxelGrid<PointType> filter;
-            filter.setInputCloud(compensated_ptr);
+            filter.setInputCloud(pcl_ptr);
             filter.setLeafSize(0.5, 0.5, 0.5);
-            filter.filter(downsampled_compensated);
+            filter.filter(ds_pcl);
             
-            return downsampled_compensated;
+            Points ds_points;
+            for (PointType p : ds_pcl.points) ds_points.push_back(Point (p));
+            return ds_points;
         }
 
-        PointCloud Compensator::onion_downsample(const PointCloud& pcl) {
-            PointCloud downsampled_pcl;
-            downsampled_pcl.header = pcl.header;
-            downsampled_pcl.points.reserve(pcl.size()/4);
+        Points Compensator::onion_downsample(const Points& points) {
+            Points ds_points;
 
-            for (int i = 0; i < pcl.size(); ++i) {
-                PointType ptype = pcl.points[i];
-                double range = Point (ptype).range;
-
-                if (0 < range and range < 4 and (256/Config.ds_rate <= 1 or i%(256/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
-                else if (4 < range and range < 6 and (64/Config.ds_rate <= 1 or i%(64/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
-                else if (6 < range and range < 9 and (32/Config.ds_rate <= 1 or i%(32/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
-                else if (9 < range and range < 12 and (16/Config.ds_rate <= 1 or i%(16/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
-                else if (12 < range and range < 22 and (8/Config.ds_rate <= 1 or i%(8/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
-                else if (22 < range and range < 30 and (4/Config.ds_rate <= 1 or i%(4/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
-                else if (30 < range and range < 50 and (2/Config.ds_rate <= 1 or i%(2/Config.ds_rate) == 0)) downsampled_pcl.points.push_back(ptype);
-                else if (range > 50) downsampled_pcl.points.push_back(ptype);
+            for (int i = 0; i < points.size(); ++i) {
+                const Point& p = points[i];
+                if (0 < p.range and p.range < 4 and (256/Config.ds_rate <= 1 or i%(256/Config.ds_rate) == 0)) ds_points.push_back(p);
+                else if (4 < p.range and p.range < 6 and (64/Config.ds_rate <= 1 or i%(64/Config.ds_rate) == 0)) ds_points.push_back(p);
+                else if (6 < p.range and p.range < 9 and (32/Config.ds_rate <= 1 or i%(32/Config.ds_rate) == 0)) ds_points.push_back(p);
+                else if (9 < p.range and p.range < 12 and (16/Config.ds_rate <= 1 or i%(16/Config.ds_rate) == 0)) ds_points.push_back(p);
+                else if (12 < p.range and p.range < 22 and (8/Config.ds_rate <= 1 or i%(8/Config.ds_rate) == 0)) ds_points.push_back(p);
+                else if (22 < p.range and p.range < 30 and (4/Config.ds_rate <= 1 or i%(4/Config.ds_rate) == 0)) ds_points.push_back(p);
+                else if (30 < p.range and p.range < 50 and (2/Config.ds_rate <= 1 or i%(2/Config.ds_rate) == 0)) ds_points.push_back(p);
+                else if (p.range > 50) ds_points.push_back(p);
             }
 
-            return downsampled_pcl;
+            return ds_points;
         }

@@ -50,8 +50,30 @@ class Publishers {
             publish_pcl(pcl);
         }
 
+        void pointcloud(Points& points) {
+            if (points.empty()) return;
+            
+            PointCloud pcl;
+            pcl.header.frame_id = "map";
+            pcl.header.stamp = Conversions::sec2Microsec(points.back().time);
+            for (Point p : points) pcl.push_back(p.toPCL());
+
+            publish_pcl(pcl);
+        }
+
         void full_pointcloud(PointCloud& pcl) {
             pcl.header.frame_id = "map";
+            publish_full_pcl(pcl);
+        }
+
+        void full_pointcloud(Points& points) {
+            if (points.empty()) return;
+            
+            PointCloud pcl;
+            pcl.header.frame_id = "map";
+            pcl.header.stamp = Conversions::sec2Microsec(points.back().time);
+            for (Point p : points) pcl.push_back(p.toPCL());
+
             publish_full_pcl(pcl);
         }
 

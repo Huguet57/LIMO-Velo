@@ -10,7 +10,7 @@ class Localizator {
     // Variables
 
     public:
-        PointCloud points2match;
+        Points points2match;
         double last_time_integrated = -1;
 
     private:
@@ -20,7 +20,7 @@ class Localizator {
 
     public:
         Localizator();
-        void update(const PointCloud&);
+        void update(const Points&);
         void calculate_H(const state_ikfom&, const Matches&, Eigen::MatrixXd& H, Eigen::VectorXd& h);
         
         void propagate_to(double t);
@@ -29,7 +29,7 @@ class Localizator {
     private:
         void init_IKFoM();
         void init_IKFoM_state();
-        void IKFoM_update(const PointCloud&);
+        void IKFoM_update(const Points&);
         
         void propagate(const IMU& imu);
         const state_ikfom& get_x() const;

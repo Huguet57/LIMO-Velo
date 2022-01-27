@@ -87,6 +87,10 @@ template class Buffer<State>;
             return RotTransl(X) * pcl;
         }
 
+        Points operator* (const State& X, const Points& points) {
+            return RotTransl(X) * points;
+        }
+
     // private:
         // When propagating, we set noises = 0
         void State::propagate_f(IMU imu, float dt) {
@@ -138,6 +142,12 @@ template class Buffer<State>;
             PointCloud moved_pcl;
             for (PointType p : pcl.points) moved_pcl += RT * Point(p);
             return moved_pcl;
+        }
+
+        Points operator* (const RotTransl& RT, const Points& points) {
+            Points moved_pts = points;
+            for (Point& p : moved_pts) p = RT*p;
+            return moved_pts;
         }
 
 // class Plane
