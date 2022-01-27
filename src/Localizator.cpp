@@ -97,7 +97,7 @@ extern struct Params Config;
         void Localizator::IKFoM_update(const PointCloud& points) {
             double solve_H_time = 0;
             this->points2match = points;            
-            this->IKFoM_KF.update_iterated_dyn_share_modified(Config.LiDAR_noise, solve_H_time);
+            this->IKFoM_KF.update_iterated_dyn_share_modified(Config.LiDAR_noise, Config.degeneracy_threshold, solve_H_time, Config.print_degeneracy_values);
         }
 
         void Localizator::init_IKFoM_state() {

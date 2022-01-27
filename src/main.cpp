@@ -33,6 +33,8 @@ int main(int argc, char** argv) {
     nh.param<double>("LiDAR_noise", Config.LiDAR_noise, 0.001);
     nh.param<double>("min_dist", Config.min_dist, 3.);
     nh.param<double>("imu_rate", Config.imu_rate, 400);
+    nh.param<double>("degeneracy_threshold", Config.degeneracy_threshold, 5.d);
+    nh.param<bool>("print_degeneracy_values", Config.print_degeneracy_values, false);
     nh.param<double>("full_rotation_time", Config.full_rotation_time, 0.1);
     nh.param<double>("empty_lidar_time", Config.empty_lidar_time, 20.);
     nh.param<double>("real_time_delay", Config.real_time_delay, 1.);

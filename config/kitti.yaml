@@ -3,6 +3,8 @@ mapping_online: true
 real_time: false
 
 # Topics
+# points_topic: "/points_raw"
+# imus_topic: "/imu_raw"
 points_topic: "/kitti/velo/pointcloud"
 imus_topic: "/kitti/oxts/imu"
 
@@ -35,16 +37,15 @@ covariance_bias_gyroscope: 1.e-4
 covariance_bias_acceleration: 1.e-4
 
 # Localizator
-MAX_NUM_ITERS: 3
+MAX_NUM_ITERS: 1
 # LIMITS: [0.001] * 23
 NUM_MATCH_POINTS: 5
 MAX_DIST_PLANE: 2.23
 PLANES_THRESHOLD: 1.e-1
+degeneracy_threshold: 400.
+print_degeneracy_values: true
 
 # Delta refinement
 Heuristic:
-  # times: [1.0, 2.0]
-  # deltas: [0.1, 0.025, 0.01]
-
   times: []
   deltas: [0.1]

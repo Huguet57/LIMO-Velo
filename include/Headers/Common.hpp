@@ -69,6 +69,9 @@ struct Params {
 
     int ds_rate;
     double min_dist;
+    
+    double degeneracy_threshold;
+    bool print_degeneracy_values;
 
     int MAX_NUM_ITERS;
     int MAX_POINTS2MATCH;
