@@ -101,8 +101,8 @@
         }
 
         Points Compensator::downsample(const Points& points) {
-            // return this->voxelgrid_downsample(points);
-            return this->onion_downsample(points);
+            return this->voxelgrid_downsample(points);
+            // return this->onion_downsample(points);
         }
 
         /*
