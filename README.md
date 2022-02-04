@@ -9,15 +9,11 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 - [ ] Initialize IMU measurements
 - [ ] Rethink Voxelgrid filter, remove PointCloud objects where not needed.
 - [ ] Check if need to add point in map
-- [ ] Compensator does not work correctly (mapping online != offline)
-    - [ ] Doesn't compensate all points, the ones after the last IMU are ignored.
-    - [ ] Doesn't use well known states when compensating. Accumulating and mapping offline works way better.
 - [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
 
 ### New features
 - [ ] Interpolation and smoothing of states when mapping offline
 - [ ] Erase unused (potentially dangerous) points in the map
-- [ ] Add degeneracy detection and correction
 - [ ] Try to add a module for removing dynamic objects such as people or vehicles
 
 ---
@@ -38,6 +34,8 @@ An additional launch file ``roslaunch limovelo debug.launch`` is added that uses
 
 ## 3. Changing parameters
 To adapt LIMO-Velo to our own hardware infrastructure, a [YAML](https://yaml.org/) file ``config/params.yaml`` is available and we need to change it to our own topic names and sensor specs.
+
+Relevant parameters are ``real_time`` if you want to get real time experience, ``mapping_offline`` is on an alpha stage and it does not work 100% as it should of and the ``heuristic`` parameter which you can choose how you want the initialization of the pointcloud sizes (sizes =: deltas, in seconds).
 
 ## 4. Modifying the LiDAR driver to get true real-time performance
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
