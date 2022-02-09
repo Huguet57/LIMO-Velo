@@ -83,10 +83,6 @@ template class Buffer<State>;
             return RotTransl(X) * RT;
         }
 
-        PointCloud operator* (const State& X, const PointCloud& pcl) {
-            return RotTransl(X) * pcl;
-        }
-
         Points operator* (const State& X, const Points& points) {
             return RotTransl(X) * points;
         }
@@ -136,12 +132,6 @@ template class Buffer<State>;
                 RT.R*p.toEigen() + RT.t,
                 p  // attributes
             );
-        }
-
-        PointCloud operator* (const RotTransl& RT, const PointCloud& pcl) {
-            PointCloud moved_pcl;
-            for (PointType p : pcl.points) moved_pcl += RT * Point(p);
-            return moved_pcl;
         }
 
         Points operator* (const RotTransl& RT, const Points& points) {

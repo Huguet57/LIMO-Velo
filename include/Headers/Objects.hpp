@@ -83,27 +83,25 @@ class Point {
             this->set_attributes(attributes);
         }
 
-        #if LIDAR_TYPE == VELODYNE
-            velodyne_ros::Point toPCL() const {
-                velodyne_ros::Point p;
-                p.x = this->x;
-                p.y = this->y;
-                p.z = this->z;
-                p.time = (float) this->time;    // TODO?: Not relative time
-                p.intensity = this->intensity;
-                return p;
-            }
-        #elif LIDAR_TYPE == HESAI
-            hesai_ros::Point toPCL() const {
-                hesai_ros::Point p;
-                p.x = this->x;
-                p.y = this->y;
-                p.z = this->z;
-                p.timestamp = this->time;
-                p.intensity = this->intensity;
-                return p;
-            }
-        #endif
+        velodyne_ros::Point toVelodyne() const {
+            velodyne_ros::Point p;
+            p.x = this->x;
+            p.y = this->y;
+            p.z = this->z;
+            p.time = (float) this->time;    // TODO?: Not relative time
+            p.intensity = this->intensity;
+            return p;
+        }
+
+        hesai_ros::Point toHesai() const {
+            hesai_ros::Point p;
+            p.x = this->x;
+            p.y = this->y;
+            p.z = this->z;
+            p.timestamp = this->time;
+            p.intensity = this->intensity;
+            return p;
+        }
 
         Eigen::Matrix<float, 3, 1> toEigen() const {
             return Eigen::Matrix<float, 3, 1>(this->x, this->y, this->z);
@@ -268,7 +266,6 @@ class State {
         void operator+= (const IMU& imu);
         friend Point operator* (const State& X, const Point& p);
         friend RotTransl operator* (const State& X, const RotTransl& RT);
-        friend PointCloud operator* (const State& X, const PointCloud& pcl);
         friend Points operator* (const State& X, const Points& points);
     private:
         // When propagating, we set noises = 0
@@ -300,7 +297,6 @@ class RotTransl {
 
         friend RotTransl operator* (const RotTransl&, const RotTransl&);
         friend Point operator* (const RotTransl&, const Point& p);
-        friend PointCloud operator* (const RotTransl&, const PointCloud&);
         friend Points operator* (const RotTransl&, const Points&);
 };
 

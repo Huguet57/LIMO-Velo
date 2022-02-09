@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
     nh.param<double>("MAX_DIST_PLANE", Config.MAX_DIST_PLANE, 2.0);
     nh.param<float>("PLANES_THRESHOLD", Config.PLANES_THRESHOLD, 0.1f);
     nh.param<float>("PLANES_CHOOSE_CONSTANT", Config.PLANES_CHOOSE_CONSTANT, 9.0f);
+    nh.param<int>("LiDAR_type", Config.LiDAR_type, 0);
     nh.param<double>("LiDAR_noise", Config.LiDAR_noise, 0.001);
     nh.param<double>("min_dist", Config.min_dist, 3.);
     nh.param<double>("imu_rate", Config.imu_rate, 400);
