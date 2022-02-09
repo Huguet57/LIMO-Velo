@@ -191,8 +191,6 @@ class IMU {
         }
 
         IMU (double time) : IMU (Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), time) {}
-
-        friend std::ostream& operator<< (std::ostream& out, const IMU& imu);
 };
 
 class State {
@@ -333,9 +331,7 @@ class Plane {
         Plane() {}
         Plane(const PointVector&, const std::vector<float>&);
         float dist_to_plane(const Point&) const;
-    
-    template <typename AbstractPoint>
-        bool on_plane(const AbstractPoint&);
+        bool on_plane(const Point&);
 
     private:
         bool enough_points(const PointVector&);
@@ -356,7 +352,4 @@ class Match {
         }
 
         bool is_chosen();
-
-    private:
-        bool FAST_LIO_HEURISTIC();
 };
