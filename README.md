@@ -7,7 +7,8 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 ## TODO list
 ### Fixes
 - [ ] Initialize IMU measurements
-- [ ] Rethink Voxelgrid filter, remove PointCloud objects where not needed.
+- [ ] Remove unused ``Publishers.hpp``'s methods.
+- [ ] Simplify the upsampling in the Compensator.
 - [ ] Check if need to add point in map
 - [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
 
