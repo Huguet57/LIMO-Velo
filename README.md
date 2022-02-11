@@ -15,6 +15,8 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 - [ ] Interpolation and smoothing of states when mapping offline
 - [ ] Erase unused (potentially dangerous) points in the map
 - [ ] Try to add a module for removing dynamic objects such as people or vehicles
+- [ ] Use UKF instead of EKF for fun
+- [ ] Add vision buffer and ability to paint the map's points
 
 ---
 
