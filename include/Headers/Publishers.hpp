@@ -1,3 +1,8 @@
+namespace Processor {
+    void fill(pcl::PointCloud<velodyne_ros::Point>&, const Points&);
+    void fill(pcl::PointCloud<hesai_ros::Point>&, const Points&);
+}
+
 class Publishers {
     public:
         ros::Publisher state_pub;
@@ -45,34 +50,24 @@ class Publishers {
             publish_planes(X, planes);
         }
 
-        void pointcloud(PointCloud& pcl) {
-            pcl.header.frame_id = "map";
-            publish_pcl(pcl);
-        }
-
         void pointcloud(Points& points) {
             if (points.empty()) return;
             
-            PointCloud pcl;
+            pcl::PointCloud<velodyne_ros::Point> pcl;
             pcl.header.frame_id = "map";
             pcl.header.stamp = Conversions::sec2Microsec(points.back().time);
-            for (Point p : points) pcl.push_back(p.toPCL());
+            Processor::fill(pcl, points);
 
             publish_pcl(pcl);
-        }
-
-        void full_pointcloud(PointCloud& pcl) {
-            pcl.header.frame_id = "map";
-            publish_full_pcl(pcl);
         }
 
         void full_pointcloud(Points& points) {
             if (points.empty()) return;
             
-            PointCloud pcl;
+            pcl::PointCloud<velodyne_ros::Point> pcl;
             pcl.header.frame_id = "map";
             pcl.header.stamp = Conversions::sec2Microsec(points.back().time);
-            for (Point p : points) pcl.push_back(p.toPCL());
+            Processor::fill(pcl, points);
 
             publish_full_pcl(pcl);
         }
@@ -205,7 +200,7 @@ class Publishers {
             std::cout << RT.t.transpose() << std::endl;
         }
 
-        void publish_pcl(const PointCloud& pcl) {
+        void publish_pcl(const pcl::PointCloud<velodyne_ros::Point>& pcl) {
             sensor_msgs::PointCloud2 msg;
             msg.header.stamp = ros::Time(Conversions::microsec2Sec(pcl.header.stamp));
             msg.header.frame_id = "map";
@@ -213,7 +208,7 @@ class Publishers {
             this->pcl_pub.publish(msg);
         }
 
-        void publish_full_pcl(const PointCloud& pcl) {
+        void publish_full_pcl(const pcl::PointCloud<velodyne_ros::Point>& pcl) {
             sensor_msgs::PointCloud2 msg;
             msg.header.stamp = ros::Time(Conversions::microsec2Sec(pcl.header.stamp));
             msg.header.frame_id = "map";

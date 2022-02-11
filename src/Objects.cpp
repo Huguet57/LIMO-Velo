@@ -34,30 +34,6 @@ template class Buffer<State>;
             return p + (-v);
         }
 
-        std::ostream& operator<< (std::ostream& out, const Point& p) {
-            out << "(x="
-                << p.x << ", y="
-                << p.y << ", z="
-                << p.z << ", t="
-                << std::setprecision(16)
-                << p.time
-                << ")";
-
-            return out;
-        }
-
-// class IMU
-    // public:
-        std::ostream& operator<< (std::ostream& out, const IMU& imu) {
-            out << "{" << std::endl
-                << "\ta: " << imu.a.transpose() << std::endl
-                << "\tw: " << imu.w.transpose() << std::endl
-                << "\ttime: " << std::setprecision(16) << imu.time << std::endl
-                << "}";
-            
-            return out;
-        }
-
 // class State {
     // public:
         RotTransl State::I_Rt_L() const {
@@ -81,10 +57,6 @@ template class Buffer<State>;
 
         RotTransl operator* (const State& X, const RotTransl& RT) {
             return RotTransl(X) * RT;
-        }
-
-        PointCloud operator* (const State& X, const PointCloud& pcl) {
-            return RotTransl(X) * pcl;
         }
 
         Points operator* (const State& X, const Points& points) {
@@ -131,17 +103,11 @@ template class Buffer<State>;
             );
         }
 
-        Point operator* (const RotTransl& RT, const Point& p) {
+        Point operator* (const RotTransl& RT, const Point& attributes) {
             return Point(
                 RT.R*p.toEigen() + RT.t,
-                p  // attributes
+                attributes
             );
-        }
-
-        PointCloud operator* (const RotTransl& RT, const PointCloud& pcl) {
-            PointCloud moved_pcl;
-            for (PointType p : pcl.points) moved_pcl += RT * Point(p);
-            return moved_pcl;
         }
 
         Points operator* (const RotTransl& RT, const Points& points) {
@@ -164,8 +130,7 @@ template class Buffer<State>;
             return n.A * p.x + n.B * p.y + n.C * p.z + n.D;
         }
 
-        template <typename AbstractPoint>
-        bool Plane::on_plane(const AbstractPoint& p) {
+        bool Plane::on_plane(const Point& p) {
             return std::fabs(this->dist_to_plane(p)) < Config.PLANES_THRESHOLD;
         }
 
@@ -201,10 +166,4 @@ template class Buffer<State>;
     // public:
         bool Match::is_chosen() {
             return this->plane.is_plane;
-        }
-
-    // private:
-        bool Match::FAST_LIO_HEURISTIC() {
-            float s = 1 - 0.9 * std::fabs(this->distance) / std::sqrt(this->point.range);
-            return s > 0.9;
         }

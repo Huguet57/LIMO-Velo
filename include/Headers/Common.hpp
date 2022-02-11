@@ -41,10 +41,10 @@
 #include "ikd_Tree.h"
 #endif
 
-// Define the LiDAR type for the compiler
-#define VELODYNE 0
-#define HESAI 1
-#define LIDAR_TYPE VELODYNE
+namespace LIDAR_TYPE {
+    const int Velodyne = 0;
+    const int Hesai = 1;
+}
 
 struct HeuristicParams {
     std::vector<double> times;
@@ -69,6 +69,7 @@ struct Params {
 
     int ds_rate;
     double min_dist;
+    int LiDAR_type;
     
     double degeneracy_threshold;
     bool print_degeneracy_values;
@@ -135,14 +136,6 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(hesai_ros::Point,
     (std::uint16_t, ring, ring)
 )
 
-#if LIDAR_TYPE == VELODYNE
-    typedef velodyne_ros::Point PointType;
-#elif LIDAR_TYPE == HESAI
-    typedef hesai_ros::Point PointType;
-#endif
-
-typedef std::vector<PointType, Eigen::aligned_allocator<PointType> > PointTypes;
-typedef pcl::PointCloud<PointType> PointCloud;
 typedef sensor_msgs::PointCloud2::ConstPtr PointCloud_msg;
 typedef sensor_msgs::ImuConstPtr IMU_msg;
 typedef double TimeType;

@@ -145,18 +145,18 @@
 
         Points Compensator::voxelgrid_downsample(const Points& points) {
             // Create a PointCloud pointer
-            PointCloud::Ptr pcl_ptr(new PointCloud());
-            for (Point p : points) pcl_ptr->points.push_back(p.toPCL());
+            pcl::PointCloud<velodyne_ros::Point>::Ptr pcl_ptr(new pcl::PointCloud<velodyne_ros::Point>());
+            Processor::fill(*pcl_ptr, points);
 
             // Downsample using a VoxelGrid
-            PointCloud ds_pcl;
-            pcl::VoxelGrid<PointType> filter;
+            pcl::PointCloud<velodyne_ros::Point> ds_pcl;
+            pcl::VoxelGrid<velodyne_ros::Point> filter;
             filter.setInputCloud(pcl_ptr);
             filter.setLeafSize(0.5, 0.5, 0.5);
             filter.filter(ds_pcl);
             
             Points ds_points;
-            for (PointType p : ds_pcl.points) ds_points.push_back(Point (p));
+            for (auto p : ds_pcl.points) ds_points.push_back(Point (p));
             return ds_points;
         }
 
