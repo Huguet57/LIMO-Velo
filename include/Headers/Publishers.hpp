@@ -271,6 +271,16 @@ class Publishers {
             msg.pose.pose.orientation.z = q.z();
             msg.pose.pose.orientation.w = q.w();
 
+            // Local velocities
+            Eigen::Vector3f localVels = state.R.transpose()*state.vel;
+            msg.twist.twist.linear.x = localVels(0);
+            msg.twist.twist.linear.y = localVels(1);
+            msg.twist.twist.linear.z = localVels(2);
+
+            msg.twist.twist.angular.x = state.w(0);
+            msg.twist.twist.angular.y = state.w(1);
+            msg.twist.twist.angular.z = state.w(2);
+
             this->state_pub.publish(msg);
         }
 

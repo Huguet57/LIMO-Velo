@@ -224,6 +224,11 @@ class State {
 
         State() : State (0.) {}
 
+        State(const state_ikfom& s, const IMU& imu, double time) : State(s, time) {
+            this->a = imu.a;
+            this->w = imu.w;
+        }
+
         State(const state_ikfom& s, double time) : State (time) {
             this->R = s.rot.toRotationMatrix().cast<float>();
             this->pos = s.pos.cast<float>();

@@ -67,6 +67,7 @@ extern struct Params Config;
         State Localizator::latest_state() {
             return State(
                 this->get_x(),
+                Accumulator::getInstance().get_next_imu(this->last_time_integrated),
                 this->last_time_integrated
             );
         }
