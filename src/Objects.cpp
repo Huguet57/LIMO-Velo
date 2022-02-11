@@ -103,10 +103,10 @@ template class Buffer<State>;
             );
         }
 
-        Point operator* (const RotTransl& RT, const Point& attributes) {
+        Point operator* (const RotTransl& RT, const Point& p) {
             return Point(
                 RT.R*p.toEigen() + RT.t,
-                attributes
+                p
             );
         }
 
