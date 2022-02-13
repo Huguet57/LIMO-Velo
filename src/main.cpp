@@ -99,10 +99,16 @@ int main(int argc, char** argv) {
 
             // Refine delta if need to be
             rate = accum.refine_delta(Config.Heuristic, t2);
-            double t1 = t2 - accum.delta;
+            
+            // Define t1
+            double t1 = std::max(KF.last_time_updated, t2 - accum.delta);
+            if (KF.last_time_updated < 0) t1 = t2 - accum.delta;
 
             // Integrate from t1 to t2
             KF.propagate_to(t2);
+
+            // Field of view too small (relevant for real-time)
+            if (t2 - t1 < accum.delta - 1e-6) break;
 
             if (Config.mapping_online or (not Config.mapping_online and map.exists())) {
                 // Compensated pointcloud given a path
@@ -111,7 +117,7 @@ int main(int argc, char** argv) {
                 if (ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
                 // Localize points in map
-                KF.update(ds_compensated);
+                KF.update(ds_compensated, t2);
                 State Xt2 = KF.latest_state();
                 accum.add(Xt2, t2);
                 publish.state(Xt2, false);
@@ -149,7 +155,7 @@ int main(int argc, char** argv) {
             break;
         }
 
-        if (accum.ended(t2)) break;
+        if (accum.ended(t2) and not Config.real_time) break;
 
         ros::spinOnce();
         rate.sleep();

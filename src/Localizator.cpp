@@ -20,9 +20,10 @@ extern struct Params Config;
         }
 
         // Given points, update new position
-        void Localizator::update(const Points& points) {
+        void Localizator::update(const Points& points, double time) {
             if (not Mapper::getInstance().exists()) return;
-            return this->IKFoM_update(points);
+            this->IKFoM_update(points);
+            this->last_time_updated = time;
         }
 
         void Localizator::calculate_H(const state_ikfom& s, const Matches& matches, Eigen::MatrixXd& H, Eigen::VectorXd& h) {
@@ -58,17 +59,29 @@ extern struct Params Config;
         void Localizator::propagate_to(double t) {
             if (this->last_time_integrated < 0) this->last_time_integrated = t;
             IMUs imus = Accumulator::getInstance().get_imus(this->last_time_integrated, t);
-            for (IMU imu : imus) this->propagate(imu);
+            
+            // Integrate every new IMU between last time and now
+            for (IMU imu : imus) {
+                this->propagate(imu);
+                this->last_time_integrated = imu.time;
+            }
             
             // Propagate last known IMU to t 
-            if (not imus.empty()) this->propagate(IMU (imus.back().a, imus.back().w, t));
+            if (not imus.empty()) {
+                this->propagate(IMU (imus.back().a, imus.back().w, t));
+                this->last_time_integrated = t;
+            }
         }
 
         State Localizator::latest_state() {
+            // If no updates, return empty state
+            if (this->last_time_updated < 0)
+                return State (this->last_time_integrated);
+
             return State(
                 this->get_x(),
-                Accumulator::getInstance().get_next_imu(this->last_time_integrated),
-                this->last_time_integrated
+                Accumulator::getInstance().get_next_imu(this->last_time_updated),
+                this->last_time_updated
             );
         }
 
@@ -136,7 +149,6 @@ extern struct Params Config;
             Q.block<3, 3>(9, 9) = Config.cov_bias_acc * Eigen::Matrix<double, 3, 3>::Identity();
 
             double dt = imu.time - this->last_time_integrated;
-            this->last_time_integrated = imu.time;
 
             this->IKFoM_KF.predict(dt, Q, in);
         }

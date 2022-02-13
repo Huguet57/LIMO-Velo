@@ -12,6 +12,7 @@ class Localizator {
     public:
         Points points2match;
         double last_time_integrated = -1;
+        double last_time_updated = -1;
 
     private:
         esekfom::esekf<state_ikfom, 12, input_ikfom> IKFoM_KF;
@@ -20,7 +21,7 @@ class Localizator {
 
     public:
         Localizator();
-        void update(const Points&);
+        void update(const Points&, double time);
         void calculate_H(const state_ikfom&, const Matches&, Eigen::MatrixXd& H, Eigen::VectorXd& h);
         
         void propagate_to(double t);
