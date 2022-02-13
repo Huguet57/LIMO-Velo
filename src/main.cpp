@@ -131,6 +131,8 @@ int main(int argc, char** argv) {
                 if (Config.mapping_online) {
                     map.add(global_compensated, t2, true);
                     publish.full_pointcloud(global_compensated);
+                    
+                    if (Config.print_extrinsics) publish.extrinsics(Xt2);
                 }
             }
             
