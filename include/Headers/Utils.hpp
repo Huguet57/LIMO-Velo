@@ -1,6 +1,6 @@
 namespace Conversions {
-    long long sec2Microsec(double t);
-    double microsec2Sec(long long t);
+    uint64_t sec2Microsec(double t);
+    double microsec2Sec(uint64_t t);
 }
 
 namespace Algorithms {

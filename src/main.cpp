@@ -72,11 +72,6 @@ int main(int argc, char** argv) {
         &Accumulator::receive_imu, &accum
     );
 
-    ros::Subscriber tfs_sub = nh.subscribe(
-        "/tf", 1000,
-        &Publishers::receive_tf, &publish
-    );
-
     ros::Rate rate(10);
 
     // If not real time, define an artificial clock
@@ -125,12 +120,12 @@ int main(int argc, char** argv) {
 
                 // Publish compensated
                 Points global_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
-                publish.pointcloud(global_compensated);
+                publish.pointcloud(global_compensated, true);
 
                 // Map at the same time (online)
                 if (Config.mapping_online) {
                     map.add(global_compensated, t2, true);
-                    publish.full_pointcloud(global_compensated);
+                    publish.pointcloud(global_compensated, false);
                     
                     if (Config.print_extrinsics) publish.extrinsics(Xt2);
                 }
@@ -147,7 +142,7 @@ int main(int argc, char** argv) {
                 if (Config.print_extrinsics) publish.extrinsics(Xt2);
 
                 map.add(global_full_ds_compensated, t2, true);
-                publish.full_pointcloud(global_full_ds_compensated);
+                publish.pointcloud(global_full_ds_compensated, false);
             }
 
             // Empty too old LiDAR points

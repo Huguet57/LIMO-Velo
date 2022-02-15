@@ -11,11 +11,11 @@
 #include "Headers/Mapper.hpp"
 #endif
 
-long long Conversions::sec2Microsec(double t) {
+uint64_t Conversions::sec2Microsec(double t) {
     return std::round(t*1e6);
 }
 
-double Conversions::microsec2Sec(long long t) {
+double Conversions::microsec2Sec(uint64_t t) {
     int secs = t/1000000;
     int msecs = t%1000000;
     return secs + msecs*1e-6;

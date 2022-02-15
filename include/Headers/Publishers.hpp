@@ -37,58 +37,41 @@ class Publishers {
         }
 
         void state(const State& state, bool couts) {
-            if (not only_couts) publish_pos(state);
-            if (not only_couts) publish_vels(state);
-            if (couts) cout_state(state);
+            if (not this->only_couts) this->publish_state(state);
+            if (couts) this->cout_state(state);
         }
 
         void states(const States& states) {
-            publish_states(states);
+            this->publish_states(states);
         }
 
-        void planes(const State& X, const Planes& planes) {
-            publish_planes(X, planes);
+        void planes(const Planes& planes) {
+            this->publish_planes(planes);
         }
 
-        void pointcloud(Points& points) {
+        void pointcloud(Points& points, bool part=false) {
             if (points.empty()) return;
             
             pcl::PointCloud<velodyne_ros::Point> pcl;
             pcl.header.frame_id = "map";
-            pcl.header.stamp = Conversions::sec2Microsec(points.back().time);
             Processor::fill(pcl, points);
 
-            publish_pcl(pcl);
-        }
-
-        void full_pointcloud(Points& points) {
-            if (points.empty()) return;
-            
-            pcl::PointCloud<velodyne_ros::Point> pcl;
-            pcl.header.frame_id = "map";
-            pcl.header.stamp = Conversions::sec2Microsec(points.back().time);
-            Processor::fill(pcl, points);
-
-            publish_full_pcl(pcl);
+            if (part) this->publish_pcl(pcl, this->pcl_pub);
+            else this->publish_pcl(pcl, this->full_pcl_pub);
         }
 
         void rottransl(const RotTransl& RT) {
-            cout_rottransl(RT);
+            this->cout_rottransl(RT);
         }
 
         void t1_t2(const Points& points, const IMUs& imus, const States& states, double t1, double t2) {
-            cout_t1_t2(points, imus, states, t1, t2);
-        }
-
-        void receive_tf(const tf2_msgs::TFMessage::ConstPtr& msg) {
-            if (this->is_first_tf) this->set_first_tf(msg, "base_link");
-            this->publish_tf(msg, "base_link");   
+            this->cout_t1_t2(points, imus, states, t1, t2);
         }
 
         void tf(const State& state) {
-            if (state.time <= last_transform_time) return;
+            if (state.time <= this->last_transform_time) return;
             this->send_transform(state);
-            last_transform_time = state.time;
+            this->last_transform_time = state.time;
         }
 
         void extrinsics(const State& state) {
@@ -97,48 +80,6 @@ class Publishers {
 
     private:
         bool only_couts;
-        bool is_first_tf = true;
-        Eigen::Vector3d tfirst;
-        Eigen::Quaterniond qfirst;
-
-        void set_first_tf(const tf2_msgs::TFMessage::ConstPtr& msg, const std::string& body_frame) {
-            for (auto tf : msg->transforms)
-                if (tf.child_frame_id == body_frame) {
-                    this->tfirst = Eigen::Vector3d (tf.transform.translation.x, tf.transform.translation.y, tf.transform.translation.z);
-                    this->qfirst = Eigen::Quaterniond (tf.transform.rotation.w, tf.transform.rotation.x, tf.transform.rotation.y, tf.transform.rotation.z);
-                }
-
-            this->is_first_tf = false;
-        }
-
-        void publish_tf(const tf2_msgs::TFMessage::ConstPtr& msg, const std::string& body_frame) {
-            for (auto tf : msg->transforms)
-                if (tf.child_frame_id == body_frame)
-                    this->publish_tf(
-                        tf.transform, ros::Time::now(),
-                        "map", "body"
-                    );
-        }
-
-        void publish_tf(const geometry_msgs::Transform& transform, const ros::Time& stamp, std::string world, std::string body) {
-            nav_msgs::Odometry msg;
-            msg.header.stamp = stamp;
-            msg.header.frame_id = world;
-
-            auto t = transform.translation;
-            Eigen::Vector3d tnow(t.x, t.y, t.z);
-            msg.pose.pose.position.x = (qfirst.conjugate() * (tnow - tfirst)).x();
-            msg.pose.pose.position.y = (qfirst.conjugate() * (tnow - tfirst)).y();
-            msg.pose.pose.position.z = (qfirst.conjugate() * (tnow - tfirst)).z();
-
-            auto q = transform.rotation;
-            Eigen::Quaterniond qnow(q.w, q.x, q.y, q.z);
-            msg.pose.pose.orientation.x = (qnow * qfirst.conjugate()).x();
-            msg.pose.pose.orientation.y = (qnow * qfirst.conjugate()).y();
-            msg.pose.pose.orientation.z = (qnow * qfirst.conjugate()).z();
-            msg.pose.pose.orientation.w = (qnow * qfirst.conjugate()).w();
-            this->gt_pub.publish(msg);
-        }
 
         void cout_extrinsics(const State& state) {
             std::cout << "t:" << std::endl;
@@ -148,13 +89,11 @@ class Publishers {
             std::cout << "-----------" << std::endl;
         }
 
-        void publish_planes(const State& X, const Planes& planes) {
+        void publish_planes(const Planes& planes) {
             geometry_msgs::PoseArray normalPoseArray;
             normalPoseArray.header.frame_id = "map";
-            normalPoseArray.header.stamp = ros::Time().fromSec(X.time);
                 
-            for (Plane plane : planes)
-            {
+            for (Plane plane : planes) {
                 Point point_world = plane.centroid;
                 Normal n = plane.n;
 
@@ -200,31 +139,12 @@ class Publishers {
             std::cout << RT.t.transpose() << std::endl;
         }
 
-        void publish_pcl(const pcl::PointCloud<velodyne_ros::Point>& pcl) {
+        void publish_pcl(const pcl::PointCloud<velodyne_ros::Point>& pcl, ros::Publisher pub) {
             sensor_msgs::PointCloud2 msg;
             msg.header.stamp = ros::Time(Conversions::microsec2Sec(pcl.header.stamp));
             msg.header.frame_id = "map";
             pcl::toROSMsg(pcl, msg);
-            this->pcl_pub.publish(msg);
-        }
-
-        void publish_full_pcl(const pcl::PointCloud<velodyne_ros::Point>& pcl) {
-            sensor_msgs::PointCloud2 msg;
-            msg.header.stamp = ros::Time(Conversions::microsec2Sec(pcl.header.stamp));
-            msg.header.frame_id = "map";
-            pcl::toROSMsg(pcl, msg);
-            this->full_pcl_pub.publish(msg);
-        }
-
-        void publish_yaw(const State& state) {
-            std_msgs::Float32 yaw;
-
-            Eigen::Quaternionf q(state.R);
-            double siny_cosp = 2 * (q.w() * q.z() + q.x() * q.y());
-            double cosy_cosp = 1 - 2 * (q.y() * q.y() + q.z() * q.z());
-            yaw.data = std::atan2(siny_cosp, cosy_cosp);
-
-            this->yaw_pub.publish(yaw);
+            pub.publish(msg);
         }
 
         void publish_states(const States& states) {
@@ -251,7 +171,7 @@ class Publishers {
             this->states_pub.publish(msg);
         }
 
-        void publish_pos(const State& state) {
+        void publish_state(const State& state) {
             nav_msgs::Odometry msg;
             msg.header.stamp = ros::Time(state.time);
             msg.header.frame_id = "map";
@@ -277,19 +197,6 @@ class Publishers {
             msg.twist.twist.angular.z = state.w(2);
 
             this->state_pub.publish(msg);
-        }
-
-        void publish_vels(const State& state) {
-            nav_msgs::Odometry msg;
-            msg.header.stamp = ros::Time(state.time);
-            msg.header.frame_id = "map";
-
-            msg.pose.pose.orientation.x = state.vel(0);
-            msg.pose.pose.orientation.y = state.vel(1);
-            msg.pose.pose.orientation.z = state.vel(2);
-            msg.pose.pose.orientation.w = 0.;
-
-            this->vel_pub.publish(msg);
         }
 
         void cout_state(const State& state) {
