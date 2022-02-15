@@ -86,14 +86,17 @@ add_executable(limovelo
   include/IKFoM/use-ikfom.hpp
   include/IKFoM/use-ikfom.cpp
 
+  # Pipelines
   src/main.cpp
-  src/Utils.cpp
-  src/Objects.cpp
-  src/Accumulator.cpp
-  src/Compensator.cpp
-  src/PointCloudProcessor.cpp
-  src/Localizator.cpp
-  src/Mapper.cpp
+  
+  # Modules
+  src/Modules/Utils.cpp
+  src/Modules/Objects.cpp
+  src/Modules/Accumulator.cpp
+  src/Modules/Compensator.cpp
+  src/Modules/PointCloudProcessor.cpp
+  src/Modules/Localizator.cpp
+  src/Modules/Mapper.cpp
 )
 target_link_libraries(limovelo ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${PYTHON_LIBRARIES})
 target_include_directories(limovelo

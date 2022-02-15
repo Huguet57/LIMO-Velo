@@ -91,7 +91,7 @@ class Point {
                 this->set_attributes(p);
                 this->time = (double) p.time;
             }
-        
+
         full_info::Point toPCL() const {
             full_info::Point p;
             p.x = this->x;

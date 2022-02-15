@@ -1,0 +1,2 @@
+# Adding your custom LiDAR point type
+To add your own custom point type, take a look at the codes ``customLiDAR.cpp`` and ``customLiDAR.hpp`` to see what methods have to be modified and added to which files.

@@ -14,6 +14,9 @@ class PointCloudProcessor {
         // HESAI specific
             Points hesaimsg2points(const PointCloud_msg&);
             double get_begin_time(const pcl::PointCloud<hesai_ros::Point>&);
+        
+        // Custom specific
+            Points custommsg2points(const PointCloud_msg&);
 
         template <typename PointType> Points to_points(const typename pcl::PointCloud<PointType>&);
 

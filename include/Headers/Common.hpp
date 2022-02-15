@@ -44,6 +44,7 @@
 namespace LIDAR_TYPE {
     const int Velodyne = 0;
     const int Hesai = 1;
+    const int Custom = 2;
 }
 
 struct HeuristicParams {

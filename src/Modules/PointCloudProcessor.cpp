@@ -18,7 +18,9 @@ extern struct Params Config;
         PointCloudProcessor::PointCloudProcessor(const PointCloud_msg& msg) {
             Points points;
             if (Config.LiDAR_type == LIDAR_TYPE::Velodyne) points = this->velodynemsg2points(msg);
-            if (Config.LiDAR_type == LIDAR_TYPE::Hesai) points = this->hesaimsg2points(msg);
+            else if (Config.LiDAR_type == LIDAR_TYPE::Hesai) points = this->hesaimsg2points(msg);
+            // else if (Config.LiDAR_type == LIDAR_TYPE::Custom) points = this->custommsg2points(msg);
+            else ROS_ERROR("Unknown LiDAR type! Change your YAML parameters file.");
             Points downsample_points = this->downsample(points);
             
             this->sort_points(downsample_points);
