@@ -1,12 +1,12 @@
 // -------------------------------------------
-//      To add to PointCloudProcessor.cpp
+//      Add this to PointCloudProcessor.cpp
 // -------------------------------------------
 
     double PointCloudProcessor::get_begin_time(const pcl::PointCloud<custom::Point>& pcl) {
         // Example: Points with relative time
         return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time;
         
-        // Example: points with absolute time
+        // Example: Points with absolute time
         return 0.d;
     }
 
@@ -17,11 +17,11 @@
         return this->to_points(*raw_pcl);
     }
 
-    // Uncomment this line in the constructor (around line 22):
-        else if (Config.LiDAR_type == LIDAR_TYPE::Custom) points = this->custommsg2points(msg);
+    // Add this line to the PointCloudProcessor::msg2points method
+    if (Config.LiDAR_type == LIDAR_TYPE::Custom) return this->custommsg2points(msg);
 
 // -------------------------------------------
-//           To add to Objects.cpp
+//           Add this to Objects.cpp
 // -------------------------------------------
 
     Point::Point(const custom::Point& p) {

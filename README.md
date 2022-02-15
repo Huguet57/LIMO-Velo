@@ -12,6 +12,9 @@ Designed for easy modifying via modular and easy to understand code. Relying upo
 - [ ] Check if need to add point in map
 - [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
 
+### Design choices
+- [ ] Making adding a custom LiDAR point type easier 
+
 ### New features
 - [ ] Interpolation and smoothing of states when mapping offline
 - [ ] Erase unused (potentially dangerous) points in the map

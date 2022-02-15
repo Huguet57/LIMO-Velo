@@ -16,11 +16,7 @@ extern struct Params Config;
 // class PointCloudProcessor
     // public:
         PointCloudProcessor::PointCloudProcessor(const PointCloud_msg& msg) {
-            Points points;
-            if (Config.LiDAR_type == LIDAR_TYPE::Velodyne) points = this->velodynemsg2points(msg);
-            else if (Config.LiDAR_type == LIDAR_TYPE::Hesai) points = this->hesaimsg2points(msg);
-            // else if (Config.LiDAR_type == LIDAR_TYPE::Custom) points = this->custommsg2points(msg);
-            else ROS_ERROR("Unknown LiDAR type! Change your YAML parameters file.");
+            Points points = this->msg2points(msg);
             Points downsample_points = this->downsample(points);
             
             this->sort_points(downsample_points);
@@ -28,6 +24,16 @@ extern struct Params Config;
         }
 
     // private:
+        Points PointCloudProcessor::msg2points(const PointCloud_msg& msg) {
+            if (Config.LiDAR_type == LIDAR_TYPE::Velodyne) return this->velodynemsg2points(msg);
+            if (Config.LiDAR_type == LIDAR_TYPE::Hesai) return this->hesaimsg2points(msg);
+            // if (Config.LiDAR_type == LIDAR_TYPE::Custom) return this->custommsg2points(msg);
+            
+            // Unknown LiDAR type
+            ROS_ERROR("Unknown LiDAR type! Change your YAML parameters file.");
+            return Points ();
+        }
+
         // Velodyne specific
             Points PointCloudProcessor::velodynemsg2points(const PointCloud_msg& msg) {
                 pcl::PointCloud<velodyne_ros::Point>::Ptr raw_pcl(new pcl::PointCloud<velodyne_ros::Point>());

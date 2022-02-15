@@ -7,6 +7,8 @@ class PointCloudProcessor {
         PointCloudProcessor(const PointCloud_msg&);
 
     private:
+        Points msg2points(const PointCloud_msg&);
+
         // Velodyne specific
             Points velodynemsg2points(const PointCloud_msg&);
             double get_begin_time(const pcl::PointCloud<velodyne_ros::Point>&);
