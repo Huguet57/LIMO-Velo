@@ -123,6 +123,7 @@ namespace full_info {
       PCL_ADD_POINT4D;
       PCL_ADD_RGB;
       float intensity;
+      float range;
       double timestamp;
       uint16_t ring;
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -155,6 +156,7 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(full_info::Point,
     (float, g, g)
     (float, b, b)
     (float, intensity, intensity)
+    (float, range, range)
     (double, timestamp, timestamp)
     (std::uint16_t, ring, ring)
 )

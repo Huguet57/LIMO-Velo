@@ -59,34 +59,38 @@ class Point {
         Point(const full_info::Point& p) {
             this->set_XYZ(p);
             this->set_attributes(p);
+            this->time = p.timestamp;
         }
-
-        Point(const hesai_ros::Point& p) {
-            this->set_XYZ(p);
-            this->set_attributes(p);
-        }
-
-        Point(const velodyne_ros::Point& p) {
-            this->set_XYZ(p);
-            this->set_attributes(p);
-        }
-
-        // Delegate constructor for HESAI (absolute time)
-        Point(const hesai_ros::Point& p, double begin_time) : Point (p) {}
-        
-        // Delegate constructor for Velodyne (relative time)
-        Point(const velodyne_ros::Point& p, double begin_time) : Point (p) {
-            this->time += begin_time;
-        }
-
+  
         Point(const Eigen::Matrix<float, 3, 1>& p) {
             this->set_XYZ(p);
         }
 
-        // Delegate constructor
+        // Delegate constructor (Eigen + attributes)
         Point(const Eigen::Matrix<float, 3, 1>& p, const Point& attributes) : Point(p) {
-            this->set_attributes(attributes);
+            this->pass_attributes(attributes);
+            this->time = attributes.time;
         }
+
+        // Delegate constructor for any point type
+        template <typename PointType>
+        Point(const PointType& p, double begin_time) : Point (p) {
+            this->time += begin_time;
+        }
+
+        // HESAI specific
+            Point(const hesai_ros::Point& p) {
+                this->set_XYZ(p);
+                this->set_attributes(p);
+                this->time = p.timestamp;
+            }
+        
+        // Velodyne specific
+            Point(const velodyne_ros::Point& p) {
+                this->set_XYZ(p);
+                this->set_attributes(p);
+                this->time = (double) p.time;
+            }
         
         full_info::Point toPCL() const {
             full_info::Point p;
@@ -95,6 +99,7 @@ class Point {
             p.z = this->z;
             p.timestamp = this->time;
             p.intensity = this->intensity;
+            p.range = this->range;
             return p;
         }
 
@@ -117,19 +122,8 @@ class Point {
         friend std::ostream& operator<< (std::ostream& out, const Point& p);
 
     private:
-        void set_XYZ(const full_info::Point& p) {
-            this->x = p.x;
-            this->y = p.y;
-            this->z = p.z;
-        }
-
-        void set_XYZ(const velodyne_ros::Point& p) {
-            this->x = p.x;
-            this->y = p.y;
-            this->z = p.z;
-        }
-
-        void set_XYZ(const hesai_ros::Point& p) {
+        template <typename PointType>
+        void set_XYZ(const PointType& p) {
             this->x = p.x;
             this->y = p.y;
             this->z = p.z;
@@ -141,28 +135,15 @@ class Point {
             this->z = p(2);
         }
 
-        void set_attributes(const velodyne_ros::Point& p) {
-            this->time = (double) p.time;
+        template <typename PointType>
+        void set_attributes(const PointType& p) {
             this->intensity = p.intensity;
             this->range = this->norm();
         }
 
-        void set_attributes(const hesai_ros::Point& p) {
-            this->time = p.timestamp;
-            this->intensity = p.intensity;
-            this->range = this->norm();
-        }
-
-        void set_attributes(const full_info::Point& p) {
-            this->time = p.timestamp;
-            this->intensity = p.intensity;
-            this->range = this->norm();
-        }
-
-        void set_attributes(const Point& point_attributes) {
-            this->time = point_attributes.time;
-            this->intensity = point_attributes.intensity;
-            this->range = point_attributes.range;
+        void pass_attributes(const Point& attributes) {
+            this->intensity = attributes.intensity;
+            this->range = attributes.range;
         }
 };
 

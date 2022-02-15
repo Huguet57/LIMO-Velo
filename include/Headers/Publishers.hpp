@@ -1,6 +1,4 @@
 namespace Processor {
-    // void fill(pcl::PointCloud<velodyne_ros::Point>&, const Points&);
-    // void fill(pcl::PointCloud<hesai_ros::Point>&, const Points&);
     void fill(pcl::PointCloud<full_info::Point>&, const Points&);
 }
 

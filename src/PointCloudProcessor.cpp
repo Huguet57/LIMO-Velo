@@ -26,33 +26,38 @@ extern struct Params Config;
         }
 
     // private:
-        Points PointCloudProcessor::velodynemsg2points(const PointCloud_msg& msg) {
-            pcl::PointCloud<velodyne_ros::Point>::Ptr raw_pcl(new pcl::PointCloud<velodyne_ros::Point>());
-            pcl::fromROSMsg(*msg, *raw_pcl);
-            return this->to_points(*raw_pcl);
-        }
+        // Velodyne specific
+            Points PointCloudProcessor::velodynemsg2points(const PointCloud_msg& msg) {
+                pcl::PointCloud<velodyne_ros::Point>::Ptr raw_pcl(new pcl::PointCloud<velodyne_ros::Point>());
+                pcl::fromROSMsg(*msg, *raw_pcl);
+                return this->to_points(*raw_pcl);
+            }
 
-        Points PointCloudProcessor::hesaimsg2points(const PointCloud_msg& msg) {
-            pcl::PointCloud<hesai_ros::Point>::Ptr raw_pcl(new pcl::PointCloud<hesai_ros::Point>());
-            pcl::fromROSMsg(*msg, *raw_pcl);
-            return this->to_points(*raw_pcl);
-        }
+            double PointCloudProcessor::get_begin_time(const pcl::PointCloud<velodyne_ros::Point>& pcl) {
+                // Velodyne points have relative time
+                return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time;
+            }
 
-        double PointCloudProcessor::begin_time(const pcl::PointCloud<velodyne_ros::Point>& pcl) {
-            // Velodyne points have relative time
-            return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time;
-        }
+        // HESAI specific
+            Points PointCloudProcessor::hesaimsg2points(const PointCloud_msg& msg) {
+                pcl::PointCloud<hesai_ros::Point>::Ptr raw_pcl(new pcl::PointCloud<hesai_ros::Point>());
+                pcl::fromROSMsg(*msg, *raw_pcl);
+                return this->to_points(*raw_pcl);
+            }
 
-        double PointCloudProcessor::begin_time(const pcl::PointCloud<hesai_ros::Point>& pcl) {
-            // HESAI points have absolute time
-            return 0.d;
-        }
+            double PointCloudProcessor::get_begin_time(const pcl::PointCloud<hesai_ros::Point>& pcl) {
+                // HESAI points have absolute time
+                return 0.d;
+            }
 
         template <typename PointType>
         Points PointCloudProcessor::to_points(const typename pcl::PointCloud<PointType>& pcl) {
             Points pts;
-            for (PointType p : pcl.points)
-                pts.push_back(Point (p, this->begin_time(pcl)));
+
+            // Special case: Velodyne points have relative time, we need to get the time stamp from the earliest point
+            double begin_time = this->get_begin_time(pcl);
+
+            for (PointType p : pcl.points) pts.push_back(Point (p, begin_time));
             return pts;
         }
 

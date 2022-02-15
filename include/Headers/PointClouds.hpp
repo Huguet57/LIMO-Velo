@@ -7,11 +7,13 @@ class PointCloudProcessor {
         PointCloudProcessor(const PointCloud_msg&);
 
     private:
-        Points velodynemsg2points(const PointCloud_msg&);
-        Points hesaimsg2points(const PointCloud_msg&);
-
-        double begin_time(const pcl::PointCloud<velodyne_ros::Point>&);
-        double begin_time(const pcl::PointCloud<hesai_ros::Point>&);
+        // Velodyne specific
+            Points velodynemsg2points(const PointCloud_msg&);
+            double get_begin_time(const pcl::PointCloud<velodyne_ros::Point>&);
+        
+        // HESAI specific
+            Points hesaimsg2points(const PointCloud_msg&);
+            double get_begin_time(const pcl::PointCloud<hesai_ros::Point>&);
 
         template <typename PointType> Points to_points(const typename pcl::PointCloud<PointType>&);
 
