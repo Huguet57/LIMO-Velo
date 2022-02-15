@@ -1,6 +1,7 @@
 namespace Processor {
-    void fill(pcl::PointCloud<velodyne_ros::Point>&, const Points&);
-    void fill(pcl::PointCloud<hesai_ros::Point>&, const Points&);
+    // void fill(pcl::PointCloud<velodyne_ros::Point>&, const Points&);
+    // void fill(pcl::PointCloud<hesai_ros::Point>&, const Points&);
+    void fill(pcl::PointCloud<full_info::Point>&, const Points&);
 }
 
 class Publishers {
@@ -52,7 +53,7 @@ class Publishers {
         void pointcloud(Points& points, bool part=false) {
             if (points.empty()) return;
             
-            pcl::PointCloud<velodyne_ros::Point> pcl;
+            pcl::PointCloud<full_info::Point> pcl;
             pcl.header.frame_id = "map";
             Processor::fill(pcl, points);
 
@@ -139,7 +140,7 @@ class Publishers {
             std::cout << RT.t.transpose() << std::endl;
         }
 
-        void publish_pcl(const pcl::PointCloud<velodyne_ros::Point>& pcl, ros::Publisher pub) {
+        void publish_pcl(const pcl::PointCloud<full_info::Point>& pcl, ros::Publisher pub) {
             sensor_msgs::PointCloud2 msg;
             msg.header.stamp = ros::Time(Conversions::microsec2Sec(pcl.header.stamp));
             msg.header.frame_id = "map";

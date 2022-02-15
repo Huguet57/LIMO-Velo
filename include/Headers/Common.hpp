@@ -118,6 +118,17 @@ namespace hesai_ros {
     } EIGEN_ALIGN16;
 }
 
+namespace full_info {
+  struct EIGEN_ALIGN16 Point {
+      PCL_ADD_POINT4D;
+      PCL_ADD_RGB;
+      float intensity;
+      double timestamp;
+      uint16_t ring;
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  };
+}
+
 POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_ros::Point,
     (float, x, x)
     (float, y, y)
@@ -132,6 +143,18 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(hesai_ros::Point,
     (float, y, y)
     (float, z, z)
     (std::uint8_t, intensity, intensity)
+    (double, timestamp, timestamp)
+    (std::uint16_t, ring, ring)
+)
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(full_info::Point,
+    (float, x, x)
+    (float, y, y)
+    (float, z, z)
+    (float, r, r)
+    (float, g, g)
+    (float, b, b)
+    (float, intensity, intensity)
     (double, timestamp, timestamp)
     (std::uint16_t, ring, ring)
 )

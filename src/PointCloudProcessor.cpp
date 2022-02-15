@@ -76,22 +76,12 @@ extern struct Params Config;
             std::sort(points.begin(), points.end(), this->time_sort);
         }
 
-void Processor::fill(pcl::PointCloud<velodyne_ros::Point>& pcl, const Points& points) {
+void Processor::fill(pcl::PointCloud<full_info::Point>& pcl, const Points& points) {
     // To then set to max of points
     pcl.header.stamp = 0;
 
     for (Point p : points) {
-        pcl.points.push_back(p.toVelodyne());
-        pcl.header.stamp = std::max(pcl.header.stamp, Conversions::sec2Microsec(p.time));
-    }
-}
-
-void Processor::fill(pcl::PointCloud<hesai_ros::Point>& pcl, const Points& points) {
-    // To then set to max of points
-    pcl.header.stamp = 0;
-
-    for (Point p : points) {
-        pcl.points.push_back(p.toHesai());
+        pcl.points.push_back(p.toPCL());
         pcl.header.stamp = std::max(pcl.header.stamp, Conversions::sec2Microsec(p.time));
     }
 }

@@ -19,5 +19,3 @@ class PointCloudProcessor {
         static bool time_sort(const Point&, const Point&);
         void sort_points(Points&);
 };
-
-void fill(pcl::PointCloud<velodyne_ros::Point>&, const Points& points);
