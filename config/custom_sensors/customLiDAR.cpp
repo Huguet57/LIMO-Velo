@@ -4,7 +4,7 @@
 
     double PointCloudProcessor::get_begin_time(const pcl::PointCloud<custom::Point>& pcl) {
         // Example: Points with relative time
-        return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time;
+        return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time + pcl.points.front().time;
         
         // Example: Points with absolute time
         return 0.d;

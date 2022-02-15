@@ -1,8 +1,11 @@
 // -------------------------------------------
 //             Add this to Common.hpp
 // -------------------------------------------
-// (Try to copy the ones on the LiDAR ROS driver)
+    namespace LiDAR_type {
+        const std::string Custom = "custom";
+    }
 
+    // (Try to copy the one on the LiDAR ROS driver)
     namespace custom {
 
         // Example: point with lots of fields
@@ -18,6 +21,7 @@
 
     }
 
+    // (Try to copy the one on the LiDAR ROS driver)
     // Example: point with lots of fields
     POINT_CLOUD_REGISTER_POINT_STRUCT(custom::Point,
         (float, x, x)

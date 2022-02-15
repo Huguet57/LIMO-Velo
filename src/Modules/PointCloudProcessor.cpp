@@ -27,7 +27,7 @@ extern struct Params Config;
         Points PointCloudProcessor::msg2points(const PointCloud_msg& msg) {
             if (Config.LiDAR_type == LIDAR_TYPE::Velodyne) return this->velodynemsg2points(msg);
             if (Config.LiDAR_type == LIDAR_TYPE::Hesai) return this->hesaimsg2points(msg);
-            // if (Config.LiDAR_type == LIDAR_TYPE::Custom) return this->custommsg2points(msg);
+            if (Config.LiDAR_type == LIDAR_TYPE::Custom) return this->custommsg2points(msg);
             
             // Unknown LiDAR type
             ROS_ERROR("Unknown LiDAR type! Change your YAML parameters file.");
@@ -43,7 +43,7 @@ extern struct Params Config;
 
             double PointCloudProcessor::get_begin_time(const pcl::PointCloud<velodyne_ros::Point>& pcl) {
                 // Velodyne points have relative time
-                return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time;
+                return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time + pcl.points.front().time;
             }
 
         // HESAI specific
@@ -55,6 +55,22 @@ extern struct Params Config;
 
             double PointCloudProcessor::get_begin_time(const pcl::PointCloud<hesai_ros::Point>& pcl) {
                 // HESAI points have absolute time
+                return 0.d;
+            }
+
+        // Custom specific
+            Points PointCloudProcessor::custommsg2points(const PointCloud_msg& msg) {
+                pcl::PointCloud<custom::Point>::Ptr raw_pcl(new pcl::PointCloud<custom::Point>());
+                pcl::fromROSMsg(*msg, *raw_pcl);
+                return this->to_points(*raw_pcl);
+            }
+
+            // Change this to fit the timestamp of the first point
+            double PointCloudProcessor::get_begin_time(const pcl::PointCloud<custom::Point>& pcl) {
+                // // Example: Points with relative time
+                // return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time + pcl.points.front().time;
+                
+                // Example: Points with absolute time
                 return 0.d;
             }
 

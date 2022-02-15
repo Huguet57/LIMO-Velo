@@ -42,9 +42,9 @@
 #endif
 
 namespace LIDAR_TYPE {
-    const int Velodyne = 0;
-    const int Hesai = 1;
-    const int Custom = 2;
+    const std::string Velodyne = "velodyne";
+    const std::string Hesai = "hesai";
+    const std::string Custom = "custom";
 }
 
 struct HeuristicParams {
@@ -70,7 +70,7 @@ struct Params {
 
     int ds_rate;
     double min_dist;
-    int LiDAR_type;
+    std::string LiDAR_type;
     
     double degeneracy_threshold;
     bool print_degeneracy_values;
@@ -131,6 +131,19 @@ namespace full_info {
   };
 }
 
+namespace custom {
+    // Example: point with lots of fields
+    struct EIGEN_ALIGN16 Point {
+        PCL_ADD_POINT4D;
+        PCL_ADD_RGB;
+        float intensity;
+        float range;
+        double timestamp;
+        uint16_t ring;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    };
+}
+
 POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_ros::Point,
     (float, x, x)
     (float, y, y)
@@ -150,6 +163,20 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(hesai_ros::Point,
 )
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(full_info::Point,
+    (float, x, x)
+    (float, y, y)
+    (float, z, z)
+    (float, r, r)
+    (float, g, g)
+    (float, b, b)
+    (float, intensity, intensity)
+    (float, range, range)
+    (double, timestamp, timestamp)
+    (std::uint16_t, ring, ring)
+)
+
+// Example: point with lots of fields
+POINT_CLOUD_REGISTER_POINT_STRUCT(custom::Point,
     (float, x, x)
     (float, y, y)
     (float, z, z)

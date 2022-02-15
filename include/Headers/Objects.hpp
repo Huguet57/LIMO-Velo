@@ -92,6 +92,21 @@ class Point {
                 this->time = (double) p.time;
             }
 
+        // Custom specific
+            Point(const custom::Point& p) {
+                this->set_XYZ(p);
+
+                // -------------------------------------------
+                //      View below to modify this method
+                // -------------------------------------------
+                this->set_attributes(p);
+
+                // -------------------------------------------
+                //      Choose the appropiate time field
+                // -------------------------------------------
+                this->time = p.timestamp; // or p.time
+            }
+
         full_info::Point toPCL() const {
             full_info::Point p;
             p.x = this->x;
@@ -140,6 +155,15 @@ class Point {
             this->intensity = p.intensity;
             this->range = this->norm();
         }
+
+        // ---------------------------------------------------------------------------------------
+        //      Uncomment and modify this if point type doesn't have 'intensity' as attribute
+        // ---------------------------------------------------------------------------------------
+        
+        // Point::set_attributes(const custom::Point& p) {
+        //     this->intensity = p.intensity;   // or p.i?
+        //     this->range = this->norm();      // or p.range?
+        // }
 
         void pass_attributes(const Point& attributes) {
             this->intensity = attributes.intensity;

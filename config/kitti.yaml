@@ -20,11 +20,12 @@ I_Rotation_L: [
 ]
 
 # Delays
-LiDAR_noise: 0.001
 empty_lidar_time: 1.0       # Should be at least [FULL_ROTATION_TIME]
 real_time_delay: 0.5        # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
 # LiDAR
+LiDAR_type: velodyne
+LiDAR_noise: 0.001
 full_rotation_time: 0.10
 min_dist: 4
 ds_rate: 4

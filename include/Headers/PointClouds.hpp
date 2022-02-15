@@ -19,7 +19,8 @@ class PointCloudProcessor {
         
         // Custom specific
             Points custommsg2points(const PointCloud_msg&);
-
+            double get_begin_time(const pcl::PointCloud<custom::Point>&);
+        
         template <typename PointType> Points to_points(const typename pcl::PointCloud<PointType>&);
 
         Points downsample(const Points&);
