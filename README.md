@@ -13,7 +13,6 @@ See the part of my thesis where I explain the algorithm and its results: [LIMOVe
 ## TODO list
 ### Urgent fixes
 - [ ] Rethink ``mapping_offline`` (see Discussions)
-- [ ] Adding Ouster as a LiDAR type
 - [ ] Adding Livox as a LiDAR type
 
 ### Design choices
