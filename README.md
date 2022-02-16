@@ -1,4 +1,9 @@
 # LIMO-Velo [Alpha]
+:red_circle: The project is on ``alpha`` stage, so be sure to **open Issues and Discussions** and give all the **feedback** you can!
+Better to have 20 people giving lots of feedback than 1000 not saying anything.
+
+Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
+
 ## A real-time, direct and tightly-coupled LiDAR-Inertial SLAM.
 Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. Based also on their [FAST_LIO2](https://github.com/hku-mars/FAST_LIO).
 
