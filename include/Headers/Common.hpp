@@ -44,6 +44,7 @@
 namespace LIDAR_TYPE {
     const std::string Velodyne = "velodyne";
     const std::string Hesai = "hesai";
+    const std::string Ouster = "ouster";
     const std::string Custom = "custom";
 }
 
@@ -144,6 +145,19 @@ namespace custom {
     };
 }
 
+namespace ouster_ros {
+  struct EIGEN_ALIGN16 Point {
+      PCL_ADD_POINT4D;
+      float intensity;
+      std::uint32_t t;
+      std::uint16_t reflectivity;
+      std::uint8_t  ring;
+      std::uint16_t ambient;
+      std::uint32_t range;
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  };
+}
+
 POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_ros::Point,
     (float, x, x)
     (float, y, y)
@@ -173,6 +187,19 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(full_info::Point,
     (float, range, range)
     (double, timestamp, timestamp)
     (std::uint16_t, ring, ring)
+)
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(ouster_ros::Point,
+    (float, x, x)
+    (float, y, y)
+    (float, z, z)
+    (float, intensity, intensity)
+    // use std::uint32_t to avoid conflicting with pcl::uint32_t
+    (std::uint32_t, t, t)
+    (std::uint16_t, reflectivity, reflectivity)
+    (std::uint8_t, ring, ring)
+    (std::uint16_t, ambient, ambient)
+    (std::uint32_t, range, range)
 )
 
 // Example: point with lots of fields

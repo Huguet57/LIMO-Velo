@@ -17,6 +17,10 @@ class PointCloudProcessor {
             Points hesaimsg2points(const PointCloud_msg&);
             double get_begin_time(const pcl::PointCloud<hesai_ros::Point>&);
         
+        // Ouster specific
+            Points oustermsg2points(const PointCloud_msg&);
+            double get_begin_time(const pcl::PointCloud<ouster_ros::Point>&);
+
         // Custom specific
             Points custommsg2points(const PointCloud_msg&);
             double get_begin_time(const pcl::PointCloud<custom::Point>&);

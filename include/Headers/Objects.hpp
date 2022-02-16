@@ -92,6 +92,13 @@ class Point {
                 this->time = (double) p.time;
             }
 
+        // Ouster specific
+            Point(const ouster_ros::Point& p) {
+                this->set_XYZ(p);
+                this->set_attributes(p);
+                this->time = (double) p.t;
+            }
+
         // Custom specific
             Point(const custom::Point& p) {
                 this->set_XYZ(p);
@@ -155,13 +162,19 @@ class Point {
             this->intensity = p.intensity;
             this->range = this->norm();
         }
+        
+        // Ouster specific
+        void set_attributes(const ouster_ros::Point& p) {
+            this->intensity = p.reflectivity;
+            this->range = p.range;
+        }
 
         // ---------------------------------------------------------------------------------------
         //      Uncomment and modify this if point type doesn't have 'intensity' as attribute
         // ---------------------------------------------------------------------------------------
         
         // Point::set_attributes(const custom::Point& p) {
-        //     this->intensity = p.intensity;   // or p.i?
+        //     this->intensity = p.intensity;   // or p.reflectivity?
         //     this->range = this->norm();      // or p.range?
         // }
 

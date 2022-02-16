@@ -27,6 +27,7 @@ extern struct Params Config;
         Points PointCloudProcessor::msg2points(const PointCloud_msg& msg) {
             if (Config.LiDAR_type == LIDAR_TYPE::Velodyne) return this->velodynemsg2points(msg);
             if (Config.LiDAR_type == LIDAR_TYPE::Hesai) return this->hesaimsg2points(msg);
+            if (Config.LiDAR_type == LIDAR_TYPE::Ouster) return this->oustermsg2points(msg);
             if (Config.LiDAR_type == LIDAR_TYPE::Custom) return this->custommsg2points(msg);
             
             // Unknown LiDAR type
@@ -55,6 +56,18 @@ extern struct Params Config;
 
             double PointCloudProcessor::get_begin_time(const pcl::PointCloud<hesai_ros::Point>& pcl) {
                 // HESAI points have absolute time
+                return 0.d;
+            }
+
+        // Ouster specific
+            Points PointCloudProcessor::oustermsg2points(const PointCloud_msg& msg) {
+                pcl::PointCloud<ouster_ros::Point>::Ptr raw_pcl(new pcl::PointCloud<ouster_ros::Point>());
+                pcl::fromROSMsg(*msg, *raw_pcl);
+                return this->to_points(*raw_pcl);
+            }
+
+            double PointCloudProcessor::get_begin_time(const pcl::PointCloud<ouster_ros::Point>& pcl) {
+                // Ouster points have absolute time
                 return 0.d;
             }
 
