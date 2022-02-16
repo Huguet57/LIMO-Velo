@@ -1,26 +1,33 @@
-# LIMO-Velo [Alpha] (based on Fast-LIO2)
-## A real-time, direct and LM-detached LIO SLAM.
-Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. 
+# LIMO-Velo [Alpha]
+## A real-time, direct and tightly-coupled LiDAR-Inertial SLAM.
+Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. Based also on their [FAST_LIO2](https://github.com/hku-mars/FAST_LIO).
 
-![Perfomance of the algorithm](./config/docs/img/Localization.gif)
+Tested on and made for Barcelona's own "[Xaloc](https://www.youtube.com/watch?v=ly_ax8w-T7E&feature=emb_logo)".
+
+<p align="center">
+  <img src="./config/docs/img/Localization.gif" alt="Perfomance of the algorithm" />
+</p>
+
+See the part of my thesis where I explain the algorithm and its results: [LIMOVelo + Results](https://github.com/Huguet57/LIMO-Velo/blob/main/config/docs/Thesis%20-%20LIMOVelo%20%2B%20Results.pdf).
 
 ## TODO list
-### Fixes
-- [ ] Initialize IMU measurements
-- [ ] Remove unused ``Publishers.hpp``'s methods.
-- [ ] Simplify the upsampling in the Compensator.
-- [ ] Check if need to add point in map
-- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
+### Urgent fixes
+- [ ] Rethink ``mapping_offline`` (see Discussions)
+- [ ] Adding Ouster as a LiDAR type
+- [ ] Adding Livox as a LiDAR type
 
 ### Design choices
-- [ ] Making adding a custom LiDAR point type easier 
+- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
+- [ ] Simplify the upsampling in the Compensator.
 
-### New features
+### Fixes to investigate
 - [ ] Interpolation and smoothing of states when mapping offline
 - [ ] Erase unused (potentially dangerous) points in the map
+- [ ] Check if need to add point in map
 - [ ] Try to add a module for removing dynamic objects such as people or vehicles
-- [ ] Use UKF instead of EKF for fun
+- [ ] Use UKF instead of EKF
 - [ ] Add vision buffer and ability to paint the map's points
+- [ ] Initialize IMU measurements
 
 ---
 
@@ -41,7 +48,10 @@ An additional launch file ``roslaunch limovelo debug.launch`` is added that uses
 ## 3. Changing parameters
 To adapt LIMO-Velo to our own hardware infrastructure, a [YAML](https://yaml.org/) file ``config/params.yaml`` is available and we need to change it to our own topic names and sensor specs.
 
-Relevant parameters are ``real_time`` if you want to get real time experience, ``mapping_offline`` is on an alpha stage and it does not work 100% as it should of and the ``heuristic`` parameter which you can choose how you want the initialization of the pointcloud sizes (sizes =: deltas, in seconds).
+Relevant parameters are:
+- ``real_time`` if you want to get real time experience.
+- ``mapping_offline`` is on an pre-alpha stage and it does not work 100% as it should of.
+- ``heuristic`` which you can choose how you want the initialization of the pointcloud sizes (sizes =: deltas, in seconds).
 
 ## 4. Modifying the LiDAR driver to get true real-time performance
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
