@@ -1,26 +1,27 @@
-# LIMO-Velo [Alpha] (based on Fast-LIO2)
-## A real-time, direct and LM-detached LIO SLAM.
-Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. 
+# LIMO-Velo [Alpha]
+## A real-time, direct and tightly-coupled LiDAR-Inertial SLAM.
+Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. Based also on their [FAST_LIO2](https://github.com/hku-mars/FAST_LIO).
 
 ![Perfomance of the algorithm](./config/docs/img/Localization.gif)
 
 ## TODO list
-### Fixes
-- [ ] Initialize IMU measurements
-- [ ] Remove unused ``Publishers.hpp``'s methods.
-- [ ] Simplify the upsampling in the Compensator.
-- [ ] Check if need to add point in map
-- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
+### Urgent fixes
+- [ ] Rethink ``mapping_offline`` (see Discussions)
+- [ ] Adding Ouster as a LiDAR type
+- [ ] Adding Livox as a LiDAR type
 
 ### Design choices
-- [ ] Making adding a custom LiDAR point type easier 
+- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
+- [ ] Simplify the upsampling in the Compensator.
 
-### New features
+### Fixes to investigate
 - [ ] Interpolation and smoothing of states when mapping offline
 - [ ] Erase unused (potentially dangerous) points in the map
+- [ ] Check if need to add point in map
 - [ ] Try to add a module for removing dynamic objects such as people or vehicles
-- [ ] Use UKF instead of EKF for fun
+- [ ] Use UKF instead of EKF
 - [ ] Add vision buffer and ability to paint the map's points
+- [ ] Initialize IMU measurements
 
 ---
 
