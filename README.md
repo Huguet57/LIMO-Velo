@@ -1,5 +1,5 @@
 # LIMO-Velo [Alpha]
-:red_circle: The project is on ``alpha`` stage, so be sure to **open Issues and Discussions** and give all the **feedback** you can!
+:red_circle: [16 February 2022] :red_circle: The project is on ``alpha`` stage, so be sure to **open Issues and Discussions** and give all the **feedback** you can!
 Better to have 20 people giving lots of feedback than 1000 not saying anything.
 
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
@@ -31,23 +31,11 @@ Developing an algorithm for a team requires the algorithm to be easy enough to u
   LIMO-Velo's pipeline. Here are seen the different modules (blue), data (orange) and libraries (dark green).
 </p>
 
-# TODO list
-### Urgent fixes
-- [ ] Rethink ``mapping_offline`` (see Discussions)
-- [ ] Adding Livox as a LiDAR type
-
-### Design choices
-- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
-- [ ] Simplify the upsampling in the Compensator.
-
-### Fixes to investigate
-- [ ] Interpolation and smoothing of states when mapping offline
-- [ ] Erase unused (potentially dangerous) points in the map
-- [ ] Check if need to add point in map
-- [ ] Try to add a module for removing dynamic objects such as people or vehicles
-- [ ] Use UKF instead of EKF
-- [ ] Add vision buffer and ability to paint the map's points
-- [ ] Initialize IMU measurements
+# Dependencies
+- [Ubuntu](https://ubuntu.com) (tested on 20.04)
+- [ROS](http://wiki.ros.org/ROS/Installation) (tested on Noetic)
+- [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+- [PCL](http://www.pointclouds.org/downloads/linux.html) (tested on 1.8)
 
 # Using LIMO-Velo
 
@@ -80,3 +68,21 @@ Relevant parameters are:
 - [IKFoM](https://github.com/hku-mars/IKFoM): Iterated Kalman Filters on Manifolds
 - [ikd-Tree](https://github.com/hku-mars/ikd-Tree): Incremental KD-Tree for Robotic Applications
 - [FAST-LIO2](https://github.com/hku-mars/FAST_LIO): Fast and Direct LIO SLAM
+
+# TODO list
+### Urgent fixes
+- [ ] Rethink ``mapping_offline`` (see Discussions)
+- [ ] Adding Livox as a LiDAR type
+
+### Design choices
+- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
+- [ ] Simplify the upsampling in the Compensator.
+
+### Fixes to investigate
+- [ ] Interpolation and smoothing of states when mapping offline
+- [ ] Erase unused (potentially dangerous) points in the map
+- [ ] Check if need to add point in map
+- [ ] Try to add a module for removing dynamic objects such as people or vehicles
+- [ ] Use UKF instead of EKF
+- [ ] Add vision buffer and ability to paint the map's points
+- [ ] Initialize IMU measurements
