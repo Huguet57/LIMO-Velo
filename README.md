@@ -1,5 +1,5 @@
 # LIMO-Velo [Alpha]
-:red_circle: The project is on ``alpha`` stage, so be sure to **open Issues and Discussions** and give all the **feedback** you can!
+:red_circle: [16 February 2022] :red_circle: The project is on ``alpha`` stage, so be sure to **open Issues and Discussions** and give all the **feedback** you can!
 Better to have 20 people giving lots of feedback than 1000 not saying anything.
 
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
