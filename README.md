@@ -4,7 +4,7 @@ Better to have 20 people giving lots of feedback than 1000 not saying anything.
 
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 
-## A real-time, direct and tightly-coupled LiDAR-Inertial SLAM.
+## A real-time, direct and tightly-coupled LiDAR-Inertial SLAM that works (surprisingly) well under high velocities - even with spinning LiDARs.
 Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. Based also on their [FAST_LIO2](https://github.com/hku-mars/FAST_LIO).
 
 ### Tested and made for racing at Formula Student Driverless
