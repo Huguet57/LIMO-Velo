@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
         rate.sleep();
     }
 
-    ROS_ERROR("LIMOVelo out.");
+    ROS_ERROR("Rosbag ending detected.");
 
     return 0;
 }

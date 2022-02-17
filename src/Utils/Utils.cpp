@@ -11,14 +11,22 @@
 #include "Headers/Mapper.hpp"
 #endif
 
-uint64_t Conversions::sec2Microsec(double t) {
+std::uint64_t Conversions::sec2Microsec(double t) {
     return std::round(t*1e6);
 }
 
-double Conversions::microsec2Sec(uint64_t t) {
-    int secs = t/1000000;
-    int msecs = t%1000000;
-    return secs + msecs*1e-6;
+double Conversions::microsec2Sec(std::uint64_t t) {
+    int order = 1e6;
+    int secs = t/order;
+    int musecs = t%order;
+    return secs + musecs*1e-6;
+}
+
+double Conversions::nanosec2Sec(std::uint32_t t) {
+    int order = 1e9;
+    int secs = t/order;
+    int nsecs = t%order;
+    return secs + nsecs*1e-9;
 }
 
 Eigen::Matrix<float, 4, 1> R3Math::estimate_plane(const PointVector &point) {

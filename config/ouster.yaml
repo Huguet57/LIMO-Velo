@@ -16,7 +16,7 @@ initial_gravity: [0.0, 0.0, +9.807]
 I_Translation_L: [0.006253, -0.011775, 0.028535]
 I_Rotation_L: [
      -1.0,  0.0,  0.0,
-     0.0, 1.0,  0.0,
+     0.0, -1.0,  0.0,
      0.0,  0.0, 1.0
 ]
 
@@ -33,10 +33,10 @@ ds_rate: 4                 # Downsampling rate: results show that this one can b
 
 # IMU
 imu_rate: 100              # Approximated IMU rate: only used to estimate when to start the algorithm
-covariance_acceleration: 1.e+0
-covariance_gyroscope: 1.e+0
-covariance_bias_acceleration: 1.e-2
-covariance_bias_gyroscope: 1.e-2
+covariance_acceleration: 1.e-1
+covariance_gyroscope: 1.e-1
+covariance_bias_acceleration: 1.e-4
+covariance_bias_gyroscope: 1.e-4
 
 # Localizator
 MAX_NUM_ITERS: 3
@@ -57,6 +57,6 @@ Heuristic:
     times: []
     deltas: [0.1]
 
-    # # With heuristic (shakes if mapping_online = true)
+    # # With heuristic
     # times: [2.0]
     # deltas: [0.1, 0.025]
