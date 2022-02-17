@@ -264,7 +264,7 @@ class State {
         State(double time) {
             Eigen::Vector3f init_g = Eigen::Map<Eigen::Vector3f>(Config.initial_gravity.data(), 3);
             Eigen::Vector3f I_t_L = Eigen::Map<Eigen::Vector3f>(Config.I_Translation_L.data(), 3);
-            Eigen::Matrix3f I_R_L = Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3);
+            Eigen::Matrix3f I_R_L = Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3).transpose();
 
             this->R = Eigen::Matrix3f::Identity();
             this->g = init_g;
