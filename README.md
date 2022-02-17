@@ -7,15 +7,31 @@ Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 ## A real-time, direct and tightly-coupled LiDAR-Inertial SLAM.
 Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. Based also on their [FAST_LIO2](https://github.com/hku-mars/FAST_LIO).
 
-Tested on and made for Barcelona's own "[Xaloc](https://www.youtube.com/watch?v=ly_ax8w-T7E&feature=emb_logo)".
+### Tested and made for racing at Formula Student Driverless
+Tested on and made for Barcelona's own "[Xaloc](https://www.youtube.com/watch?v=ly_ax8w-T7E&feature=emb_logo)". Common working speeds are 20m/s in straights and 200deg/s in the turns.
 
 <p align="center">
-  <img src="./config/docs/img/Localization.gif" alt="Perfomance of the algorithm" />
+  <img src="./config/docs/img/Localization.gif" alt="Perfomance of the algorithm" /><br />
+  Visualization of the algorithm with <code>delta = 0.01</code> (100Hz)
 </p>
 
-See the part of my thesis where I explain the algorithm and its results: [LIMOVelo + Results](https://github.com/Huguet57/LIMO-Velo/blob/main/config/docs/Thesis%20-%20LIMOVelo%20%2B%20Results.pdf).
+### Centimeter-level accuracy is kept under racing speeds
+Only algorithm that can deliver centimeter-level resolution on real-time. See the part of my thesis where I explain the algorithm and its results: [LIMOVelo + Results](https://github.com/Huguet57/LIMO-Velo/blob/main/config/docs/Thesis%20-%20LIMOVelo%20%2B%20Results.pdf).
 
-## TODO list
+<p align="center">
+  <img src="./config/docs/img/cones-comparison.png" alt="Map comparison - Cones" /><br />
+  Comparison of cones under racing speeds running all algorithms in real-time, except for LIO-SAM (-r 0.5).
+</p>
+
+### Designed to be easily understood even by beginners
+Developing an algorithm for a team requires the algorithm to be easy enough to understand being passed through generations.
+
+<p align="center">
+  <img src="./config/docs/img/pipeline.png" alt="Map comparison - Cones" /><br />
+  LIMO-Velo's pipeline. Here are seen the different modules (blue), data (orange) and libraries (dark green).
+</p>
+
+# TODO list
 ### Urgent fixes
 - [ ] Rethink ``mapping_offline`` (see Discussions)
 - [ ] Adding Livox as a LiDAR type
@@ -33,7 +49,7 @@ See the part of my thesis where I explain the algorithm and its results: [LIMOVe
 - [ ] Add vision buffer and ability to paint the map's points
 - [ ] Initialize IMU measurements
 
----
+# Using LIMO-Velo
 
 ## 0. Cloning the repository
 When cloning the repository, we also need to clone the [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) submodules. Hence we will use the ``--recurse-submodules`` tag.
@@ -60,7 +76,7 @@ Relevant parameters are:
 ## 4. Modifying the LiDAR driver to get true real-time performance
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
 
-## References
+# References
 - [IKFoM](https://github.com/hku-mars/IKFoM): Iterated Kalman Filters on Manifolds
 - [ikd-Tree](https://github.com/hku-mars/ikd-Tree): Incremental KD-Tree for Robotic Applications
 - [FAST-LIO2](https://github.com/hku-mars/FAST_LIO): Fast and Direct LIO SLAM
