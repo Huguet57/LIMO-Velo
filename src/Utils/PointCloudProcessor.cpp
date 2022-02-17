@@ -67,8 +67,8 @@ extern struct Params Config;
             }
 
             double PointCloudProcessor::get_begin_time(const pcl::PointCloud<ouster_ros::Point>& pcl) {
-                // Ouster points have absolute time
-                return 0.d;
+                // Ouster points have relative time
+                return Conversions::microsec2Sec(pcl.header.stamp) - Conversions::microsec2Sec(pcl.points.back().t)*1e-3 + Conversions::microsec2Sec(pcl.points.front().t)*1e-3;
             }
 
         // Custom specific

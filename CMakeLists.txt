@@ -89,12 +89,14 @@ add_executable(limovelo
   # Pipelines
   src/main.cpp
   
+  # Utils
+  src/Utils/Utils.cpp
+  src/Utils/Objects.cpp
+  src/Utils/PointCloudProcessor.cpp
+
   # Modules
-  src/Modules/Utils.cpp
-  src/Modules/Objects.cpp
   src/Modules/Accumulator.cpp
   src/Modules/Compensator.cpp
-  src/Modules/PointCloudProcessor.cpp
   src/Modules/Localizator.cpp
   src/Modules/Mapper.cpp
 )

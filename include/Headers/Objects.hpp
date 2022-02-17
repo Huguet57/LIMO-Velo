@@ -96,7 +96,7 @@ class Point {
             Point(const ouster_ros::Point& p) {
                 this->set_XYZ(p);
                 this->set_attributes(p);
-                this->time = (double) p.t;
+                this->time = (double) Conversions::microsec2Sec(p.t)*1e-3;
             }
 
         // Custom specific
