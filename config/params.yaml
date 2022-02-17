@@ -1,6 +1,6 @@
 # Online/Offline
-mapping_online: true
-real_time: false
+mapping_online: true     # set to 'true' until mapping offline fixed (see Discussions in GitHub)
+real_time: false         # in a slow CPU, real_time ensures to always output to latest odometry (possibly skipping points)
 
 # Topics
 points_topic: "/lidar/points"
@@ -10,6 +10,7 @@ imus_topic: "/imu/raw"
 estimate_extrinsics: false
 print_extrinsics: false
 initial_gravity: [0.0, 0.0, -9.807]
+# Extrinsics LiDAR -> IMU
 I_Translation_L: [0.0, 0.0, 0.0]
 I_Rotation_L: [
      1.0,  0.0,  0.0,
@@ -22,14 +23,14 @@ empty_lidar_time: 0.1      # Should be at least [FULL_ROTATION_TIME]
 real_time_delay: 0.1       # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
 # LiDAR
-LiDAR_type: velodyne
+LiDAR_type: velodyne       # Options: velodyne, hesai, ouster, custom
 LiDAR_noise: 0.001
 full_rotation_time: 0.1
-min_dist: 4
-ds_rate: 4
+min_dist: 4                # Minimum distance: doesn't use points closer than this radius
+ds_rate: 4                 # Downsampling rate: results show that this one can be up to 32 and still work, try it if you need a speedup
 
 # IMU
-imu_rate: 200
+imu_rate: 200              # Approximated IMU rate: only used to estimate when to start the algorithm
 covariance_acceleration: 1.e-2
 covariance_gyroscope: 1.e-4
 covariance_bias_acceleration: 1.e-4
@@ -41,15 +42,19 @@ MAX_NUM_ITERS: 3
 NUM_MATCH_POINTS: 5
 MAX_DIST_PLANE: 2.0
 PLANES_THRESHOLD: 5.e-2
-degeneracy_threshold: 5.
-print_degeneracy_values: false
+# Localizator - Degeneracy
+degeneracy_threshold: 5.           # Its magnitude depends on delta (see below), keeping it too high can cause blurry results
+print_degeneracy_values: false     # Print the degeneracy eigenvalues to guess what the threshold must be for you
 
 # Delta refinement
+# Choose a set of times and field of view sizes (deltas) for the initialization.
+# The delta (t2 - t1) that will be used through the algorithm therefore is the last one in the 'deltas' vector
+# Tick the 'Localizator' box in RViz to see the initialization in action
 Heuristic:
 #     # No heuristic
 #     times: []
 #     deltas: [0.1]
     
     # With heuristic
-    times: [0.5, 1.0, 1.25]
+    times: [0.5, 1.0]
     deltas: [0.1, 0.05, 0.02]
