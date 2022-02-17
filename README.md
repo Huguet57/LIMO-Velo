@@ -8,7 +8,7 @@ Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. Based also on their [FAST_LIO2](https://github.com/hku-mars/FAST_LIO).
 
 ### Tested and made for racing at Formula Student Driverless
-Tested on and made for Barcelona's own "[Xaloc](https://www.youtube.com/watch?v=ly_ax8w-T7E&feature=emb_logo)". Common working speeds are 20m/s in straights and 200deg/s in the turns.
+Tested on and made for Barcelona's own "[Xaloc](https://www.youtube.com/watch?v=ly_ax8w-T7E&feature=emb_logo)". Common working speeds are 20m/s in straights and 100deg/s in the turns.
 
 <p align="center">
   <img src="./config/docs/img/Localization.gif" alt="Perfomance of the algorithm" /><br />
@@ -20,7 +20,7 @@ Only algorithm that can deliver centimeter-level resolution on real-time. See th
 
 <p align="center">
   <img src="./config/docs/img/cones-comparison.png" alt="Map comparison - Cones" /><br />
-  Comparison of cones under racing speeds running all algorithms in real-time, except for LIO-SAM (-r 0.5).
+  Comparison of cones under racing speeds running all algorithms in real-time, except for LIO-SAM (-r 0.5). It failed otherwise.
 </p>
 
 ### Designed to be easily understood even by beginners
