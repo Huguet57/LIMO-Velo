@@ -130,11 +130,11 @@ extern struct Params Config;
             // Create a temporal object to process the pointcloud message
             PointCloudProcessor processor;
             Points points = processor.msg2points(msg);
-            Points sorted_points = processor.sort_points(points);
-            Points downsampled_points = processor.downsample(sorted_points);
+            Points downsampled_points = processor.downsample(points);
+            Points sorted_points = processor.sort_points(downsampled_points);
             
-            // Return downsampled (sorted) points as "processed points"
-            return downsampled_points;
+            // Return sorted (downsampled) points as "processed points"
+            return sorted_points;
         }
 
         bool Accumulator::enough_imus() {

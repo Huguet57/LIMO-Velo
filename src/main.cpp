@@ -86,11 +86,15 @@ int main(int argc, char** argv) {
 
                 // Define time interval [t1, t2] which we will use to localize ourselves
                 if (Config.real_time) t2 = accum.latest_time();
-                else if (t2 > 0) t2 += accum.delta;
+                // Not real time, define t2 as prev_t2 + delta 
+                else if (t2 > 0) t2 = std::min(t2 + accum.delta, accum.latest_time()); // Don't go into the future
                 else t2 = accum.initial_time - Config.real_time_delay;
                 
+                // Refine delta (modifies accum.delta value)
                 rate = accum.refine_delta(Config.Heuristic, t2);
                 t1 = t2 - accum.delta;
+                // Don't use used points
+                if (t1 < KF.last_time_updated) break;
 
             // Step 1. LOCALIZATION
 
