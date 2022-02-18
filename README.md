@@ -64,6 +64,9 @@ Relevant parameters are:
 ## 4. Modifying the LiDAR driver to get true real-time performance
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
 
+# Sample datasets
+See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see which sample datasets are given. Don't hesitate to ask for more data on specific scenarios/cases.
+
 # References
 - [IKFoM](https://github.com/hku-mars/IKFoM): Iterated Kalman Filters on Manifolds
 - [ikd-Tree](https://github.com/hku-mars/ikd-Tree): Incremental KD-Tree for Robotic Applications
