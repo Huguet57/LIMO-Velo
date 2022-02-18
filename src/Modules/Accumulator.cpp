@@ -102,6 +102,7 @@ extern struct Params Config;
             return this->is_ready = false;
         }
 
+        // Check if data stream died
         bool Accumulator::ended(double t) {
             if (not this->ready()) return false;
             if (t - initial_time < 3) return false;
@@ -112,6 +113,11 @@ extern struct Params Config;
             assert(("There has to be exactly one more delta value than time delimiters", heuristic.times.size() + 1 == heuristic.deltas.size()));
             this->delta = this->interpret_heuristic(heuristic, t);
             return ros::Rate((int) 1./this->delta);
+        }
+
+        double Accumulator::latest_time() {
+            // Latest IMU timestamp - delay
+            return this->BUFFER_I.front().time - Config.real_time_delay;
         }
 
     // private:

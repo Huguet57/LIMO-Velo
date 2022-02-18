@@ -8,44 +8,48 @@ class Accumulator {
         double delta;
 
         // Add to buffer
-        void add(State, double time=-1);
-        void add(IMU, double time=-1);
-        void add(Point, double time=-1);
-        void add(Points);
+            void add(State, double time=-1);
+            void add(IMU, double time=-1);
+            void add(Point, double time=-1);
+            void add(Points);
 
         // Receive from topics
-        void receive_lidar(const PointCloud_msg&);
-        void receive_imu(const IMU_msg&);
+            void receive_lidar(const PointCloud_msg&);
+            void receive_imu(const IMU_msg&);
         
         // Empty buffers
-        void clear_buffers();
-        void clear_buffers(TimeType);
-        void clear_lidar(TimeType);
-
-        ///////////////////////////////////////////////////
+            void clear_buffers();
+            void clear_buffers(TimeType);
+            void clear_lidar(TimeType);
 
         // Get content given time intervals
 
-        State get_prev_state(double t);
-        IMU get_next_imu(double t);
+            State get_prev_state(double t);
+            IMU get_next_imu(double t);
 
-        States get_states(double t1, double t2);
-        Points get_points(double t1, double t2);
-        IMUs get_imus(double t1, double t2);
+            States get_states(double t1, double t2);
+            Points get_points(double t1, double t2);
+            IMUs get_imus(double t1, double t2);
 
-        template <typename ContentType>
-        int before_t(Buffer<ContentType>& source, double t) {
-            return Algorithms::binary_search(source.content, t, true);
-        }
+            template <typename ContentType>
+            int before_t(Buffer<ContentType>& source, double t) {
+                return Algorithms::binary_search(source.content, t, true);
+            }
 
-        template <typename ArrayType>
-        int before_t(const ArrayType& array, double t, bool desc=false) {
-            return Algorithms::binary_search(array, t, desc);
-        }
+            template <typename ArrayType>
+            int before_t(const ArrayType& array, double t, bool desc=false) {
+                return Algorithms::binary_search(array, t, desc);
+            }
 
-        bool ready();
-        bool ended(double);
-        ros::Rate refine_delta(const HeuristicParams&, double t);
+        // Start/stop
+
+            bool ready();
+            bool ended(double t);
+
+        // Time management
+        
+            ros::Rate refine_delta(const HeuristicParams&, double t);
+            double latest_time();
 
     private:
         bool is_ready = false;

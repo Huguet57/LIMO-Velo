@@ -48,8 +48,8 @@ int main(int argc, char** argv) {
     nh.param<double>("wz_MULTIPLIER", Config.wz_MULTIPLIER, 1);
     nh.param<std::string>("points_topic", Config.points_topic, "/velodyne_points");
     nh.param<std::string>("imus_topic", Config.imus_topic, "/vectornav/IMU");
-    nh.param<std::vector<double>>("/Heuristic/times", Config.Heuristic.times, {1.});
-    nh.param<std::vector<double>>("/Heuristic/deltas", Config.Heuristic.deltas, {0.1, 0.01});
+    nh.param<std::vector<double>>("/Heuristic/times", Config.Heuristic.times, {});
+    nh.param<std::vector<double>>("/Heuristic/deltas", Config.Heuristic.deltas, {0.1});
     nh.param<std::vector<float>>("initial_gravity", Config.initial_gravity, {0.0, 0.0, -9.807});
     nh.param<std::vector<float>>("I_Translation_L", Config.I_Translation_L, std::vector<float> (3, 0.));
     nh.param<std::vector<float>>("I_Rotation_L", Config.I_Rotation_L, std::vector<float> (9, 0.));
@@ -72,40 +72,31 @@ int main(int argc, char** argv) {
         &Accumulator::receive_imu, &accum
     );
 
+    // Time variables
+    double t1, t2;
+    t1 = t2 = -1;
     ros::Rate rate(10);
-
-    // If not real time, define an artificial clock
-    double clock = -1;
-    double t2 = -1;
 
     while (ros::ok()) {
         
+        // The accumulator received enough data to start
         while (accum.ready()) {
             
-            if (Config.real_time) {
-                // Should be t2 = ros::Time::now() - delay
-                double latest_imu_time = accum.BUFFER_I.front().time;
-                t2 = latest_imu_time - Config.real_time_delay; 
-            } else {
-                if (clock < 0) clock = accum.initial_time;
-                t2 = clock - Config.real_time_delay; 
-                clock += accum.delta;
-            }
+            // Step 0. TIME MANAGEMENT
 
-            // Refine delta if need to be
-            rate = accum.refine_delta(Config.Heuristic, t2);
-            
-            // Define t1
-            double t1 = std::max(KF.last_time_updated, t2 - accum.delta);
-            if (KF.last_time_updated < 0) t1 = t2 - accum.delta;
+                // Define time interval [t1, t2] which we will use to localize ourselves
+                if (Config.real_time) t2 = accum.latest_time();
+                else if (t2 > 0) t2 += accum.delta;
+                else t2 = accum.initial_time - Config.real_time_delay;
+                
+                rate = accum.refine_delta(Config.Heuristic, t2);
+                t1 = t2 - accum.delta;
 
-            // Integrate from t1 to t2
-            KF.propagate_to(t2);
+            // Step 1. LOCALIZATION
 
-            // Field of view too small (relevant for real-time)
-            if (t2 - t1 < accum.delta - 1e-6) break;
+                // Integrate IMUs up to t2
+                KF.propagate_to(t2);
 
-            if (Config.mapping_online or (not Config.mapping_online and map.exists())) {
                 // Compensated pointcloud given a path
                 Points compensated = comp.compensate(t1, t2);
                 Points ds_compensated = comp.downsample(compensated);
@@ -118,47 +109,47 @@ int main(int argc, char** argv) {
                 publish.state(Xt2, false);
                 publish.tf(Xt2);
 
-                // Publish compensated
+                // Publish pointcloud used to localize
                 Points global_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
                 publish.pointcloud(global_compensated, true);
 
-                // Map at the same time (online)
+            // Step 2. MAPPING
+
+                // Add updated points to map (mapping online)
                 if (Config.mapping_online) {
                     map.add(global_compensated, t2, true);
                     publish.pointcloud(global_compensated, false);
                     
                     if (Config.print_extrinsics) publish.extrinsics(Xt2);
                 }
-            }
-            
-            // Add updated points to map (offline)
-            if (not Config.mapping_online and map.hasToMap(t2)) {
-                State Xt2 = KF.latest_state();
-                Points full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                Points global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
-                Points global_full_ds_compensated = comp.downsample(global_full_compensated);
+                else
+                // Add updated points to map (mapping offline)
+                if (map.hasToMap(t2)) {
+                    State Xt2 = KF.latest_state();
+                    // Map points at [t2 - FULL_ROTATION_TIME, t2]
+                    Points full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
+                    Points global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
+                    Points global_full_ds_compensated = comp.downsample(global_full_compensated);
 
-                if (global_full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
-                if (Config.print_extrinsics) publish.extrinsics(Xt2);
+                    if (global_full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
+                    if (Config.print_extrinsics) publish.extrinsics(Xt2);
 
-                map.add(global_full_ds_compensated, t2, true);
-                publish.pointcloud(global_full_ds_compensated, false);
-            }
+                    map.add(global_full_ds_compensated, t2, true);
+                    publish.pointcloud(global_full_ds_compensated, false);
+                }
 
-            // Empty too old LiDAR points
-            accum.clear_lidar(t2 - Config.empty_lidar_time);
+            // Step 3. ERASE OLD DATA
+
+                // Empty too old LiDAR points
+                accum.clear_lidar(t2 - Config.empty_lidar_time);
 
             // Trick to call break in the middle of the program
             break;
         }
 
-        if (accum.ended(t2) and not Config.real_time) break;
-
         ros::spinOnce();
         rate.sleep();
     }
-
-    ROS_ERROR("Rosbag ending detected.");
 
     return 0;
 }
