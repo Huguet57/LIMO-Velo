@@ -65,7 +65,11 @@ Relevant parameters are:
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
 
 # Sample datasets
-See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see which sample datasets are given. Don't hesitate to ask for more data on specific scenarios/cases.
+Try ``xaloc.launch`` with Xaloc's own rosbags. High velocity in the straights (~15m/s) and tight turns (~80deg/s).
+
+Find them here: [https://drive.google.com/drive/folders/1uex3OhSXszxFhOLbmLHyYZTLkc01otxx?usp=sharing](https://drive.google.com/drive/folders/1uex3OhSXszxFhOLbmLHyYZTLkc01otxx?usp=sharing)
+
+See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sample datasets. Don't hesitate to ask there for more data on specific scenarios/cases.
 
 # References
 - [IKFoM](https://github.com/hku-mars/IKFoM): Iterated Kalman Filters on Manifolds
