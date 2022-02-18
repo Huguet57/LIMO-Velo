@@ -116,6 +116,9 @@ extern struct Params Config;
         }
 
         double Accumulator::latest_time() {
+            // // Ideally should be ros::Time::now() - delay, but it's easier the other way with rosbags (no need for use_sim_time=true)
+            // return ros::Time::now() - Config.real_time_delay;
+
             // Latest IMU timestamp - delay
             return this->BUFFER_I.front().time - Config.real_time_delay;
         }

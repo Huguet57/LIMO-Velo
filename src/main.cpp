@@ -13,11 +13,8 @@
 
 Params Config;
 
-int main(int argc, char** argv) {
-    ros::init(argc, argv, "limovelo");
-    ros::NodeHandle nh;
-
-    // Get YAML parameters
+void fill_config() {
+    // Read YAML parameters
     nh.param<bool>("mapping_online", Config.mapping_online, true);
     nh.param<bool>("real_time", Config.real_time, true);
     nh.param<bool>("estimate_extrinsics", Config.estimate_extrinsics, false);
@@ -53,6 +50,14 @@ int main(int argc, char** argv) {
     nh.param<std::vector<float>>("initial_gravity", Config.initial_gravity, {0.0, 0.0, -9.807});
     nh.param<std::vector<float>>("I_Translation_L", Config.I_Translation_L, std::vector<float> (3, 0.));
     nh.param<std::vector<float>>("I_Rotation_L", Config.I_Rotation_L, std::vector<float> (9, 0.));
+}
+
+int main(int argc, char** argv) {
+    ros::init(argc, argv, "limovelo");
+    ros::NodeHandle nh;
+
+    // Fill configurations Params with YAML
+    fill_config();
 
     // Objects
     Publishers publish(nh);
@@ -126,9 +131,8 @@ int main(int argc, char** argv) {
                     
                     if (Config.print_extrinsics) publish.extrinsics(Xt2);
                 }
-                else
                 // Add updated points to map (mapping offline)
-                if (map.hasToMap(t2)) {
+                else if (map.hasToMap(t2)) {
                     State Xt2 = KF.latest_state();
                     // Map points at [t2 - FULL_ROTATION_TIME, t2]
                     Points full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);

@@ -92,7 +92,7 @@
             int_state = states.back();
 
             // IMUs after last state
-            while (int_state.time < imus.back().time) {
+            while (int_state.time < imus.back().time and u < imus.size()) {
                 int_state += imus[u++];
                 upsampled_states.push_back(int_state);
             }
