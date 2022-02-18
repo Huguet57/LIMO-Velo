@@ -15,12 +15,9 @@ extern struct Params Config;
 
 // class PointCloudProcessor
     // public:
-        PointCloudProcessor::PointCloudProcessor(const PointCloud_msg& msg) {
-            Points points = this->msg2points(msg);
-            Points downsample_points = this->downsample(points);
-            
-            this->sort_points(downsample_points);
-            this->points = downsample_points;
+        Points PointCloudProcessor::downsample(const Points& points) {
+            // Downsample points close depending on their time distance
+            return this->temporal_downsample(points);
         }
 
     // private:
@@ -98,13 +95,14 @@ extern struct Params Config;
             return pts;
         }
 
-        Points PointCloudProcessor::downsample(const Points& points) {
+        Points PointCloudProcessor::temporal_downsample(const Points& points) {
             Points downsampled;
             int ds_counter = 0;
 
             for (Point p : points) {
-                bool downsample_point = Config.ds_rate <= 1 or ++ds_counter%Config.ds_rate == 0; 
-                if (downsample_point and Config.min_dist < p.norm()) downsampled.push_back(p);
+                // Keep point if counter is multiple of ds_rate
+                bool keep_point = Config.ds_rate <= 1 or ++ds_counter%Config.ds_rate == 0; 
+                if (keep_point and Config.min_dist < p.norm()) downsampled.push_back(p);
             }
 
             return downsampled;
@@ -114,8 +112,11 @@ extern struct Params Config;
             return a.time < b.time;
         }
 
-        void PointCloudProcessor::sort_points(Points& points) {
-            std::sort(points.begin(), points.end(), this->time_sort);
+        Points PointCloudProcessor::sort_points(const Points& points) {
+            Points sorted_points = points;
+            // Use std::sort included in <algorithms>
+            std::sort(sorted_points.begin(), sorted_points.end(), this->time_sort);
+            return sorted_points;
         }
 
 void Processor::fill(pcl::PointCloud<full_info::Point>& pcl, const Points& points) {

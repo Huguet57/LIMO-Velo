@@ -74,8 +74,12 @@ class Point {
 
         // Delegate constructor for any point type
         template <typename PointType>
-        Point(const PointType& p, double begin_time) : Point (p) {
-            this->time += begin_time;
+        Point(const PointType& p, double time_offset)
+            // Construct point as usual first
+            : Point (p)
+        {
+            // Then add the time offset to the Point's time
+            this->time += time_offset;
         }
 
         // HESAI specific

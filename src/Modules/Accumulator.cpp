@@ -16,50 +16,54 @@ extern struct Params Config;
 // class Accumulator
     // public:
         // Add content to buffer
-        void Accumulator::add(State cnt, double time) {
-            if (time > 0) cnt.time = time;
-            this->push(cnt);
-        }
+            void Accumulator::add(State cnt, double time) {
+                if (time > 0) cnt.time = time;
+                this->push(cnt);
+            }
 
-        void Accumulator::add(IMU cnt, double time) {
-            if (time > 0) cnt.time = time;
-            this->push(cnt);
-        }
+            void Accumulator::add(IMU cnt, double time) {
+                if (time > 0) cnt.time = time;
+                this->push(cnt);
+            }
 
-        void Accumulator::add(Point cnt, double time) {
-            if (time > 0) cnt.time = time;
-            this->push(cnt);
-        }
+            void Accumulator::add(Point cnt, double time) {
+                if (time > 0) cnt.time = time;
+                this->push(cnt);
+            }
 
-        void Accumulator::add(Points points) {
-            for (Point p : points) this->push(p);
-        }
+            void Accumulator::add(Points points) {
+                for (Point p : points) this->push(p);
+            }
 
         // Receive from topics
-        void Accumulator::receive_lidar(const PointCloud_msg& msg) {
-            PointCloudProcessor processed(msg);
-            this->add(processed.points);
-        }
+            void Accumulator::receive_lidar(const PointCloud_msg& msg) {
+                // Turn message to processed points
+                Points points = this->process(msg);
+                // Add them individually on the LiDAR buffer
+                for (Point p : points) this->add(p);
+            }
 
-        void Accumulator::receive_imu(const IMU_msg& msg) {
-            IMU imu(msg);
-            this->add(imu);
-        }
+            void Accumulator::receive_imu(const IMU_msg& msg) {
+                // Turn message to IMU object
+                IMU imu(msg);
+                // Add it to the IMU buffer
+                this->add(imu);
+            }
 
         // Empty buffers
-        void Accumulator::clear_buffers() {
-            this->BUFFER_L.clear();
-            this->BUFFER_I.clear();
-        }
+            void Accumulator::clear_buffers() {
+                this->BUFFER_L.clear();
+                this->BUFFER_I.clear();
+            }
 
-        void Accumulator::clear_buffers(TimeType t) {
-            this->BUFFER_L.clear(t);
-            this->BUFFER_I.clear(t);
-        }
+            void Accumulator::clear_buffers(TimeType t) {
+                this->BUFFER_L.clear(t);
+                this->BUFFER_I.clear(t);
+            }
 
-        void Accumulator::clear_lidar(TimeType t) {
-            this->BUFFER_L.clear(t);
-        }
+            void Accumulator::clear_lidar(TimeType t) {
+                this->BUFFER_L.clear(t);
+            }
 
         /////////////////////////////////
 
@@ -115,6 +119,17 @@ extern struct Params Config;
         void Accumulator::push(const State& state) { this->BUFFER_X.push(state); }
         void Accumulator::push(const IMU& imu) { this->BUFFER_I.push(imu); }
         void Accumulator::push(const Point& point) { this->BUFFER_L.push(point); }
+
+        Points Accumulator::process(const PointCloud_msg& msg) {
+            // Create a temporal object to process the pointcloud message
+            PointCloudProcessor processor;
+            Points points = processor.msg2points(msg);
+            Points sorted_points = processor.sort_points(points);
+            Points downsampled_points = processor.downsample(sorted_points);
+            
+            // Return downsampled (sorted) points as "processed points"
+            return downsampled_points;
+        }
 
         bool Accumulator::enough_imus() {
             return this->BUFFER_I.size() > Config.real_time_delay*Config.imu_rate;

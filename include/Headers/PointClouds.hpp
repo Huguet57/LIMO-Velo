@@ -3,12 +3,12 @@ class PointCloudProcessor {
     // Given a PointCloud, process it to push to the buffer
 
     public:
-        Points points;
-        PointCloudProcessor(const PointCloud_msg&);
+        PointCloudProcessor() = default;
+        Points msg2points(const PointCloud_msg&);
+        Points downsample(const Points&);
+        Points sort_points(const Points&);
 
     private:
-        Points msg2points(const PointCloud_msg&);
-
         // Velodyne specific
             Points velodynemsg2points(const PointCloud_msg&);
             double get_begin_time(const pcl::PointCloud<velodyne_ros::Point>&);
@@ -27,7 +27,6 @@ class PointCloudProcessor {
         
         template <typename PointType> Points to_points(const typename pcl::PointCloud<PointType>&);
 
-        Points downsample(const Points&);
+        Points temporal_downsample(const Points&);
         static bool time_sort(const Point&, const Point&);
-        void sort_points(Points&);
 };

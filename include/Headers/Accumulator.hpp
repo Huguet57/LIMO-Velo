@@ -100,6 +100,9 @@ class Accumulator {
             return source.front();
         }
 
+        // Process LiDAR pointcloud message
+        Points process(const PointCloud_msg&);
+
         bool enough_imus();
         void set_initial_time();
         double interpret_heuristic(const HeuristicParams&, double t);
