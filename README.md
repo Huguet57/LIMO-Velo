@@ -31,6 +31,12 @@ Developing an algorithm for a team requires the algorithm to be easy enough to u
   LIMO-Velo's pipeline. Here are seen the different modules (blue), data (orange) and libraries (dark green).
 </p>
 
+# LiDARs supported
+- Velodyne
+- Hesai
+- Ouster
+- Livox (check ``livox`` git branch)
+
 # Dependencies
 - [Ubuntu](https://ubuntu.com) (tested on 20.04)
 - [ROS](http://wiki.ros.org/ROS/Installation) (tested on Noetic)
