@@ -21,7 +21,7 @@ class Localizator {
 
     public:
         Localizator();
-        void update(const Points&, double time);
+        void localize(const Points&, double time);
         void calculate_H(const state_ikfom&, const Matches&, Eigen::MatrixXd& H, Eigen::VectorXd& h);
         
         void propagate_to(double t);

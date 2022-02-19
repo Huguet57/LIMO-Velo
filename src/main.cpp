@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     Accumulator& accum = Accumulator::getInstance();
     Compensator comp = Compensator ();
     Mapper& map = Mapper::getInstance();
-    Localizator& KF = Localizator::getInstance();
+    Localizator& loc = Localizator::getInstance();
 
     // Subscribers
     ros::Subscriber lidar_sub = nh.subscribe(
@@ -66,14 +66,14 @@ int main(int argc, char** argv) {
                 delta = accum.update_delta(Config.Heuristic, t2);
 
                 // Define t1 but don't use to localize repeated points
-                t1 = std::max(t2 - delta, KF.last_time_updated);
+                t1 = std::max(t2 - delta, loc.last_time_updated);
                 // Check if interval has enough field of view
                 if (t2 - t1 < delta - 1e-6) break;
 
             // Step 1. LOCALIZATION
 
                 // Integrate IMUs up to t2
-                KF.propagate_to(t2);
+                loc.propagate_to(t2);
 
                 // Compensated pointcloud given a path
                 Points compensated = comp.compensate(t1, t2);
@@ -81,8 +81,8 @@ int main(int argc, char** argv) {
                 if (ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
                 // Localize points in map
-                KF.update(ds_compensated, t2);
-                State Xt2 = KF.latest_state();
+                loc.localize(ds_compensated, t2);
+                State Xt2 = loc.latest_state();
                 accum.add(Xt2, t2);
                 publish.state(Xt2, false);
                 publish.tf(Xt2);
@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
                 }
                 // Add updated points to map (mapping offline)
                 else if (map.hasToMap(t2)) {
-                    State Xt2 = KF.latest_state();
+                    State Xt2 = loc.latest_state();
                     // Map points at [t2 - FULL_ROTATION_TIME, t2]
                     Points full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
                     Points global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;

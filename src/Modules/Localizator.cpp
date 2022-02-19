@@ -19,8 +19,8 @@ extern struct Params Config;
             this->init_IKFoM();
         }
 
-        // Given points, update new position
-        void Localizator::update(const Points& points, double time) {
+        // Given points, find new position
+        void Localizator::localize(const Points& points, double time) {
             if (not Mapper::getInstance().exists()) return;
             this->IKFoM_update(points);
             this->last_time_updated = time;
