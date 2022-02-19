@@ -50,6 +50,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   message_generation
   eigen_conversions
+  livox_ros_driver
 )
 
 find_package(Eigen3 REQUIRED)

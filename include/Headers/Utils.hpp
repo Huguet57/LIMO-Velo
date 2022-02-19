@@ -2,6 +2,7 @@ namespace Conversions {
     std::uint64_t sec2Microsec(double t);
     double microsec2Sec(std::uint64_t t);
     double nanosec2Sec(std::uint32_t t);
+    double nanosec2Sec(std::uint64_t t);
 }
 
 namespace Algorithms {

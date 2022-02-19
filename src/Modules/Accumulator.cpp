@@ -43,9 +43,18 @@ extern struct Params Config;
                 for (Point p : points) this->add(p);
             }
 
+            void Accumulator::receive_livox(const livox_ros_driver::CustomMsg::ConstPtr& msg) {                
+                // Turn message to processed points
+                Points points = this->process(msg);
+
+                // Add them individually on the LiDAR buffer
+                for (Point p : points) this->add(p);
+            }
+
             void Accumulator::receive_imu(const IMU_msg& msg) {
                 // Turn message to IMU object
                 IMU imu(msg);
+                                
                 // Add it to the IMU buffer
                 this->add(imu);
             }
@@ -128,7 +137,8 @@ extern struct Params Config;
         void Accumulator::push(const IMU& imu) { this->BUFFER_I.push(imu); }
         void Accumulator::push(const Point& point) { this->BUFFER_L.push(point); }
 
-        Points Accumulator::process(const PointCloud_msg& msg) {
+        template <typename pcl_msg>
+        Points Accumulator::process(const pcl_msg& msg) {
             // Create a temporal object to process the pointcloud message
             PointCloudProcessor processor;
             Points points = processor.msg2points(msg);

@@ -21,6 +21,10 @@ extern struct Params Config;
         }
 
     // private:
+        Points PointCloudProcessor::msg2points(const livox_ros_driver::CustomMsg::ConstPtr& msg) {
+            return this->livoxmsg2points(msg);
+        }
+
         Points PointCloudProcessor::msg2points(const PointCloud_msg& msg) {
             if (Config.LiDAR_type == LIDAR_TYPE::Velodyne) return this->velodynemsg2points(msg);
             if (Config.LiDAR_type == LIDAR_TYPE::Hesai) return this->hesaimsg2points(msg);
@@ -68,6 +72,16 @@ extern struct Params Config;
                 return Conversions::microsec2Sec(pcl.header.stamp) - Conversions::nanosec2Sec(pcl.points.back().t) + Conversions::nanosec2Sec(pcl.points.front().t);
             }
 
+        // Livox specific
+            Points PointCloudProcessor::livoxmsg2points(const livox_ros_driver::CustomMsg::ConstPtr& msg) {
+                return this->to_points(*msg);
+            }
+
+            double PointCloudProcessor::get_begin_time(const livox_ros_driver::CustomMsg& msg) {
+                // Livox points have relative time
+                return Conversions::nanosec2Sec(msg.timebase);
+            }
+
         // Custom specific
             Points PointCloudProcessor::custommsg2points(const PointCloud_msg& msg) {
                 pcl::PointCloud<custom::Point>::Ptr raw_pcl(new pcl::PointCloud<custom::Point>());
@@ -92,6 +106,15 @@ extern struct Params Config;
             double begin_time = this->get_begin_time(pcl);
 
             for (PointType p : pcl.points) pts.push_back(Point (p, begin_time));
+            return pts;
+        }
+
+        Points PointCloudProcessor::to_points(const typename livox_ros_driver::CustomMsg& pcl) {
+            Points pts;
+
+            double begin_time = this->get_begin_time(pcl);
+
+            for (livox_ros_driver::CustomPoint p : pcl.points) pts.push_back(Point (p, begin_time));
             return pts;
         }
 

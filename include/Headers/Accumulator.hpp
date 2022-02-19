@@ -14,6 +14,7 @@ class Accumulator {
 
         // Receive from topics
             void receive_lidar(const PointCloud_msg&);
+            void receive_livox(const livox_ros_driver::CustomMsg::ConstPtr&);
             void receive_imu(const IMU_msg&);
         
         // Empty buffers
@@ -104,7 +105,8 @@ class Accumulator {
         }
 
         // Process LiDAR pointcloud message
-        Points process(const PointCloud_msg&);
+        template <typename pcl_msg>
+        Points process(const pcl_msg& msg);
 
         bool enough_imus();
         void set_initial_time();

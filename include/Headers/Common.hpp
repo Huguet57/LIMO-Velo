@@ -25,6 +25,8 @@
 #include <std_msgs/Bool.h>
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/Pose.h>
+#include <livox_ros_driver/CustomMsg.h>
+#include <livox_ros_driver/CustomPoint.h>
 // PCL Library
 #define PCL_NO_PRECOMPILE
 #include <pcl_conversions/pcl_conversions.h>
@@ -45,6 +47,7 @@ namespace LIDAR_TYPE {
     const std::string Velodyne = "velodyne";
     const std::string Hesai = "hesai";
     const std::string Ouster = "ouster";
+    const std::string Livox = "livox";
     const std::string Custom = "custom";
 }
 

@@ -22,29 +22,39 @@ int main(int argc, char** argv) {
     // Fill configurations Params with YAML
     fill_config(nh);
 
-    // Objects
-    Publishers publish(nh);
-    Accumulator& accum = Accumulator::getInstance();
-    Compensator comp = Compensator ();
-    Mapper& map = Mapper::getInstance();
-    Localizator& loc = Localizator::getInstance();
+    // Modules
+        Publishers publish(nh);
+        Accumulator& accum = Accumulator::getInstance();
+        Compensator comp = Compensator ();
+        Mapper& map = Mapper::getInstance();
+        Localizator& loc = Localizator::getInstance();
 
     // Subscribers
-    ros::Subscriber lidar_sub = nh.subscribe(
-        Config.points_topic, 1000,
-        &Accumulator::receive_lidar, &accum
-    );
+        // LiDAR
+        ros::Subscriber lidar_sub;
+        if (Config.LiDAR_type != LIDAR_TYPE::Livox) {
+            lidar_sub = nh.subscribe(
+                Config.points_topic, 1000,
+                &Accumulator::receive_lidar, &accum
+            );
+        } else {
+            lidar_sub = nh.subscribe(
+                Config.points_topic, 1000,
+                &Accumulator::receive_livox, &accum
+            );
+        }
 
-    ros::Subscriber imu_sub = nh.subscribe(
-        Config.imus_topic, 1000,
-        &Accumulator::receive_imu, &accum
-    );
+        // IMU
+        ros::Subscriber imu_sub = nh.subscribe(
+            Config.imus_topic, 1000,
+            &Accumulator::receive_imu, &accum
+        );
 
     // Time variables
     double t1, t2;
     t2 = DBL_MAX;
 
-    // (Delta = t2 - t1) Size of the field of view we use to localize
+    // Delta (= t2 - t1): size of the field of view we use to localize
     double delta = Config.Heuristic.deltas.front();
     
     ros::Rate rate(5000);

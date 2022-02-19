@@ -5,6 +5,7 @@ class PointCloudProcessor {
     public:
         PointCloudProcessor() = default;
         Points msg2points(const PointCloud_msg&);
+        Points msg2points(const livox_ros_driver::CustomMsg::ConstPtr&);
         Points downsample(const Points&);
         Points sort_points(const Points&);
 
@@ -21,10 +22,15 @@ class PointCloudProcessor {
             Points oustermsg2points(const PointCloud_msg&);
             double get_begin_time(const pcl::PointCloud<ouster_ros::Point>&);
 
+        // Livox specific
+            Points livoxmsg2points(const livox_ros_driver::CustomMsg::ConstPtr&);
+            double get_begin_time(const livox_ros_driver::CustomMsg&);
+
         // Custom specific
             Points custommsg2points(const PointCloud_msg&);
             double get_begin_time(const pcl::PointCloud<custom::Point>&);
         
+        Points to_points(const livox_ros_driver::CustomMsg&);
         template <typename PointType> Points to_points(const typename pcl::PointCloud<PointType>&);
 
         Points temporal_downsample(const Points&);

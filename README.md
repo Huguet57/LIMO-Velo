@@ -37,6 +37,12 @@ Developing an algorithm for a team requires the algorithm to be easy enough to u
 - [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
 - [PCL](http://www.pointclouds.org/downloads/linux.html) (tested on 1.8)
 
+# Support for all types of LiDAR
+- Velodyne
+- Ouster
+- Hesai
+- Livox
+
 # Using LIMO-Velo
 
 ## 0. Cloning the repository
@@ -81,6 +87,7 @@ See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sa
 - [ ] Rethink ``mapping_offline`` (see Discussions)
 - [ ] Adding Livox as a LiDAR type
 - [ ] Rewrite the most confusing parts according to [qpc001's feedback](https://github.com/qpc001/LIMO-Velo/commit/a45b6489cbbcefc68515565eeaeaed267c976da8). (thank you!)
+- [ ] [Livox] Investigate why Fast-LIO outperforms it in 2020-09-16-quick-shack.bag (given by the Fast-LIO authors). 
 
 ### Design choices
 - [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)

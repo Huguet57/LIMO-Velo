@@ -103,6 +103,13 @@ class Point {
                 this->time = Conversions::nanosec2Sec(p.t);
             }
 
+        // Livox specific
+            Point(const livox_ros_driver::CustomPoint& p) {
+                this->set_XYZ(p);
+                this->set_attributes(p);
+                this->time = Conversions::nanosec2Sec(p.offset_time);
+            }
+
         // Custom specific
             Point(const custom::Point& p) {
                 this->set_XYZ(p);
@@ -173,6 +180,12 @@ class Point {
             this->range = p.range;
         }
 
+        // Livox specific
+        void set_attributes(const livox_ros_driver::CustomPoint& p) {
+            this->intensity = p.reflectivity;
+            this->range = this->norm();
+        }
+
         // ---------------------------------------------------------------------------------------
         //      Uncomment and modify this if point type doesn't have 'intensity' as attribute
         // ---------------------------------------------------------------------------------------
@@ -202,6 +215,8 @@ class IMU {
             this->a(0) = imu.linear_acceleration.x;
             this->a(1) = imu.linear_acceleration.y;
             this->a(2) = imu.linear_acceleration.z;
+
+            this->a *= 9.807/this->a.norm();
 
             // Gyroscope
             this->w(0) = imu.angular_velocity.x;
