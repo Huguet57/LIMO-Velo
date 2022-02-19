@@ -36,12 +36,7 @@ Developing an algorithm for a team requires the algorithm to be easy enough to u
 - [ROS](http://wiki.ros.org/ROS/Installation) (tested on Noetic)
 - [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
 - [PCL](http://www.pointclouds.org/downloads/linux.html) (tested on 1.8)
-
-# Support for all types of LiDAR
-- Velodyne
-- Ouster
-- Hesai
-- Livox
+- [Livox ROS Driver](https://github.com/Livox-SDK/livox_ros_driver)
 
 # Using LIMO-Velo
 
