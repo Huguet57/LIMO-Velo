@@ -5,7 +5,6 @@ class Accumulator {
         Buffer<State> BUFFER_X;
 
         double initial_time;
-        double delta;
 
         // Add to buffer
             void add(State, double time=-1);
@@ -48,7 +47,7 @@ class Accumulator {
 
         // Time management
         
-            ros::Rate refine_delta(const HeuristicParams&, double t);
+            double update_delta(const HeuristicParams&, double t);
             double latest_time();
 
     private:

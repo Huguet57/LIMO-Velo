@@ -109,10 +109,9 @@ extern struct Params Config;
             return this->get_imus(t - 3., t).size() < 2;
         }
 
-        ros::Rate Accumulator::refine_delta(const HeuristicParams& heuristic, double t) {
+        double Accumulator::update_delta(const HeuristicParams& heuristic, double t) {
             assert(("There has to be exactly one more delta value than time delimiters", heuristic.times.size() + 1 == heuristic.deltas.size()));
-            this->delta = this->interpret_heuristic(heuristic, t);
-            return ros::Rate((int) 1./this->delta);
+            return this->interpret_heuristic(heuristic, t);
         }
 
         double Accumulator::latest_time() {
