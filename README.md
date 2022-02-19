@@ -73,7 +73,7 @@ Relevant parameters are:
 # Sample datasets
 Try ``xaloc.launch`` with Xaloc's own rosbags. High velocity in the straights (~15m/s) and tight turns (~80deg/s).
 
-Find them here: [https://drive.google.com/drive/folders/1uex3OhSXszxFhOLbmLHyYZTLkc01otxx?usp=sharing](https://drive.google.com/drive/folders/1uex3OhSXszxFhOLbmLHyYZTLkc01otxx?usp=sharing)
+Find a ``slow`` and a ``fast`` run in this [Dropbox](https://www.dropbox.com/sh/4116xoc7srps6a5/AAC3q1h50swG7fRMI3USNn2la?dl=0)
 
 See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sample datasets. Don't hesitate to ask there for more data on specific scenarios/cases.
 
