@@ -5,14 +5,20 @@ Better to have 20 people giving lots of feedback than 1000 not saying anything.
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 
 ## A real-time, direct and tightly-coupled LiDAR-Inertial SLAM that works (surprisingly) well under high velocities - even with spinning LiDARs.
-Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. Based also on their [FAST_LIO2](https://github.com/hku-mars/FAST_LIO).
-
-### Tested and made for racing at Formula Student Driverless
-Tested on and made for Barcelona's own "[Xaloc](https://www.youtube.com/watch?v=ly_ax8w-T7E&feature=emb_logo)". Common working speeds are 20m/s in straights and 100deg/s in the turns.
 
 <p align="center">
   <img src="./config/docs/img/Localization.gif" alt="Perfomance of the algorithm" /><br />
   Visualization of the algorithm with <code>delta = 0.01</code> (100Hz)
+</p>
+
+Designed for easy modifying via modular and easy to understand code. Relying upon [HKU-Mars](https://github.com/hku-mars)'s [IKFoM](https://github.com/hku-mars/IKFoM) and [ikd-Tree](https://github.com/hku-mars/ikd-Tree) open-source libraries. Based also on their [FAST_LIO2](https://github.com/hku-mars/FAST_LIO).
+
+### Tested and made for racing at Formula Student Driverless
+Common working speeds are 20m/s in straights and 100deg/s in the turns.
+
+<p align="center">
+  <img src="./config/docs/img/xaloc.gif" alt="Perfomance of the algorithm" /><br />
+  Tested on and made for Barcelona's own "<a href="https://www.youtube.com/watch?v=ly_ax8w-T7E&feature=emb_logo">Xaloc</a>".
 </p>
 
 ### Centimeter-level accuracy is kept under racing speeds
@@ -71,11 +77,14 @@ Relevant parameters are:
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
 
 # Sample datasets
-Try ``xaloc.launch`` with Xaloc's own rosbags. High velocity in the straights (~15m/s) and tight turns (~80deg/s).
+<p align="center">
+  <img src="./config/docs/img/rosbag-xaloc.gif" alt="Xaloc's fast dataset" /><br />
+  Xaloc's "fast" dataset. High velocity in the straights (~15m/s) and tight turns (~80deg/s).
+</p>
 
-Find a ``slow`` and a ``fast`` run in this [Dropbox](https://www.dropbox.com/sh/4116xoc7srps6a5/AAC3q1h50swG7fRMI3USNn2la?dl=0)
+Try ``xaloc.launch`` with Xaloc's own rosbags. Find a ``slow`` and a ``fast`` run in this [Dropbox](https://www.dropbox.com/sh/4116xoc7srps6a5/AAC3q1h50swG7fRMI3USNn2la?dl=0).
 
-See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sample datasets. Don't hesitate to ask there for more data on specific scenarios/cases.
+See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sample datasets found in the web. Don't hesitate to ask there for more data on specific scenarios/cases.
 
 # References
 - [IKFoM](https://github.com/hku-mars/IKFoM): Iterated Kalman Filters on Manifolds
