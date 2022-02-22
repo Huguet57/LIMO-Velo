@@ -44,7 +44,9 @@ extern struct Params Config;
             
             omp_set_num_threads(MP_PROC_NUM);
             #pragma omp parallel for
-            for (Point p : points) {
+            for (int pi = 0; pi < points.size(); ++pi) {
+                Point p = points[pi];
+
                 // Direct approach: we match the point with a plane on the map
                 Match match = this->match_plane(X * X.I_Rt_L() * p);
                 if (match.is_chosen()) matches.push_back(match);
