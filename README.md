@@ -4,7 +4,7 @@ Better to have 20 people giving lots of feedback than 1000 not saying anything.
 
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 
-## A real-time, direct and tightly-coupled LiDAR-Inertial SLAM that works (surprisingly) well under high velocities - even with spinning LiDARs.
+## A real-time LiDAR-Inertial SLAM for high velocities in spinning LiDARs.
 
 <p align="center">
   <img src="./config/docs/img/Localization.gif" alt="Perfomance of the algorithm" /><br />
@@ -49,6 +49,22 @@ Developing an algorithm for a team requires the algorithm to be easy enough to u
 - [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
 - [PCL](http://www.pointclouds.org/downloads/linux.html) (tested on 1.8)
 
+# Newest addition
+<p align="center">
+  <img src="./config/docs/img/prelocalization-hdmaps.gif" alt="Prelocalizing with a given HD map" /><br />
+  Prelocalization with a previoulsy saved HD map. Still work in progress on the <code>hdmaps</code> branch. Official release will be in a couple of days.
+</p>
+
+# Sample datasets
+<p align="center">
+  <img src="./config/docs/img/rosbag-xaloc.gif" alt="Xaloc's fast dataset" /><br />
+  Xaloc's "fast" dataset. High velocity in the straights (~15m/s) and tight turns (~80deg/s).
+</p>
+
+Try ``xaloc.launch`` with Xaloc's own rosbags. Find a ``slow`` and a ``fast`` run in this [Dropbox](https://www.dropbox.com/sh/4116xoc7srps6a5/AAC3q1h50swG7fRMI3USNn2la?dl=0).
+
+See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sample datasets found in the web. Don't hesitate to ask there for more data on specific scenarios/cases.
+
 # Using LIMO-Velo
 
 ## 0. Cloning the repository
@@ -75,16 +91,6 @@ Relevant parameters are:
 
 ## 4. Modifying the LiDAR driver to get true real-time performance
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
-
-# Sample datasets
-<p align="center">
-  <img src="./config/docs/img/rosbag-xaloc.gif" alt="Xaloc's fast dataset" /><br />
-  Xaloc's "fast" dataset. High velocity in the straights (~15m/s) and tight turns (~80deg/s).
-</p>
-
-Try ``xaloc.launch`` with Xaloc's own rosbags. Find a ``slow`` and a ``fast`` run in this [Dropbox](https://www.dropbox.com/sh/4116xoc7srps6a5/AAC3q1h50swG7fRMI3USNn2la?dl=0).
-
-See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sample datasets found in the web. Don't hesitate to ask there for more data on specific scenarios/cases.
 
 # References
 - [IKFoM](https://github.com/hku-mars/IKFoM): Iterated Kalman Filters on Manifolds
