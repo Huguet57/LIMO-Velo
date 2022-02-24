@@ -23,6 +23,7 @@ real_time_delay: 0.1       # Should be at least [FULL_ROTATION_TIME] (without a 
 
 # LiDAR
 LiDAR_type: velodyne
+offset_begin: true        # (Xaloc's value, having a modified LiDAR driver, is 'true') Is the offset with respect the beginning of the rotation (i.e. point.time ~ [0, 0.1]) or with respect the end (i.e. point.time ~ [-0.1, 0])? For more information see Issue #14: https://github.com/Huguet57/LIMO-Velo/issues/14
 LiDAR_noise: 0.001
 full_rotation_time: 0.1
 min_dist: 4

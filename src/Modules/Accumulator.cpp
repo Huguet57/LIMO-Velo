@@ -39,6 +39,10 @@ extern struct Params Config;
             void Accumulator::receive_lidar(const PointCloud_msg& msg) {
                 // Turn message to processed points
                 Points points = this->process(msg);
+                
+                // Check if missing data
+                if (this->missing_data(points)) this->throw_warning(points);
+
                 // Add them individually on the LiDAR buffer
                 for (Point p : points) this->add(p);
             }
@@ -161,4 +165,29 @@ extern struct Params Config;
                     return heuristic.deltas[k];
 
             return heuristic.deltas.back();
+        }
+
+        bool Accumulator::missing_data(const Points& time_sorted_points) {
+            if (time_sorted_points.size() < Config.MAX_POINTS2MATCH) return false;
+            
+            // Check missing 'time' information
+            if (time_sorted_points.front().time == 0 and time_sorted_points.back().time == 0) {
+                // Remove Heuristic
+                Config.Heuristic.times = {};
+                Config.Heuristic.deltas = {Config.full_rotation_time};
+                
+                return true;
+            }
+
+            return false;
+        }
+
+        void Accumulator::throw_warning(const Points& time_sorted_points) {
+            // Warn once
+            if (not this->has_warned_lidar) this->has_warned_lidar = true;
+            else return;
+
+            // Warn missing 'time' information
+            ROS_ERROR("LiDAR points are missing 'time' information.");
+            ROS_ERROR("Delta has been fixed to %f (s) leading to a fixed %d (Hz) localization.", Config.full_rotation_time, (int) 1./Config.full_rotation_time);
         }
