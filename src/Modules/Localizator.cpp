@@ -57,9 +57,15 @@ extern struct Params Config;
         }
 
         void Localizator::propagate_to(double t) {
-            if (this->last_time_integrated < 0) this->last_time_integrated = t;
+            // Get new IMUs
             IMUs imus = Accumulator::getInstance().get_imus(this->last_time_integrated, t);
-            
+
+            // Initialize
+            if (this->last_time_integrated < 0) {
+                if (imus.back().has_orientation()) this->set_orientation(imus.back());
+                this->last_time_integrated = t;
+            }
+
             // Integrate every new IMU between last time and now
             for (IMU imu : imus) {
                 this->propagate(imu);
@@ -152,3 +158,10 @@ extern struct Params Config;
 
             this->IKFoM_KF.predict(dt, Q, in);
         }
+
+        void Localizator::set_orientation(const IMU& imu) {
+            state_ikfom current_state = this->IKFoM_KF.get_x();
+            current_state.rot = imu.q.cast<double>();
+            this->IKFoM_KF.change_x(current_state);
+        }
+        
