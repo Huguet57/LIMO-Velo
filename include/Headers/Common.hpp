@@ -73,7 +73,8 @@ struct Params {
     double min_dist;
     std::string LiDAR_type;
     
-    bool offset_begin;
+    bool offset_beginning;
+    bool stamp_beginning;
 
     double degeneracy_threshold;
     bool print_degeneracy_values;

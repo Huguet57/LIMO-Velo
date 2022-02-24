@@ -95,7 +95,7 @@ class Point {
                 this->set_attributes(p);
                 
                 // Time offset with respect to beginning of rotation, i.e. ~= [0, 0.1]
-                if (Config.offset_begin) this->time = (double) p.time;
+                if (Config.offset_beginning) this->time = (double) p.time;
                 // Time offset with respect to end of rotation, i.e. ~= [-0.1, 0]
                 else this->time = Config.full_rotation_time + (double) p.time;
             }
@@ -106,7 +106,7 @@ class Point {
                 this->set_attributes(p);
 
                 // Time offset with respect to beginning of rotation, i.e. ~= [0, 0.1]
-                if (Config.offset_begin) this->time = Conversions::nanosec2Sec(p.t);
+                if (Config.offset_beginning) this->time = Conversions::nanosec2Sec(p.t);
                 // Time offset with respect to end of rotation, i.e. ~= [-0.1, 0]
                 else this->time = Config.full_rotation_time + Conversions::nanosec2Sec(p.t);
             }
