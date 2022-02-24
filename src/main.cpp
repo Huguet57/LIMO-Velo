@@ -137,7 +137,8 @@ void fill_config(ros::NodeHandle& nh) {
     nh.param<bool>("real_time", Config.real_time, true);
     nh.param<bool>("estimate_extrinsics", Config.estimate_extrinsics, false);
     nh.param<bool>("print_extrinsics", Config.print_extrinsics, false);
-    nh.param<int>("ds_rate", Config.ds_rate, 4);
+    nh.param<int>("downsample_rate", Config.downsample_rate, 4);
+    nh.param<float>("downsample_prec", Config.downsample_prec, 0.2);
     nh.param<int>("MAX_NUM_ITERS", Config.MAX_NUM_ITERS, 3);
     nh.param<std::vector<double>>("LIMITS", Config.LIMITS, std::vector<double> (23, 0.001));
     nh.param<int>("NUM_MATCH_POINTS", Config.NUM_MATCH_POINTS, 5);

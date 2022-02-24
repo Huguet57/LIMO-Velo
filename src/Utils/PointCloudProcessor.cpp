@@ -103,8 +103,8 @@ extern struct Params Config;
             int ds_counter = 0;
 
             for (Point p : points) {
-                // Keep point if counter is multiple of ds_rate
-                bool keep_point = Config.ds_rate <= 1 or ++ds_counter%Config.ds_rate == 0; 
+                // Keep point if counter is multiple of downsample_rate
+                bool keep_point = Config.downsample_rate <= 1 or ++ds_counter%Config.downsample_rate == 0; 
                 if (keep_point and Config.min_dist < p.norm()) downsampled.push_back(p);
             }
 

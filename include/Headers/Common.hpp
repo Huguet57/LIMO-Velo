@@ -69,7 +69,8 @@ struct Params {
     double full_rotation_time;
     double imu_rate;
 
-    int ds_rate;
+    int downsample_rate;
+    float downsample_prec;
     double min_dist;
     std::string LiDAR_type;
     
