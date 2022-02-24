@@ -25,7 +25,9 @@ empty_lidar_time: 0.1      # Should be at least [FULL_ROTATION_TIME]
 real_time_delay: 0.1       # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
 # LiDAR
-LiDAR_type: ouster       # Options: velodyne, hesai, ouster, custom
+LiDAR_type: ouster         # Options: velodyne, hesai, ouster, custom
+stamp_beginning: false     # (Usually: false) Is the pointcloud's stamp the last point's timestamp (end of rotation) or the first's (beggining of rotation)?
+offset_beginning: true     # (Usual values: Velodyne = false, Ouster = true, HESAI = indiferent) Is the offset with respect the beginning of the rotation (i.e. point.time ~ [0, 0.1]) or with respect the end (i.e. point.time ~ [-0.1, 0])? For more information see Issue #14: https://github.com/Huguet57/LIMO-Velo/issues/14
 LiDAR_noise: 0.001
 full_rotation_time: 0.1
 min_dist: 4                # Minimum distance: doesn't use points closer than this radius

@@ -41,7 +41,8 @@ extern struct Params Config;
 
             double PointCloudProcessor::get_begin_time(const pcl::PointCloud<velodyne_ros::Point>& pcl) {
                 // Velodyne points have relative time
-                return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time + pcl.points.front().time;
+                if (Config.stamp_beginning) return Conversions::microsec2Sec(pcl.header.stamp) + pcl.points.front().time;
+                else return Conversions::microsec2Sec(pcl.header.stamp) + pcl.points.front().time - pcl.points.back().time;
             }
 
         // HESAI specific
@@ -65,7 +66,8 @@ extern struct Params Config;
 
             double PointCloudProcessor::get_begin_time(const pcl::PointCloud<ouster_ros::Point>& pcl) {
                 // Ouster points have relative time
-                return Conversions::microsec2Sec(pcl.header.stamp) - Conversions::nanosec2Sec(pcl.points.back().t) + Conversions::nanosec2Sec(pcl.points.front().t);
+                if (Config.stamp_beginning) return Conversions::microsec2Sec(pcl.header.stamp) + Conversions::nanosec2Sec(pcl.points.front().t);
+                else return Conversions::microsec2Sec(pcl.header.stamp) + Conversions::nanosec2Sec(pcl.points.front().t) - Conversions::nanosec2Sec(pcl.points.back().t);
             }
 
         // Custom specific
@@ -78,7 +80,8 @@ extern struct Params Config;
             // Change this to fit the timestamp of the first point
             double PointCloudProcessor::get_begin_time(const pcl::PointCloud<custom::Point>& pcl) {
                 // // Example: Points with relative time
-                // return Conversions::microsec2Sec(pcl.header.stamp) - pcl.points.back().time + pcl.points.front().time;
+                // if (Config.stamp_beginning) return Conversions::microsec2Sec(pcl.header.stamp) + pcl.points.front().time;
+                // else return Conversions::microsec2Sec(pcl.header.stamp) + pcl.points.front().time - pcl.points.back().time;
                 
                 // Example: Points with absolute time
                 return 0.d;

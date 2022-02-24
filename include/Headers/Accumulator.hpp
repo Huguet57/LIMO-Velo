@@ -52,6 +52,7 @@ class Accumulator {
 
     private:
         bool is_ready = false;
+        bool has_warned_lidar = false;
 
         void push(const State&);
         void push(const IMU&);
@@ -109,6 +110,9 @@ class Accumulator {
         bool enough_imus();
         void set_initial_time();
         double interpret_heuristic(const HeuristicParams&, double t);
+
+        bool missing_data(const Points&);
+        void throw_warning(const Points&);
 
     // Singleton pattern
     public:
