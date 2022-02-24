@@ -88,17 +88,21 @@ int main(int argc, char** argv) {
                 publish.tf(Xt2);
 
                 // Publish pointcloud used to localize
-                Points global_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
-                publish.pointcloud(global_compensated, true);
+                Points global_compensated = Xt2 * Xt2.I_Rt_L() * compensated;
+                Points global_ds_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
+                if (Config.high_quality_publish) publish.pointcloud(global_compensated, true);
+                else publish.pointcloud(global_ds_compensated, true);
+
+                // Publish updated extrinsics
+                if (Config.print_extrinsics) publish.extrinsics(Xt2);
 
             // Step 2. MAPPING
 
                 // Add updated points to map (mapping online)
                 if (Config.mapping_online) {
-                    map.add(global_compensated, t2, true);
-                    publish.pointcloud(global_compensated, false);
-                    
-                    if (Config.print_extrinsics) publish.extrinsics(Xt2);
+                    map.add(global_ds_compensated, t2, true);
+                    if (Config.high_quality_publish) publish.pointcloud(global_compensated, false);                    
+                    else publish.pointcloud(global_ds_compensated, false);                    
                 }
                 // Add updated points to map (mapping offline)
                 else if (map.hasToMap(t2)) {
@@ -108,11 +112,9 @@ int main(int argc, char** argv) {
                     Points global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
                     Points global_full_ds_compensated = comp.downsample(global_full_compensated);
 
-                    if (global_full_ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
-                    if (Config.print_extrinsics) publish.extrinsics(Xt2);
-
                     map.add(global_full_ds_compensated, t2, true);
-                    publish.pointcloud(global_full_ds_compensated, false);
+                    if (Config.high_quality_publish) publish.pointcloud(global_full_compensated, false);
+                    else publish.pointcloud(global_full_ds_compensated, false);
                 }
 
             // Step 3. ERASE OLD DATA
@@ -137,7 +139,9 @@ void fill_config(ros::NodeHandle& nh) {
     nh.param<bool>("real_time", Config.real_time, true);
     nh.param<bool>("estimate_extrinsics", Config.estimate_extrinsics, false);
     nh.param<bool>("print_extrinsics", Config.print_extrinsics, false);
-    nh.param<int>("ds_rate", Config.ds_rate, 4);
+    nh.param<int>("downsample_rate", Config.downsample_rate, 4);
+    nh.param<float>("downsample_prec", Config.downsample_prec, 0.2);
+    nh.param<bool>("high_quality_publish", Config.high_quality_publish, false);
     nh.param<int>("MAX_NUM_ITERS", Config.MAX_NUM_ITERS, 3);
     nh.param<std::vector<double>>("LIMITS", Config.LIMITS, std::vector<double> (23, 0.001));
     nh.param<int>("NUM_MATCH_POINTS", Config.NUM_MATCH_POINTS, 5);
