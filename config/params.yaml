@@ -6,6 +6,9 @@ real_time: false         # in a slow CPU, real_time ensures to always output to 
 points_topic: "/lidar/points"
 imus_topic: "/imu/raw"
 
+# Publishers
+high_quality_publish: false   # true: Publishes the map without downsampling, can be slower. false: Publishes the downsampled map.  
+
 # Extrinsics
 estimate_extrinsics: false
 print_extrinsics: false
@@ -30,7 +33,7 @@ LiDAR_noise: 0.001
 full_rotation_time: 0.1
 min_dist: 4                # Minimum distance: doesn't use points closer than this radius
 downsample_rate: 4         # Downsampling rate: results show that this one can be up to 32 and still work, try it if you need a speedup
-downsample_prec: 0.2       # Downsampling precision: Indoors, lower values (~0.1) work better. Outdoors, higher values (~0.5) lead to less degeneracy.
+downsample_prec: 0.5       # Downsampling precision: Indoors, lower values (~0.2) work better. Outdoors, higher values (~0.5) lead to less degeneracy.
 
 # IMU
 imu_rate: 200              # Approximated IMU rate: only used to estimate when to start the algorithm
