@@ -192,6 +192,7 @@ class IMU {
     public:
         Eigen::Vector3f a;
         Eigen::Vector3f w;
+        Eigen::Quaternionf q;
         TimeType time;
 
         IMU() : IMU (Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), 0.) {}
@@ -208,6 +209,12 @@ class IMU {
             this->w(1) = imu.angular_velocity.y;
             this->w(2) = imu.angular_velocity.z;
 
+            // Orientation
+            this->q.x() = imu.orientation.x;
+            this->q.y() = imu.orientation.y;
+            this->q.z() = imu.orientation.z;
+            this->q.w() = imu.orientation.w;
+
             // Time
             this->time = imu.header.stamp.toSec();
         }
@@ -219,6 +226,10 @@ class IMU {
         }
 
         IMU (double time) : IMU (Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), time) {}
+
+        bool has_orientation() {
+            return not (this->q.x() == 0 and this->q.y() == 0 and this->q.z() == 0 and this->q.w() == 0);
+        }
 };
 
 class State {

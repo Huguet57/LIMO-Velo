@@ -34,6 +34,7 @@ class Localizator {
         
         void propagate(const IMU& imu);
         const state_ikfom& get_x() const;
+        void set_orientation(const IMU& imu);
 
     // Singleton pattern
 
