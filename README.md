@@ -49,7 +49,16 @@ Developing an algorithm for a team requires the algorithm to be easy enough to u
 - [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
 - [PCL](http://www.pointclouds.org/downloads/linux.html) (tested on 1.8)
 
-# Newest addition
+# Newest additions
+## High Quality Maps
+Sometimes a higher map quality is needed, now a new ``high_quality_publish`` parameter has been added to yield results like this below.
+
+<p align="center">
+  <img src="./config/docs/img/high-quality-cones.png" alt="High quality cones" /><br />
+  Sometimes Xaloc needs more definition to see if a cluster of points is actually a cone.
+</p>
+
+## Work in progress (branch ``hdmaps``)
 <p align="center">
   <img src="./config/docs/img/prelocalization-hdmaps.gif" alt="Prelocalizing with a given HD map" /><br />
   Prelocalization with a previoulsy saved HD map. Still work in progress on the <code>hdmaps</code> branch. Official release will be in a couple of days.
