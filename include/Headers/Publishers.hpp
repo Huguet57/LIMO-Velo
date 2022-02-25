@@ -53,6 +53,7 @@ class Publishers {
             
             pcl::PointCloud<full_info::Point> pcl;
             pcl.header.frame_id = "map";
+            pcl.header.stamp = Conversions::sec2Microsec(points.back().time);
             Processor::fill(pcl, points);
 
             if (part) this->publish_pcl(pcl, this->pcl_pub);
