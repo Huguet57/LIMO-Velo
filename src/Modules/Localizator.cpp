@@ -20,7 +20,7 @@ extern struct Params Config;
         }
 
         // Given points, find new position
-        void Localizator::localize(const Points& points, double time) {
+        void Localizator::correct(const Points& points, double time) {
             if (not Mapper::getInstance().exists()) return;
             this->IKFoM_update(points);
             this->last_time_updated = time;
@@ -80,10 +80,19 @@ extern struct Params Config;
         }
 
         State Localizator::latest_state() {
-            // If no updates, return empty state
+            // If no integrated, return empty state
+            if (this->last_time_integrated < 0)
+                return State (Accumulator::getInstance().initial_time);
+            
+            // If no updates, return integrated state
             if (this->last_time_updated < 0)
-                return State (this->last_time_integrated);
-
+                return State (
+                    this->get_x(),
+                    Accumulator::getInstance().get_next_imu(this->last_time_integrated),
+                    this->last_time_integrated
+                );
+            
+            // Otherwise, return corrected state
             return State(
                 this->get_x(),
                 Accumulator::getInstance().get_next_imu(this->last_time_updated),
