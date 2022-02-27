@@ -62,7 +62,7 @@ extern struct Params Config;
 
             // Initialize
             if (this->last_time_integrated < 0) {
-                if (imus.back().has_orientation()) this->set_orientation(imus.back());
+                // if (imus.back().has_orientation()) this->set_orientation(imus.back());
                 this->last_time_integrated = t;
             }
 
