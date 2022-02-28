@@ -88,14 +88,12 @@ extern struct Params Config;
             if (this->last_time_updated < 0)
                 return State (
                     this->get_x(),
-                    Accumulator::getInstance().get_next_imu(this->last_time_integrated),
                     this->last_time_integrated
                 );
             
             // Otherwise, return corrected state
-            return State(
+            return State (
                 this->get_x(),
-                Accumulator::getInstance().get_next_imu(this->last_time_updated),
                 this->last_time_updated
             );
         }

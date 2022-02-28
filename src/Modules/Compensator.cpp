@@ -11,6 +11,8 @@
 #include "Headers/Mapper.hpp"
 #endif
 
+extern struct Params Config;
+
 // class Compensator
     // public:
         Points Compensator::compensate(double t1, double t2) {
