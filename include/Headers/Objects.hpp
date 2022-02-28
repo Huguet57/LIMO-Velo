@@ -1,3 +1,5 @@
+extern struct Params Config;
+
 template <typename ContentType>
 class Buffer {
     public:
@@ -118,11 +120,9 @@ class State {
 
         State();
         State(double time);
+        State(const state_ikfom& s, const IMU& imu, double time);
         State(const state_ikfom& s, double time);
 
-        // Return a state with initial values (from the Accumulator)
-        static State Initial();
-        
         RotTransl I_Rt_L() const;
         RotTransl inv() const;
 

@@ -13,37 +13,37 @@
 
 extern struct Params Config;
 
-// class State {
+// class State
     // public:
-        State::State() {
-            // Read from YAML
+
+        State::State() : State::State (0.) {
+            // Read YAML parameters
             this->g = Eigen::Map<Eigen::Vector3f>(Config.initial_gravity.data(), 3);
             this->tLI = Eigen::Map<Eigen::Vector3f>(Config.I_Translation_L.data(), 3);
             this->RLI = Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3).transpose();
 
-            // Assume object is static at the begging
+            // State
+            this->pos = Eigen::Vector3f::Zero();
+            this->R = Eigen::Matrix3f::Identity();
             this->vel = Eigen::Vector3f::Zero();
 
-            // Assume biases and noises zero as a first estimation
+            // Biases
             this->bw = Eigen::Vector3f::Zero();
             this->ba = Eigen::Vector3f::Zero();
 
+            // Noise
             this->nw = Eigen::Vector3f::Zero();
             this->na = Eigen::Vector3f::Zero();
             this->nbw = Eigen::Vector3f::Zero();
             this->nba = Eigen::Vector3f::Zero();
-
-            // Assume vehicle at origin
-            this->pos = Eigen::Vector3f::Zero();
-            this->R = Eigen::Matrix3f::Identity();
         }
 
-        State::State(double time) : State::State() {
-            this->time = time;
+        State::State(const state_ikfom& s, const IMU& imu, double time) : State::State(s, time) {
+            this->a = imu.a;
+            this->w = imu.w;
         }
 
-        State::State(const state_ikfom& s, double time) : State () {
-            // Export state_ikfom parameters
+        State::State(const state_ikfom& s, double time) : State::State (time) {
             this->R = s.rot.toRotationMatrix().cast<float>();
             this->pos = s.pos.cast<float>();
             this->vel = s.vel.cast<float>();
@@ -53,13 +53,12 @@ extern struct Params Config;
 
             this->RLI = s.offset_R_L_I.toRotationMatrix().cast<float>();
             this->tLI = s.offset_T_L_I.cast<float>();
-            
-            // Get closest IMU to time
-            IMU imu = Accumulator::getInstance().get_next_imu(time);
-            this->a = imu.a;
-            this->w = imu.w;
+        }
 
+        State::State(double time) {
             this->time = time;
+            this->a = -this->g;
+            this->w = Eigen::Vector3f::Zero();
         }
 
         RotTransl State::I_Rt_L() const {
@@ -119,4 +118,4 @@ extern struct Params Config;
             this->time = imu.time;
             this->a = 0.5*this->a + 0.5*imu.a;  // Exponential mean (noisy inputs)
             this->w = 0.5*this->w + 0.5*imu.w;  // Exponential mean (noisy inputs)
-        }  
+        }

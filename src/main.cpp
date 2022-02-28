@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
                 if (ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
 
                 // Localize points in map
-                // loc.correct(ds_compensated, t2);
+                loc.correct(ds_compensated, t2);
                 State Xt2 = loc.latest_state();
                 accum.add(Xt2, t2);
                 publish.state(Xt2, false);
