@@ -91,9 +91,18 @@ add_executable(limovelo
   
   # Utils
   src/Utils/Utils.cpp
-  src/Utils/Objects.cpp
   src/Utils/PointCloudProcessor.cpp
 
+  # Objects
+  src/Objects/Buffer.cpp
+  src/Objects/IMU.cpp
+  src/Objects/Match.cpp
+  src/Objects/Normal.cpp
+  src/Objects/Plane.cpp
+  src/Objects/Point.cpp
+  src/Objects/RotTransl.cpp
+  src/Objects/State.cpp
+  
   # Modules
   src/Modules/Accumulator.cpp
   src/Modules/Compensator.cpp

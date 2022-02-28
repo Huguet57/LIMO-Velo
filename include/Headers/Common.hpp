@@ -240,6 +240,7 @@ typedef std::vector<Normal> Normals;
 typedef std::vector<Plane> Planes;
 typedef std::vector<Match> Matches;
 
+class Accumulator;
 class Localizator;
 class Mapper;
 
