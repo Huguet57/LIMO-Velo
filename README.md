@@ -96,7 +96,7 @@ To adapt LIMO-Velo to our own hardware infrastructure, a [YAML](https://yaml.org
 Relevant parameters are:
 - ``real_time`` if you want to get real time experience.
 - ``mapping_offline`` is on an pre-alpha stage and it does not work 100% as it should of.
-- ``heuristic`` which you can choose how you want the initialization of the pointcloud sizes (sizes =: deltas, in seconds).
+- ``initialization`` which you can choose how you want the initialization of the pointcloud sizes (sizes =: deltas, in seconds).
 
 ## 4. Modifying the LiDAR driver to get true real-time performance
 *TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.

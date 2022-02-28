@@ -113,9 +113,9 @@ extern struct Params Config;
             return this->get_imus(t - 3., t).size() < 2;
         }
 
-        double Accumulator::update_delta(const HeuristicParams& heuristic, double t) {
-            assert(("There has to be exactly one more delta value than time delimiters", heuristic.times.size() + 1 == heuristic.deltas.size()));
-            return this->interpret_heuristic(heuristic, t);
+        double Accumulator::update_delta(const InitializationParams& initialization, double t) {
+            assert(("There has to be exactly one more delta value than time delimiters", initialization.times.size() + 1 == initialization.deltas.size()));
+            return this->interpret_initialization(initialization, t);
         }
 
         double Accumulator::latest_time() {
@@ -154,17 +154,17 @@ extern struct Params Config;
             this->initial_time = latest_imu_time - Config.real_time_delay;
         }
 
-        double Accumulator::interpret_heuristic(const HeuristicParams& heuristic, double t) {
+        double Accumulator::interpret_initialization(const InitializationParams& initialization, double t) {
             // If is after last time
-            if (heuristic.times.empty()) return heuristic.deltas.back();
-            if (t - this->initial_time >= heuristic.times.back()) return heuristic.deltas.back();
+            if (initialization.times.empty()) return initialization.deltas.back();
+            if (t - this->initial_time >= initialization.times.back()) return initialization.deltas.back();
             
             // If we have to find it in the list
-            for (int k = 0; k < heuristic.times.size(); ++k)
-                if (t - this->initial_time < heuristic.times[k])
-                    return heuristic.deltas[k];
+            for (int k = 0; k < initialization.times.size(); ++k)
+                if (t - this->initial_time < initialization.times[k])
+                    return initialization.deltas[k];
 
-            return heuristic.deltas.back();
+            return initialization.deltas.back();
         }
 
         bool Accumulator::missing_data(const Points& time_sorted_points) {
@@ -172,9 +172,9 @@ extern struct Params Config;
             
             // Check missing 'time' information
             if (time_sorted_points.front().time == 0 and time_sorted_points.back().time == 0) {
-                // Remove Heuristic
-                Config.Heuristic.times = {};
-                Config.Heuristic.deltas = {Config.full_rotation_time};
+                // Remove Initialization
+                Config.Initialization.times = {};
+                Config.Initialization.deltas = {Config.full_rotation_time};
                 
                 return true;
             }

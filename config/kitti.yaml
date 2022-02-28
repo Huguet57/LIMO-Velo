@@ -47,6 +47,6 @@ degeneracy_threshold: 400.
 print_degeneracy_values: false
 
 # Delta refinement
-Heuristic:
+Initialization:
   times: []
   deltas: [0.1]
