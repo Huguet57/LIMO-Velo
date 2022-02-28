@@ -51,11 +51,11 @@ degeneracy_threshold: 5.
 print_degeneracy_values: false
 
 # Delta refinement
-Heuristic:
-#     # No heuristic
+Initialization:
+#     # No initialization
 #     times: []
 #     deltas: [0.1]
     
-    # With heuristic
+    # With initialization
     times: [0.5, 1.0, 1.25]
     deltas: [0.1, 0.05, 0.02]

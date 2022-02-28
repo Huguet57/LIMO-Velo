@@ -48,7 +48,7 @@ namespace LIDAR_TYPE {
     const std::string Custom = "custom";
 }
 
-struct HeuristicParams {
+struct InitializationParams {
     std::vector<double> times;
     std::vector<double> deltas;
 };
@@ -103,7 +103,7 @@ struct Params {
     std::string points_topic;
     std::string imus_topic;
 
-    HeuristicParams Heuristic;
+    InitializationParams Initialization;
 };
 
 namespace velodyne_ros {

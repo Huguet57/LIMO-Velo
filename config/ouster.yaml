@@ -58,11 +58,11 @@ print_degeneracy_values: false     # Print the degeneracy eigenvalues to guess w
 # Choose a set of times and field of view sizes (deltas) for the initialization.
 # The delta (t2 - t1) that will be used through the algorithm therefore is the last one in the 'deltas' vector
 # Tick the 'Localizator' box in RViz to see the initialization in action
-Heuristic:
-    # No heuristic
+Initialization:
+    # No initialization
     times: []
     deltas: [0.1]
 
-    # # With heuristic
+    # # With initialization
     # times: [2.0]
     # deltas: [0.1, 0.025]

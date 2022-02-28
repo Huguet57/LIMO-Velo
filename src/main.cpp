@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     t2 = DBL_MAX;
 
     // (Delta = t2 - t1) Size of the field of view we use to localize
-    double delta = Config.Heuristic.deltas.front();
+    double delta = Config.Initialization.deltas.front();
     
     ros::Rate rate(5000);
 
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
                 else t2 = std::min(t2 + delta, accum.latest_time());
                 
                 // Update delta value
-                delta = accum.update_delta(Config.Heuristic, t2);
+                delta = accum.update_delta(Config.Initialization, t2);
 
                 // Define t1 but don't use to localize repeated points
                 t1 = std::max(t2 - delta, loc.last_time_updated);
@@ -168,8 +168,8 @@ void fill_config(ros::NodeHandle& nh) {
     nh.param<std::string>("imus_topic", Config.imus_topic, "/vectornav/IMU");
     nh.param<bool>("offset_beginning", Config.offset_beginning, false);
     nh.param<bool>("stamp_beginning", Config.stamp_beginning, false);
-    nh.param<std::vector<double>>("/Heuristic/times", Config.Heuristic.times, {});
-    nh.param<std::vector<double>>("/Heuristic/deltas", Config.Heuristic.deltas, {Config.full_rotation_time});
+    nh.param<std::vector<double>>("/Initialization/times", Config.Initialization.times, {});
+    nh.param<std::vector<double>>("/Initialization/deltas", Config.Initialization.deltas, {Config.full_rotation_time});
     nh.param<std::vector<float>>("initial_gravity", Config.initial_gravity, {0.0, 0.0, -9.807});
     nh.param<std::vector<float>>("I_Translation_L", Config.I_Translation_L, std::vector<float> (3, 0.));
     nh.param<std::vector<float>>("I_Rotation_L", Config.I_Rotation_L, std::vector<float> (9, 0.));

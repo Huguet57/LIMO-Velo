@@ -47,7 +47,7 @@ class Accumulator {
 
         // Time management
         
-            double update_delta(const HeuristicParams&, double t);
+            double update_delta(const InitializationParams&, double t);
             double latest_time();
 
     private:
@@ -111,7 +111,7 @@ class Accumulator {
 
         bool enough_imus();
         void set_initial_time();
-        double interpret_heuristic(const HeuristicParams&, double t);
+        double interpret_initialization(const InitializationParams&, double t);
 
         bool missing_data(const Points&);
         void throw_warning(const Points&);
