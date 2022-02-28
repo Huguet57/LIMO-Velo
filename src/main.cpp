@@ -90,8 +90,7 @@ int main(int argc, char** argv) {
                 // Publish pointcloud used to localize
                 Points global_compensated = Xt2 * Xt2.I_Rt_L() * compensated;
                 Points global_ds_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
-                if (Config.high_quality_publish) publish.pointcloud(global_compensated, true);
-                else publish.pointcloud(global_ds_compensated, true);
+                publish.pointcloud(global_ds_compensated, true);
 
                 // Publish updated extrinsics
                 if (Config.print_extrinsics) publish.extrinsics(Xt2);
