@@ -61,7 +61,7 @@ class Accumulator {
         template <typename ContentType>
         std::deque<ContentType> get(Buffer<ContentType>& source, double t1, double t2) {
             std::deque<ContentType> result;
-            int k_t2 = before_t(source, t2);
+            int k_t2 = std::max(0, before_t(source, t2));
 
             // Get content between t1 from t2 sorted new to old
             for (int k = k_t2; k < source.content.size(); ++k) {
@@ -75,7 +75,11 @@ class Accumulator {
 
         template <typename ContentType>
         ContentType get_next(Buffer<ContentType>& source, double t) {
-            int k_t = before_t(source, t);
+            if (source.content.empty()) return ContentType();
+            if (source.content.back().time > t) return ContentType();
+            if (t > source.content.front().time) return source.content.front();
+            
+            int k_t = std::max(0, before_t(source, t));
 
             // Get rightest content left to t (sorted new to old)
             for (int k = k_t; k < source.content.size(); ++k) {
@@ -84,9 +88,7 @@ class Accumulator {
                 if (t >= cnt.time) return next_cnt;
             }
 
-            // If not content found, push an empty one at t
-            this->add(ContentType(), t);
-            return source.front();
+            return ContentType();
         }
 
         template <typename ContentType>

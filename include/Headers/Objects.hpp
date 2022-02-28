@@ -120,7 +120,6 @@ class State {
 
         State();
         State(double time);
-        State(const state_ikfom& s, const IMU& imu, double time);
         State(const state_ikfom& s, double time);
 
         RotTransl I_Rt_L() const;

@@ -16,7 +16,7 @@ extern struct Params Config;
 // class State
     // public:
 
-        State::State() : State::State (0.) {
+        State::State() {
             // Read YAML parameters
             this->g = Eigen::Map<Eigen::Vector3f>(Config.initial_gravity.data(), 3);
             this->tLI = Eigen::Map<Eigen::Vector3f>(Config.I_Translation_L.data(), 3);
@@ -38,12 +38,18 @@ extern struct Params Config;
             this->nba = Eigen::Vector3f::Zero();
         }
 
-        State::State(const state_ikfom& s, const IMU& imu, double time) : State::State(s, time) {
+        State::State(double time) : State::State() {
+            // Set time
+            this->time = time;
+            
+            // Get time
+            IMU imu = Accumulator::getInstance().get_next_imu(time);
             this->a = imu.a;
             this->w = imu.w;
         }
 
         State::State(const state_ikfom& s, double time) : State::State (time) {
+            // Export data from IKFoM state
             this->R = s.rot.toRotationMatrix().cast<float>();
             this->pos = s.pos.cast<float>();
             this->vel = s.vel.cast<float>();
@@ -53,12 +59,6 @@ extern struct Params Config;
 
             this->RLI = s.offset_R_L_I.toRotationMatrix().cast<float>();
             this->tLI = s.offset_T_L_I.cast<float>();
-        }
-
-        State::State(double time) {
-            this->time = time;
-            this->a = -this->g;
-            this->w = Eigen::Vector3f::Zero();
         }
 
         RotTransl State::I_Rt_L() const {
