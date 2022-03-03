@@ -7,7 +7,7 @@ points_topic: "/lidar/points"
 imus_topic: "/imu/raw"
 
 # Publishers
-high_quality_publish: false   # true: Publishes the map without downsampling, can be slower. false: Publishes the downsampled map.  
+high_quality_publish: true   # true: Publishes the map without downsampling, can be slower. false: Publishes the downsampled map.  
 
 # Extrinsics
 estimate_extrinsics: false

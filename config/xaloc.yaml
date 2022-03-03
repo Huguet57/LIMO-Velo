@@ -7,10 +7,10 @@ points_topic: "/velodyne_points"
 imus_topic: "/vectornav/IMU"
 
 # Publishers
-high_quality_publish: false   # true: Publishes the map without downsampling, can be slower. false: Publishes the downsampled map.  
+high_quality_publish: true   # true: Publishes the map without downsampling, can be slower. false: Publishes the downsampled map.  
 
 # Extrinsics
-estimate_extrinsics: false
+estimate_extrinsics: true
 print_extrinsics: false
 initial_gravity: [0.0, 0.0, -9.807]
 I_Translation_L: [1.25, 0.0, 0.0]

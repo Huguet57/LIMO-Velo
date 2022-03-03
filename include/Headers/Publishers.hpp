@@ -112,7 +112,7 @@ class Publishers {
                 normalPoseArray.poses.push_back(normalPose);
             }
 
-            this->planes_pub.publish(normalPoseArray);
+            if (this->planes_pub.getNumSubscribers() > 0) this->planes_pub.publish(normalPoseArray);
         }
 
         void send_transform(const State& X) {
@@ -144,7 +144,7 @@ class Publishers {
             msg.header.stamp = ros::Time(Conversions::microsec2Sec(pcl.header.stamp));
             msg.header.frame_id = "map";
             pcl::toROSMsg(pcl, msg);
-            pub.publish(msg);
+            if (pub.getNumSubscribers() > 0) pub.publish(msg);
         }
 
         void publish_states(const States& states) {
@@ -168,7 +168,7 @@ class Publishers {
                 msg.poses.push_back(pose);
             }
 
-            this->states_pub.publish(msg);
+            if (this->states_pub.getNumSubscribers() > 0) this->states_pub.publish(msg);
         }
 
         void publish_state(const State& state) {
@@ -196,7 +196,7 @@ class Publishers {
             msg.twist.twist.angular.y = state.w(1);
             msg.twist.twist.angular.z = state.w(2);
 
-            this->state_pub.publish(msg);
+            if (this->state_pub.getNumSubscribers() > 0) this->state_pub.publish(msg);
         }
 
         void cout_state(const State& state) {
