@@ -15,7 +15,7 @@ extern struct Params Config;
 
 // class IMU {
     // public:
-        IMU::IMU() : IMU::IMU (Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), 0.) {}
+        IMU::IMU() : IMU::IMU (0.) {}
         IMU::IMU(const sensor_msgs::ImuConstPtr& msg) : IMU::IMU(*msg) {}
 
         IMU::IMU(const sensor_msgs::Imu& imu) {
@@ -39,13 +39,21 @@ extern struct Params Config;
             this->time = imu.header.stamp.toSec();
         }
 
-        IMU::IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time) {
+        IMU::IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time) : IMU::IMU(a, w, Eigen::Quaternionf (1,0,0,0), time) {
             this->a = a;
             this->w = w;
+            this->q = q;
             this->time = time;
         }
 
-        IMU::IMU (double time) : IMU::IMU (Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), time) {}
+        IMU::IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, const Eigen::Quaternionf& q, double time) {
+            this->a = a;
+            this->w = w;
+            this->q = q;
+            this->time = time;
+        }
+
+        IMU::IMU (double time) : IMU::IMU (Eigen::Vector3f::Zero(), Eigen::Vector3f::Zero(), Eigen::Quaternionf (1,0,0,0), time) {}
 
         bool IMU::has_orientation() {
             return not (this->q.x() == 0 and this->q.y() == 0 and this->q.z() == 0 and this->q.w() == 0);

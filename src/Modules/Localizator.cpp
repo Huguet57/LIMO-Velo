@@ -59,11 +59,14 @@ extern struct Params Config;
         void Localizator::propagate_to(double t) {
             // Get new IMUs
             IMUs imus = Accumulator::getInstance().get_imus(this->last_time_integrated, t);
+            if (this->last_time_integrated < 0) this->last_time_integrated = t;
 
             // Initialize
-            if (this->last_time_integrated < 0) {
-                // if (imus.back().has_orientation()) this->set_orientation(imus.back());
-                this->last_time_integrated = t;
+            if (not this->initialized) {
+                if (imus.empty()) return;
+                IMU initial_IMU = IMU (); // imus.back();
+                // IMU initial_IMU = imus.back();
+                this->initialize(initial_IMU);
             }
 
             // Integrate every new IMU between last time and now
@@ -116,9 +119,12 @@ extern struct Params Config;
                 Config.MAX_NUM_ITERS,
                 Config.LIMITS
             );
+        }
 
+        void Localizator::initialize(const IMU& imu) {
             // Initialize state
-            this->init_IKFoM_state();
+            this->init_IKFoM_state(imu);
+            this->initialized = true;
         }
 
         void Localizator::IKFoM_update(const Points& points) {
@@ -127,8 +133,9 @@ extern struct Params Config;
             this->IKFoM_KF.update_iterated_dyn_share_modified(Config.LiDAR_noise, Config.degeneracy_threshold, solve_H_time, Config.print_degeneracy_values);
         }
 
-        void Localizator::init_IKFoM_state() {
+        void Localizator::init_IKFoM_state(const IMU& imu) {
             state_ikfom init_state = this->IKFoM_KF.get_x();
+            init_state.rot = imu.q.cast<double> ();
             init_state.grav = S2(-Eigen::Vector3f (Config.initial_gravity.data()).cast<double>());
             init_state.bg = Eigen::Vector3d::Zero();
             init_state.offset_R_L_I = SO3(Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3).cast<double>());

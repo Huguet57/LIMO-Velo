@@ -89,6 +89,7 @@ class IMU {
 
         IMU(const sensor_msgs::Imu& imu);
         IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time);
+        IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, const Eigen::Quaternionf& q, double time);
         IMU (double time);
         bool has_orientation();
 };
