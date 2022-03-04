@@ -70,9 +70,11 @@ Sometimes a higher map quality is needed, now a new ``high_quality_publish`` par
   Xaloc's "fast" dataset. High velocity in the straights (~15m/s) and tight turns (~80deg/s).
 </p>
 
-Try ``xaloc.launch`` with Xaloc's own rosbags. Find a ``slow`` and a ``fast`` run in this [Dropbox](https://www.dropbox.com/sh/4116xoc7srps6a5/AAC3q1h50swG7fRMI3USNn2la?dl=0).
+Try ``xaloc.launch`` with Xaloc's own rosbags.
+- :checkered_flag: Find a ``slow`` (818MB) and a ``fast`` (1.71GB) run in [this Dropbox folder](https://www.dropbox.com/sh/4116xoc7srps6a5/AAC3q1h50swG7fRMI3USNn2la?dl=0).
 
-See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sample datasets found in the web. Don't hesitate to ask there for more data on specific scenarios/cases.
+See Issue [#10](https://github.com/Huguet57/LIMO-Velo/issues/10) to see other sample datasets found in the web.
+Don't hesitate to ask there for more data on specific scenarios/cases.
 
 # Using LIMO-Velo
 
@@ -107,14 +109,15 @@ Relevant parameters are:
 - [FAST-LIO2](https://github.com/hku-mars/FAST_LIO): Fast and Direct LIO SLAM
 
 # TODO list
-### Urgent fixes
+### Fixes in progress
+- [ ] Work with 9-DOF IMUs
+- [ ] Saving and loading HD-Maps (needs 9-DOF done)
+- [ ] Adding GPS as extra input
 - [ ] Rethink ``mapping_offline`` (see Discussions)
-- [ ] Adding Livox as a LiDAR type
-- [ ] Rewrite the most confusing parts according to [qpc001's feedback](https://github.com/qpc001/LIMO-Velo/commit/a45b6489cbbcefc68515565eeaeaed267c976da8). (thank you!)
 
 ### Design choices
 - [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
-- [ ] Simplify the upsampling in the Compensator. (called it.)
+- [ ] Simplify the upsampling in the Compensator.
 
 ### Fixes to investigate
 - [ ] Interpolation and smoothing of states when mapping offline
