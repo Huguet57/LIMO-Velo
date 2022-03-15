@@ -44,8 +44,8 @@ Developing an algorithm for a team requires the algorithm to be easy enough to u
 - Livox (check ``livox`` git branch)
 
 # Dependencies
-- [Ubuntu](https://ubuntu.com) (tested on 20.04)
-- [ROS](http://wiki.ros.org/ROS/Installation) (tested on Noetic)
+- [Ubuntu](https://ubuntu.com) (tested on 18.04, 20.04)
+- [ROS](http://wiki.ros.org/ROS/Installation) (tested on Melodic, Noetic)
 - [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
 - [PCL](http://www.pointclouds.org/downloads/linux.html) (tested on 1.8)
 
