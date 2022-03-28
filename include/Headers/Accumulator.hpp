@@ -94,16 +94,16 @@ class Accumulator {
         template <typename ContentType>
         ContentType get_prev(Buffer<ContentType>& source, double t) {
             int k_t = before_t(source, t) + 1;
+            if (k_t >= source.content.size()) k_t = source.content.size() - 1;
 
-            // Get leftest State right to t (sorted new to old)
-            for (int k = k_t; k < source.content.size(); ++k) {
+            // Get leftest (newest) content right (previous) to t (sorted new to old)
+            for (int k = k_t; k >= 0; --k) {
                 ContentType cnt = source.content[k];
                 if (t > cnt.time) return cnt;
             }
 
-            // If not a state found, push an empty one at t
-            this->add(ContentType(), t);
-            return source.front();
+            // If not a content found, push an empty one at t
+            return ContentType();
         }
 
         // Process LiDAR pointcloud message

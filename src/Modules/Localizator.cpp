@@ -64,8 +64,7 @@ extern struct Params Config;
             // Initialize
             if (not this->initialized) {
                 if (imus.empty()) return;
-                IMU initial_IMU = IMU (); // imus.back();
-                // IMU initial_IMU = imus.back();
+                IMU initial_IMU = imus.back();
                 this->initialize(initial_IMU);
             }
 
@@ -85,7 +84,10 @@ extern struct Params Config;
         State Localizator::latest_state() {
             // If no integrated, return empty state
             if (this->last_time_integrated < 0)
-                return State (Accumulator::getInstance().initial_time);
+                return State (
+                    this->get_x(),
+                    Accumulator::getInstance().initial_time
+                );
             
             // If no updates, return integrated state
             if (this->last_time_updated < 0)

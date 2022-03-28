@@ -72,6 +72,13 @@ extern struct Params Config;
         /////////////////////////////////
 
         State Accumulator::get_prev_state(double t) {
+            if (this->BUFFER_X.empty()) {
+                State X = Localizator::getInstance().latest_state();
+                Accumulator::getInstance().add(X, t);
+                X.time = t;
+                return X;
+            }
+            
             return this->get_prev(this->BUFFER_X, t);
         }
 
