@@ -106,7 +106,6 @@ extern struct Params Config;
             // Ready if there's enough IMUs to fit the delay
             if (this->enough_imus()) {
                 this->set_initial_time();
-                Localizator::getInstance().initialize(this->initial_time);
                 return this->is_ready = true;
             }
 

@@ -70,6 +70,9 @@ int main(int argc, char** argv) {
                 // Check if interval has enough field of view
                 if (t2 - t1 < delta - 1e-6) break;
 
+            // Step 0.1. PRE-LOCALIZATION
+            if (not loc.initialized) loc.initialize(accum.initial_time);
+
             // Step 1. LOCALIZATION
 
                 // Integrate IMUs up to t2
