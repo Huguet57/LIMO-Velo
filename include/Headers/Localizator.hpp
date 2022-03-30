@@ -22,7 +22,7 @@ class Localizator {
 
     public:
         Localizator();
-        void initialize(const IMU& imu = IMU ());
+        void initialize(double t);
         
         void correct(const Points&, double time);
         void calculate_H(const state_ikfom&, const Matches&, Eigen::MatrixXd& H, Eigen::VectorXd& h);

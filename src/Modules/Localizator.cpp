@@ -61,13 +61,6 @@ extern struct Params Config;
             IMUs imus = Accumulator::getInstance().get_imus(this->last_time_integrated, t);
             if (this->last_time_integrated < 0) this->last_time_integrated = t;
 
-            // Initialize
-            if (not this->initialized) {
-                if (imus.empty()) return;
-                IMU initial_IMU = imus.back();
-                this->initialize(initial_IMU);
-            }
-
             // Integrate every new IMU between last time and now
             for (IMU imu : imus) {
                 this->propagate(imu);
@@ -123,9 +116,13 @@ extern struct Params Config;
             );
         }
 
-        void Localizator::initialize(const IMU& imu) {
+        void Localizator::initialize(double t) {
+            // Get IMU at t
+            IMUs imus = Accumulator::getInstance().get_imus(-1, t);
+            IMU initial_IMU = imus.back();
+
             // Initialize state
-            this->init_IKFoM_state(imu);
+            this->init_IKFoM_state(initial_IMU);
             this->initialized = true;
         }
 
