@@ -20,6 +20,7 @@ class Accumulator {
             void clear_buffers();
             void clear_buffers(TimeType);
             void clear_lidar(TimeType);
+            void clear_states();
 
         // Get content given time intervals
 

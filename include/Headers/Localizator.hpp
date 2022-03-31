@@ -30,6 +30,9 @@ class Localizator {
         void propagate_to(double t);
         State latest_state();
 
+        void set_orientation(const IMU& imu);
+        void set_position(const Eigen::Vector3f& pos);
+
     private:
         void init_IKFoM();
         void init_IKFoM_state(const IMU& imu);
@@ -37,7 +40,6 @@ class Localizator {
         
         void propagate(const IMU& imu);
         const state_ikfom& get_x() const;
-        void set_orientation(const IMU& imu);
 
     // Singleton pattern
 

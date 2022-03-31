@@ -69,6 +69,11 @@ extern struct Params Config;
                 this->BUFFER_L.clear(t);
             }
 
+
+            void Accumulator::clear_states() {
+                this->BUFFER_X.clear();
+            }
+
         /////////////////////////////////
 
         State Accumulator::get_prev_state(double t) {

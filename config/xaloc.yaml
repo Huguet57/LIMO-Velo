@@ -59,3 +59,11 @@ Initialization:
     # With initialization
     times: [0.5, 1.0, 1.25]
     deltas: [0.1, 0.05, 0.02]
+
+# Load/Save map
+loadsave:
+     map_name: "forum"   # "montmelo-IN2" / "forum"
+     maps_path: "/media/andreu/Movies/ws_limovelo/maps"
+     action: load   # OPTIONS: save / load / none
+     ini_pos: [-33.257496, -21.466413, -0.112764]
+     # ini_pos: [0., 0., 0.]
