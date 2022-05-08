@@ -1,6 +1,6 @@
 # Online/Offline
 mapping_online: true
-real_time: true
+real_time: false
 
 # Topics
 points_topic: "/velodyne_points"
@@ -57,13 +57,13 @@ Initialization:
 #     deltas: [0.1]
     
     # With initialization
-    times: [0.5, 1.0, 1.25]
+    times: [1.5, 2.0, 3.25]
     deltas: [0.1, 0.05, 0.02]
 
 # Load/Save map
 loadsave:
      map_name: "forum"   # "montmelo-IN2" / "forum"
      maps_path: "/media/andreu/Movies/ws_limovelo/maps"
-     action: load   # OPTIONS: save / load / none
-     ini_pos: [-33.257496, -21.466413, -0.112764]
-     # ini_pos: [0., 0., 0.]
+     action: none   # OPTIONS: save / load / none
+     # ini_pos: [-0.581022, -32.419407, -0.023406]
+     ini_pos: [0., 0., 0.]

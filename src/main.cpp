@@ -171,9 +171,9 @@ int main(int argc, char** argv) {
 
             // Step 3. LOOP CLOSURE
 
-                // ROS_INFO("%lf", t2);
+                ROS_INFO("%lf", t2);
 
-                if (not map.frozen and t2 > 1645441863) { // and loc.is_loop_closed(t2)) {
+                if (not map.frozen and t2 > 1637248567 and Config.loadsave_action != "none") { // and loc.is_loop_closed(t2)) {
                     // Freeze the map, don't let new points in
                     map.freeze();
                     ROS_INFO("Loop closed, map freezed.");

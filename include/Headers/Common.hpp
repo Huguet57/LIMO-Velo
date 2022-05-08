@@ -112,6 +112,7 @@ struct Params {
 
     std::string points_topic;
     std::string imus_topic;
+    std::string gps_topic;
 
     InitializationParams Initialization;
 };
