@@ -96,6 +96,25 @@ extern struct Params Config;
             );
         }
 
+        bool Localizator::is_loop_closed(double t) {
+            double dist_travelled = 0.;
+            const auto& Xs = Accumulator::getInstance().BUFFER_X.content;
+            if (Xs.empty()) return false;
+
+            // See if is close to origin (in a 5 meter radius)
+            bool close2origin = (Xs.front().pos - Xs.back().pos).norm() < 5;
+            if (not close2origin) return false;
+
+            // Check if it has moved from origin
+            for (int i = 1; i < Xs.size(); ++i) {
+                dist_travelled += (Xs[i].pos - Xs[i-1].pos).norm();
+                if (dist_travelled > 10) return true;
+            }
+
+            return false;
+        }
+
+
     // private:
         Localizator& Localizator::getInstance() {
             static Localizator* localizator = new Localizator();

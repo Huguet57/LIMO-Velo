@@ -33,6 +33,8 @@ class Localizator {
         void set_orientation(const IMU& imu);
         void set_position(const Eigen::Vector3f& pos);
 
+        bool is_loop_closed(double);
+
     private:
         void init_IKFoM();
         void init_IKFoM_state(const IMU& imu);

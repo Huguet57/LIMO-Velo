@@ -56,8 +56,6 @@ int main(int argc, char** argv) {
     int successes_prelocalizing = 0;
     int iters = 0;
 
-    Eigen::Vector3f x_increment(0.,0.,0.);
-
     while (ros::ok()) {
 
         // The accumulator received enough data to start
@@ -82,31 +80,21 @@ int main(int argc, char** argv) {
 
             // Step 0.1. PRE-LOCALIZATION
                 if (not loc.initialized) {
+                    Eigen::Vector3f ini_pos = Eigen::Map<Eigen::Vector3f>(Config.ini_pos.data(), 3);
                     loc.initialize(accum.initial_time);
-                    loc.set_position(Eigen::Map<Eigen::Vector3f>(Config.ini_pos.data(), 3));
+                    loc.set_position(ini_pos);
                 }
 
-                if (not has_prelocalized) {
-                    // // ROS_INFO("increment: %f %f %f", x_increment.x(), x_increment.y(), x_increment.z());
-                    // loc.set_position(x_increment);
-                    // x_increment += loc.latest_state().R.inverse() * Eigen::Vector3f (0.,0.1,0.);
-
+                if (LOAD_MAP and not has_prelocalized) {
                     // Publish as map the surroundings of the origin
-                    Point origin;
-                    Points surroundings = map.radius_search(origin, 1000);
-                    Points ds_surroundings; for (int i = 0; i < surroundings.size(); ++i) if (i%10 == 0) ds_surroundings.push_back(surroundings[i]);
-                    publish.pointcloud(ds_surroundings, false);
-                    // ROS_ERROR("Surroundings");
+                    Points surroundings = map.radius_search(Point (), 250);
+                    publish.pointcloud(surroundings, false);
                 }
-
-                // accum.add(loc.latest_state(), t1);
 
             // Step 1. LOCALIZATION
 
                 // Integrate IMUs up to t2
                 loc.propagate_to(t2);
-
-                ROS_WARN("before: %f, %f, %f", loc.latest_state().pos.x(), loc.latest_state().pos.y(), loc.latest_state().pos.z());
 
                 // Compensated pointcloud given a path
                 Points compensated = comp.compensate(t1, t2);
@@ -118,8 +106,6 @@ int main(int argc, char** argv) {
                 State Xt2 = loc.latest_state();
                 publish.state(Xt2, false);
                 publish.tf(Xt2);
-
-                ROS_ERROR("after: %f, %f, %f", loc.latest_state().pos.x(), loc.latest_state().pos.y(), loc.latest_state().pos.z());
 
                 // Publish pointcloud used to localize
                 Points global_compensated = Xt2 * Xt2.I_Rt_L() * compensated;
@@ -143,37 +129,23 @@ int main(int argc, char** argv) {
                     if (success) ++successes_prelocalizing;
                     else successes_prelocalizing = 0;
                     has_prelocalized = successes_prelocalizing > 5;
-
-                    // accum.clear_states();
                     break;
-                } else accum.add(Xt2, t2);
+                } else {
+                    accum.add(Xt2, t2);
+                }
 
             // Step 2. MAPPING
 
                 // Add updated points to map (mapping online)
-                if (Config.mapping_online and not map.frozen) {
+                if (not map.frozen) {
                     map.add(global_ds_compensated, t2, true);
                     if (Config.high_quality_publish) publish.pointcloud(global_compensated, false);                    
                     else publish.pointcloud(global_ds_compensated, false);                    
                 }
-                // Add updated points to map (mapping offline)
-                else if (map.hasToMap(t2) and not map.frozen) {
-                    State Xt2 = loc.latest_state();
-                    // Map points at [t2 - FULL_ROTATION_TIME, t2]
-                    Points full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                    Points global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
-                    Points global_full_ds_compensated = comp.downsample(global_full_compensated);
 
-                    map.add(global_full_ds_compensated, t2, true);
-                    if (Config.high_quality_publish) publish.pointcloud(global_full_compensated, false);
-                    else publish.pointcloud(global_full_ds_compensated, false);
-                }
+            // Step 3. MAP SAVE
 
-            // Step 3. LOOP CLOSURE
-
-                ROS_INFO("%lf", t2);
-
-                if (not map.frozen and t2 > 1637248567 and Config.loadsave_action != "none") { // and loc.is_loop_closed(t2)) {
+                if (not map.frozen and loc.is_loop_closed(t2) and Config.loadsave_action != "none") {
                     // Freeze the map, don't let new points in
                     map.freeze();
                     ROS_INFO("Loop closed, map freezed.");
