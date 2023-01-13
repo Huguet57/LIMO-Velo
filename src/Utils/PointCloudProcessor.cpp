@@ -28,7 +28,7 @@ extern struct Params Config;
             if (Config.LiDAR_type == LIDAR_TYPE::Custom) return this->custommsg2points(msg);
             
             // Unknown LiDAR type
-            ROS_ERROR("Unknown LiDAR type! Change your YAML parameters file.");
+            RCLCPP_ERROR(rclcpp::get_logger("limovelo"), "Unknown LiDAR type! Change your YAML parameters file.");
             return Points ();
         }
 

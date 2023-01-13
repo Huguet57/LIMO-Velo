@@ -85,9 +85,9 @@ class IMU {
         TimeType time;
 
         IMU();
-        IMU(const sensor_msgs::ImuConstPtr& msg);
+        IMU(const sensor_msgs::msg::Imu::ConstPtr& msg);
 
-        IMU(const sensor_msgs::Imu& imu);
+        IMU(const sensor_msgs::msg::Imu& imu);
         IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time);
         IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, const Eigen::Quaternionf& q, double time);
         IMU (double time);

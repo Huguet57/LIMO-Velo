@@ -36,7 +36,7 @@ extern struct Params Config;
             }
 
         // Receive from topics
-            void Accumulator::receive_lidar(const PointCloud_msg& msg) {
+            void Accumulator::receive_lidar(const PointCloud_msg msg) {
                 // Turn message to processed points
                 Points points = this->process(msg);
                 
@@ -47,7 +47,7 @@ extern struct Params Config;
                 for (Point p : points) this->add(p);
             }
 
-            void Accumulator::receive_imu(const IMU_msg& msg) {
+            void Accumulator::receive_imu(const IMU_msg msg) {
                 // Turn message to IMU object
                 IMU imu(msg);
                 // Add it to the IMU buffer
@@ -196,6 +196,6 @@ extern struct Params Config;
             else return;
 
             // Warn missing 'time' information
-            ROS_ERROR("LiDAR points are missing 'time' information.");
-            ROS_ERROR("Delta has been fixed to %f (s) leading to a fixed %d (Hz) localization.", Config.full_rotation_time, (int) 1./Config.full_rotation_time);
+            RCLCPP_ERROR(rclcpp::get_logger("limovelo"), "LiDAR points are missing 'time' information.");
+            RCLCPP_ERROR(rclcpp::get_logger("limovelo"), "Delta has been fixed to %f (s) leading to a fixed %d (Hz) localization.", Config.full_rotation_time, (int) 1./Config.full_rotation_time);
         }

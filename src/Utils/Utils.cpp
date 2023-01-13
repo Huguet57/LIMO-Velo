@@ -26,7 +26,7 @@ double Conversions::microsec2Sec(std::uint64_t t) {
     return secs + musecs*1e-6;
 }
 
-std::uin64_t Conversions::microsec2Nanosec(std::uint64_t t) {
+std::uint64_t Conversions::microsec2Nanosec(std::uint64_t t) {
     return t*1e3;
 }
 

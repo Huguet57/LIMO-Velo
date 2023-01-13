@@ -36,7 +36,7 @@ extern struct Params Config;
             this->q.w() = imu.orientation.w;
 
             // Time
-            this->time = imu.header.stamp.toSec();
+            this->time = Conversions::nanosec2Sec(imu.header.stamp.nanosec) + imu.header.stamp.sec;
         }
 
         IMU::IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time) : IMU::IMU(a, w, Eigen::Quaternionf (1,0,0,0), time) {

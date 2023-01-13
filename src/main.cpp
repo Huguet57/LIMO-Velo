@@ -13,6 +13,8 @@
 
 Params Config;
 
+using namespace std::chrono_literals;
+
 void fill_config(rclcpp::Node::SharedPtr node);
 
 int main(int argc, char** argv) {
@@ -32,13 +34,13 @@ int main(int argc, char** argv) {
     // Subscribers
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr lidar_sub = 
         node->create_subscription<sensor_msgs::msg::PointCloud2>(
-        Config.points_topic, 1000, 
+        Config.points_topic, 1, 
         std::bind(&Accumulator::receive_lidar, &accum, std::placeholders::_1)
     );
 
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub = 
         node->create_subscription<sensor_msgs::msg::Imu>(
-        Config.imus_topic, 1000,
+        Config.imus_topic, 1,
         std::bind(&Accumulator::receive_imu, &accum, std::placeholders::_1)
     );
 
@@ -154,19 +156,19 @@ void fill_config(rclcpp::Node::SharedPtr node) {
     node->declare_parameter("downsample_prec", 0.2);
     node->get_parameter("downsample_prec", Config.downsample_prec);
     
-    node->declare_parameter("high_quality_publish", Config.high_quality_publish, false);
-    node->get_parameter("high_quality_publish", Config.high_quality_publish, false);
+    node->declare_parameter("high_quality_publish", false);
+    node->get_parameter("high_quality_publish", Config.high_quality_publish);
     
     node->declare_parameter("MAX_NUM_ITERS", 3);
     node->get_parameter("MAX_NUM_ITERS", Config.MAX_NUM_ITERS);
     
-    node->declare_parameter("LIMITS", std::vector<double> (23, 0.001));
+    node->declare_parameter("LIMITS", std::vector<double>{23, 0.001});
     node->get_parameter("LIMITS", Config.LIMITS);
     
     node->declare_parameter("NUM_MATCH_POINTS", 5);
     node->get_parameter("NUM_MATCH_POINTS", Config.NUM_MATCH_POINTS);
     
-    node->declare_parameter("MAX_POINTS2MATCH" 10);
+    node->declare_parameter("MAX_POINTS2MATCH", 10);
     node->get_parameter("MAX_POINTS2MATCH", Config.MAX_POINTS2MATCH);
     
     node->declare_parameter("MAX_DIST_PLANE", 2.0);
@@ -241,15 +243,15 @@ void fill_config(rclcpp::Node::SharedPtr node) {
     node->declare_parameter("/Initialization/times", {});
     node->get_parameter("/Initialization/times", Config.Initialization.times);
     
-    node->declare_parameter("/Initialization/deltas", {Config.full_rotation_time});
+    node->declare_parameter("/Initialization/deltas", Config.full_rotation_time);
     node->get_parameter("/Initialization/deltas", Config.Initialization.deltas);
     
-    node->declare_parameter("initial_gravity", {0.0, 0.0, -9.807});
+    node->declare_parameter("initial_gravity", std::vector<double>{0.0, 0.0, -9.807});
     node->get_parameter("initial_gravity", Config.initial_gravity);
     
-    node->declare_parameter("I_Translation_L", std::vector<float> (3, 0.));
+    node->declare_parameter("I_Translation_L", std::vector<double>{3, 0.});
     node->get_parameter("I_Translation_L", Config.I_Translation_L);
     
-    node->declare_parameter("I_Rotation_L",std::vector<float> (9, 0.));
+    node->declare_parameter("I_Rotation_L",std::vector<double>{9, 0.});
     node->get_parameter("I_Rotation_L", Config.I_Rotation_L);
 }

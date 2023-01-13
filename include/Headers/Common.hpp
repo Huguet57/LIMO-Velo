@@ -14,13 +14,13 @@
 #include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 // ROS messages
-#include <nav_msgs/msg/odometry.h>
-#include <sensor_msgs/msg/imu.h>
-#include <sensor_msgs/msg/point_cloud2.h>
-#include <std_msgs/msg/float32.h>
-#include <std_msgs/msg/bool.h>
-#include <geometry_msgs/msg/pose_array.h>
-#include <geometry_msgs/msg/pose.h>
+#include <nav_msgs/msg/odometry.hpp>
+#include <sensor_msgs/msg/imu.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <std_msgs/msg/float32.hpp>
+#include <std_msgs/msg/bool.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 // PCL Library
 #define PCL_NO_PRECOMPILE
 #include <pcl_conversions/pcl_conversions.h>
@@ -55,9 +55,9 @@ struct Params {
 
     bool estimate_extrinsics;
     bool print_extrinsics;
-    std::vector<float> initial_gravity;
-    std::vector<float> I_Rotation_L;
-    std::vector<float> I_Translation_L;
+    std::vector<double> initial_gravity;
+    std::vector<double> I_Rotation_L;
+    std::vector<double> I_Translation_L;
 
     double empty_lidar_time;
     double real_time_delay;
@@ -216,8 +216,8 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(custom::Point,
     (std::uint16_t, ring, ring)
 )
 
-typedef sensor_msgs::msg::PointCloud2::ConstPtr PointCloud_msg;
-typedef sensor_msgs::msg::Imu::ConstPtr IMU_msg;
+typedef sensor_msgs::msg::PointCloud2::SharedPtr PointCloud_msg;
+typedef sensor_msgs::msg::Imu::SharedPtr IMU_msg;
 typedef double TimeType;
 
 class Point;
