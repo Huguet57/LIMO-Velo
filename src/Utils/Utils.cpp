@@ -15,11 +15,19 @@ std::uint64_t Conversions::sec2Microsec(double t) {
     return std::round(t*1e6);
 }
 
+std::uint64_t Conversions::sec2Nanosec(double t) {
+    return std::round(t*1e9);
+}
+
 double Conversions::microsec2Sec(std::uint64_t t) {
     int order = 1e6;
     int secs = t/order;
     int musecs = t%order;
     return secs + musecs*1e-6;
+}
+
+std::uin64_t Conversions::microsec2Nanosec(std::uint64_t t) {
+    return t*1e3;
 }
 
 double Conversions::nanosec2Sec(std::uint32_t t) {

@@ -131,7 +131,7 @@ class Publishers {
             q.setZ(q_from_R.z());
             transform.setRotation(q);
             
-            br.sendTransform(tf::StampedTransform(transform, ros::Time(X.time), "map", "body"));
+            br.sendTransform(tf::StampedTransform(transform, rclcpp::Time(Conversions::sec2Nanosec(X.time)), "map", "body"));
         }
 
         void cout_rottransl(const RotTransl& RT) {
@@ -141,7 +141,7 @@ class Publishers {
 
         void publish_pcl(const pcl::PointCloud<full_info::Point>& pcl, rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub) {
             sensor_msgs::msg::PointCloud2 msg;
-            msg.header.stamp = ros::Time(Conversions::microsec2Sec(pcl.header.stamp));
+            msg.header.stamp = rclcpp::Time(Conversions::microsec2Nanosec(pcl.header.stamp));
             msg.header.frame_id = "map";
             pcl::toROSMsg(pcl, msg);
             if (pub.getNumSubscribers() > 0) pub->publish(msg);
@@ -150,7 +150,7 @@ class Publishers {
         void publish_states(const States& states) {
             geometry_msgs::msg::PoseArray msg;
             msg.header.frame_id = "map";
-            msg.header.stamp = ros::Time(states.back().time);
+            msg.header.stamp = rclcpp::Time(Conversions::sec2Nanosec(states.back().time));
 
             for (const State& state : states) {
                 geometry_msgs::msg::Pose pose;
@@ -173,7 +173,7 @@ class Publishers {
 
         void publish_state(const State& state) {
             nav_msgs::msg::Odometry msg;
-            msg.header.stamp = ros::Time(state.time);
+            msg.header.stamp = rclcpp::Time(Conversions::sec2Nanosec(state.time));
             msg.header.frame_id = "map";
 
             msg.pose.pose.position.x = state.pos(0);
