@@ -1,8 +1,8 @@
-# LIMO-Velo [Alpha]
-:red_circle: [16 February 2022] :red_circle: The project is on ``alpha`` stage, so be sure to **open Issues and Discussions** and give all the **feedback** you can!
-Better to have 20 people giving lots of feedback than 1000 not saying anything.
-
+# LIMO-Velo
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
+
+## News! 🎉
+Now with a ROS2 branch, `ros2` - thanks to [bertaveira](https://github.com/bertaveira). Broader LiDARs support is needed.
 
 ## A real-time LiDAR-Inertial SLAM for high velocities in spinning LiDARs.
 
