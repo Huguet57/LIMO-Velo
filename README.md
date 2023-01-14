@@ -1,7 +1,4 @@
-# LIMO-Velo [Alpha]
-:red_circle: [16 February 2022] :red_circle: The project is on ``alpha`` stage, so be sure to **open Issues and Discussions** and give all the **feedback** you can!
-Better to have 20 people giving lots of feedback than 1000 not saying anything.
-
+# LIMO-Velo (ROS2)
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 
 ## A real-time LiDAR-Inertial SLAM for high velocities in spinning LiDARs.
@@ -84,13 +81,10 @@ When cloning the repository, we also need to clone the [IKFoM](https://github.co
 ``git clone --recurse-submodules https://github.com/Huguet57/LIMO-Velo.git``
 
 ## 1. Compiling the code
-We either can do ``catkin_make`` or ``catkin build`` to compile the code. By default it will compile it optimized already
+Run ``colcon build`` to compile the code. For production, ``colcon build --cmake-args '-DCMAKE_BUILD_TYPE=Release'`` it will speed up x20 your code - you are welcome!
 
 ## 2. Running LIMO-Velo
-To run LIMO-Velo, we can run the launch file ``roslaunch limovelo test.launch`` if we want a visualization or ``roslaunch limovelo run.launch`` if we want it without.
-
-### 2.1 Debugging LIMO-Velo
-An additional launch file ``roslaunch limovelo debug.launch`` is added that uses [Valgrind](https://valgrind.org/) as a analysing tool to check for leaks and offers detailed anaylsis of program crashes.
+To run LIMO-Velo, we can run a launch file ``ros2 launch limovelo ouster.launch.py`` (for Ouster in this case).
 
 ## 3. Changing parameters
 To adapt LIMO-Velo to our own hardware infrastructure, a [YAML](https://yaml.org/) file ``config/params.yaml`` is available and we need to change it to our own topic names and sensor specs.
