@@ -1,5 +1,0 @@
-<launch>
-    <rosparam command="load" file="$(find limovelo)/config/ouster.yaml" />
-    <node pkg="limovelo" type="limovelo" name="limovelo" output="screen" />
-    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find limovelo)/rviz/ouster.rviz" />
-</launch>

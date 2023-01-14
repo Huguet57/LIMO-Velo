@@ -1,68 +1,69 @@
 ### Parameters for data in: https://data.ouster.io/sample-data-1.13/OS1-16/index.html
+/limovelo:
+  ros__parameters:
+    # Online/Offline
+    mapping_online: true     # set to 'true' until mapping offline fixed (see Discussions in GitHub)
+    real_time: false         # in a slow CPU, real_time ensures to always output to latest odometry (possibly skipping points)
 
-# Online/Offline
-mapping_online: true     # set to 'true' until mapping offline fixed (see Discussions in GitHub)
-real_time: false         # in a slow CPU, real_time ensures to always output to latest odometry (possibly skipping points)
+    # Topics
+    points_topic: "/ouster/points"
+    imus_topic: "/ouster/imu"
 
-# Topics
-points_topic: "/os1_cloud_node/points"
-imus_topic: "/os1_cloud_node/imu"
+    # Publishers
+    high_quality_publish: true   # true: Publishes the map without downsampling, can be slower. false: Publishes the downsampled map.  
 
-# Publishers
-high_quality_publish: false   # true: Publishes the map without downsampling, can be slower. false: Publishes the downsampled map.  
+    # Extrinsics
+    estimate_extrinsics: false
+    print_extrinsics: false
+    initial_gravity: [0.0, 0.0, +9.807]
+    # Extrinsics LiDAR -> IMU
+    I_Translation_L: [0.006253, -0.011775, 0.007645]
+    I_Rotation_L: [
+        1.0,  0.0,  0.0,
+        0.0, 1.0,  0.0,
+        0.0,  0.0, 1.0
+    ]
 
-# Extrinsics
-estimate_extrinsics: false
-print_extrinsics: false
-initial_gravity: [0.0, 0.0, +9.807]
-# Extrinsics LiDAR -> IMU
-I_Translation_L: [0.006253, -0.011775, 0.028535]
-I_Rotation_L: [
-     -1.0,  0.0,  0.0,
-     0.0, -1.0,  0.0,
-     0.0,  0.0, 1.0
-]
+    # Delays
+    empty_lidar_time: 0.1      # Should be at least [FULL_ROTATION_TIME]
+    real_time_delay: 0.1       # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
 
-# Delays
-empty_lidar_time: 0.1      # Should be at least [FULL_ROTATION_TIME]
-real_time_delay: 0.1       # Should be at least [FULL_ROTATION_TIME] (without a modificated LiDAR driver)
+    # LiDAR
+    LiDAR_type: ouster         # Options: velodyne, hesai, ouster, custom
+    stamp_beginning: false     # (Usually: false) Is the pointcloud's stamp the last point's timestamp (end of rotation) or the first's (beggining of rotation)?
+    offset_beginning: true     # (Usual values: Velodyne = false, Ouster = true, HESAI = indiferent) Is the offset with respect the beginning of the rotation (i.e. point.time ~ [0, 0.1]) or with respect the end (i.e. point.time ~ [-0.1, 0])? For more information see Issue #14: https://github.com/Huguet57/LIMO-Velo/issues/14
+    LiDAR_noise: 0.001
+    full_rotation_time: 0.1
+    min_dist: 4.0              # Minimum distance: doesn't use points closer than this radius
+    downsample_rate: 4         # Downsampling rate: results show that this one can be up to 32 and still work, try it if you need a speedup
+    downsample_prec: 0.2       # Downsampling precision: Indoors, lower values (~0.2) work better. Outdoors, higher values (~0.5) lead to less degeneracy.
 
-# LiDAR
-LiDAR_type: ouster         # Options: velodyne, hesai, ouster, custom
-stamp_beginning: false     # (Usually: false) Is the pointcloud's stamp the last point's timestamp (end of rotation) or the first's (beggining of rotation)?
-offset_beginning: true     # (Usual values: Velodyne = false, Ouster = true, HESAI = indiferent) Is the offset with respect the beginning of the rotation (i.e. point.time ~ [0, 0.1]) or with respect the end (i.e. point.time ~ [-0.1, 0])? For more information see Issue #14: https://github.com/Huguet57/LIMO-Velo/issues/14
-LiDAR_noise: 0.001
-full_rotation_time: 0.1
-min_dist: 4                # Minimum distance: doesn't use points closer than this radius
-downsample_rate: 4         # Downsampling rate: results show that this one can be up to 32 and still work, try it if you need a speedup
-downsample_prec: 0.5       # Downsampling precision: Indoors, lower values (~0.2) work better. Outdoors, higher values (~0.5) lead to less degeneracy.
+    # IMU
+    imu_rate: 100.0            # Approximated IMU rate: only used to estimate when to start the algorithm
+    covariance_acceleration: 1.e-1
+    covariance_gyroscope: 1.e-1
+    covariance_bias_acceleration: 1.e-4
+    covariance_bias_gyroscope: 1.e-4
 
-# IMU
-imu_rate: 100              # Approximated IMU rate: only used to estimate when to start the algorithm
-covariance_acceleration: 1.e-1
-covariance_gyroscope: 1.e-1
-covariance_bias_acceleration: 1.e-4
-covariance_bias_gyroscope: 1.e-4
+    # Localizator
+    MAX_NUM_ITERS: 3
+    # LIMITS: [0.001] * 23
+    NUM_MATCH_POINTS: 5
+    MAX_DIST_PLANE: 2.0
+    PLANES_THRESHOLD: 1.e-1
+    # Localizator - Degeneracy
+    degeneracy_threshold: 5.           # Its magnitude depends on delta (see below), keeping it too high can cause blurry results
+    print_degeneracy_values: false     # Print the degeneracy eigenvalues to guess what the threshold must be for you
 
-# Localizator
-MAX_NUM_ITERS: 3
-# LIMITS: [0.001] * 23
-NUM_MATCH_POINTS: 5
-MAX_DIST_PLANE: 2.0
-PLANES_THRESHOLD: 1.e-1
-# Localizator - Degeneracy
-degeneracy_threshold: 5.           # Its magnitude depends on delta (see below), keeping it too high can cause blurry results
-print_degeneracy_values: false     # Print the degeneracy eigenvalues to guess what the threshold must be for you
+    # Delta refinement
+    # Choose a set of times and field of view sizes (deltas) for the initialization.
+    # The delta (t2 - t1) that will be used through the algorithm therefore is the last one in the 'deltas' vector
+    # Tick the 'Localizator' box in RViz to see the initialization in action
+    #Initialization:
+        # No initialization
+        #times: []
+        #deltas: [0.1]
 
-# Delta refinement
-# Choose a set of times and field of view sizes (deltas) for the initialization.
-# The delta (t2 - t1) that will be used through the algorithm therefore is the last one in the 'deltas' vector
-# Tick the 'Localizator' box in RViz to see the initialization in action
-Initialization:
-    # No initialization
-    times: []
-    deltas: [0.1]
-
-    # # With initialization
-    # times: [2.0]
-    # deltas: [0.1, 0.025]
+        # # With initialization
+        # times: [2.0]
+        # deltas: [0.1, 0.025]
