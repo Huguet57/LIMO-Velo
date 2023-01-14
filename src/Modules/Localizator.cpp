@@ -135,10 +135,10 @@ extern struct Params Config;
         void Localizator::init_IKFoM_state(const IMU& imu) {
             state_ikfom init_state = this->IKFoM_KF.get_x();
             init_state.rot = imu.q.cast<double> ();
-            init_state.grav = S2(-Eigen::Vector3f (Config.initial_gravity.data()).cast<double>());
+            init_state.grav = S2(-Eigen::Vector3f (Conversions::double2floatVect(Config.initial_gravity).data()).cast<double>());
             init_state.bg = Eigen::Vector3d::Zero();
-            init_state.offset_R_L_I = SO3(Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3).cast<double>());
-            init_state.offset_T_L_I = Eigen::Vector3f(Config.I_Translation_L.data()).cast<double>();
+            init_state.offset_R_L_I = SO3(Eigen::Map<Eigen::Matrix3f>(Conversions::double2floatVect(Config.I_Rotation_L).data(), 3, 3).cast<double>());
+            init_state.offset_T_L_I = Eigen::Vector3f(Conversions::double2floatVect(Config.I_Translation_L).data()).cast<double>();
             this->IKFoM_KF.change_x(init_state);
 
             esekfom::esekf<state_ikfom, 12, input_ikfom>::cov init_P = this->IKFoM_KF.get_P();

@@ -4,14 +4,15 @@ namespace Processor {
 
 class Publishers {
     public:
-        ros::Publisher state_pub;
-        ros::Publisher states_pub;
-        ros::Publisher vel_pub;
-        ros::Publisher yaw_pub;
-        ros::Publisher pcl_pub;
-        ros::Publisher full_pcl_pub;
-        ros::Publisher planes_pub;
-        ros::Publisher gt_pub;
+        rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr state_pub;
+        rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr states_pub;
+        rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr vel_pub;
+        rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr yaw_pub;
+        rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pcl_pub;
+        rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr full_pcl_pub;
+        rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr planes_pub;
+        rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr gt_pub;
+        std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster;
 
         double last_transform_time = -1;
 
@@ -19,20 +20,22 @@ class Publishers {
             this->only_couts = true;
         }
 
-        Publishers(ros::NodeHandle& nh) {
-            this->state_pub = nh.advertise<nav_msgs::Odometry>("/limovelo/state", 1000); 
-            this->states_pub = nh.advertise<geometry_msgs::PoseArray>("/limovelo/states", 1000); 
+        Publishers(rclcpp::Node::SharedPtr node) {
+            this->state_pub = node->create_publisher<nav_msgs::msg::Odometry>("/limovelo/state", 1000); 
+            this->states_pub = node->create_publisher<geometry_msgs::msg::PoseArray>("/limovelo/states", 1000); 
 
-            this->vel_pub = nh.advertise<nav_msgs::Odometry>("/limovelo/vel", 1000); 
-            this->yaw_pub = nh.advertise<std_msgs::Float32>("/limovelo/yaw", 1000); 
+            this->vel_pub = node->create_publisher<nav_msgs::msg::Odometry>("/limovelo/vel", 1000); 
+            this->yaw_pub = node->create_publisher<std_msgs::msg::Float32>("/limovelo/yaw", 1000); 
             
-            this->pcl_pub = nh.advertise<sensor_msgs::PointCloud2>("/limovelo/pcl", 1000); 
-            this->full_pcl_pub = nh.advertise<sensor_msgs::PointCloud2>("/limovelo/full_pcl", 1000); 
+            this->pcl_pub = node->create_publisher<sensor_msgs::msg::PointCloud2>("/limovelo/pcl", 1000); 
+            this->full_pcl_pub = node->create_publisher<sensor_msgs::msg::PointCloud2>("/limovelo/full_pcl", 1000); 
 
-            this->gt_pub = nh.advertise<nav_msgs::Odometry>("/limovelo/gt", 1000);
+            this->gt_pub = node->create_publisher<nav_msgs::msg::Odometry>("/limovelo/gt", 1000);
 
-            this->planes_pub = nh.advertise<geometry_msgs::PoseArray>("/limovelo/planes", 1000);
+            this->planes_pub = node->create_publisher<geometry_msgs::msg::PoseArray>("/limovelo/planes", 1000);
             this->only_couts = false;
+
+            this->tf_broadcaster = std::make_unique<tf2_ros::TransformBroadcaster>(*node);
         }
 
         void state(const State& state, bool couts) {
@@ -90,14 +93,14 @@ class Publishers {
         }
 
         void publish_planes(const Planes& planes) {
-            geometry_msgs::PoseArray normalPoseArray;
+            geometry_msgs::msg::PoseArray normalPoseArray;
             normalPoseArray.header.frame_id = "map";
                 
             for (Plane plane : planes) {
                 Point point_world = plane.centroid;
                 Normal n = plane.n;
 
-                geometry_msgs::Pose normalPose;
+                geometry_msgs::msg::Pose normalPose;
                 normalPose.position.x = point_world.x;
                 normalPose.position.y = point_world.y;
                 normalPose.position.z = point_world.z;
@@ -112,26 +115,29 @@ class Publishers {
                 normalPoseArray.poses.push_back(normalPose);
             }
 
-            if (this->planes_pub.getNumSubscribers() > 0) this->planes_pub.publish(normalPoseArray);
+            if (this->planes_pub->get_subscription_count() > 0) this->planes_pub->publish(normalPoseArray);
         }
 
         void send_transform(const State& X) {
-            static tf::TransformBroadcaster br;
-            tf::Transform transform;
-            tf::Quaternion q;
+            geometry_msgs::msg::TransformStamped t;
+            tf2::Quaternion q;
 
-            transform.setOrigin(tf::Vector3(X.pos(0), \
-                                            X.pos(1), \
-                                            X.pos(2)));
+            t.header.stamp = rclcpp::Time(Conversions::sec2Nanosec(X.time));
+            t.header.frame_id = "map";
+            t.child_frame_id = "body";
+
+            t.transform.translation.x = X.pos(0);
+            t.transform.translation.y = X.pos(1);
+            t.transform.translation.z = X.pos(2);
             
             Eigen::Quaternionf q_from_R(X.R);
-            q.setW(q_from_R.w());
-            q.setX(q_from_R.x());
-            q.setY(q_from_R.y());
-            q.setZ(q_from_R.z());
-            transform.setRotation(q);
+            t.transform.rotation.x = q_from_R.x();
+            t.transform.rotation.y = q_from_R.y();
+            t.transform.rotation.z = q_from_R.z();
+            t.transform.rotation.w = q_from_R.w();
+
             
-            br.sendTransform(tf::StampedTransform(transform, ros::Time(X.time), "map", "body"));
+            this->tf_broadcaster->sendTransform(t);
         }
 
         void cout_rottransl(const RotTransl& RT) {
@@ -139,21 +145,21 @@ class Publishers {
             std::cout << RT.t.transpose() << std::endl;
         }
 
-        void publish_pcl(const pcl::PointCloud<full_info::Point>& pcl, ros::Publisher pub) {
-            sensor_msgs::PointCloud2 msg;
-            msg.header.stamp = ros::Time(Conversions::microsec2Sec(pcl.header.stamp));
+        void publish_pcl(const pcl::PointCloud<full_info::Point>& pcl, rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub) {
+            sensor_msgs::msg::PointCloud2 msg;
+            msg.header.stamp = rclcpp::Time(Conversions::microsec2Nanosec(pcl.header.stamp));
             msg.header.frame_id = "map";
             pcl::toROSMsg(pcl, msg);
-            if (pub.getNumSubscribers() > 0) pub.publish(msg);
+            if (pub->get_subscription_count() > 0) pub->publish(msg);
         }
 
         void publish_states(const States& states) {
-            geometry_msgs::PoseArray msg;
+            geometry_msgs::msg::PoseArray msg;
             msg.header.frame_id = "map";
-            msg.header.stamp = ros::Time(states.back().time);
+            msg.header.stamp = rclcpp::Time(Conversions::sec2Nanosec(states.back().time));
 
             for (const State& state : states) {
-                geometry_msgs::Pose pose;
+                geometry_msgs::msg::Pose pose;
 
                 pose.position.x = state.pos(0);
                 pose.position.y = state.pos(1);
@@ -168,12 +174,12 @@ class Publishers {
                 msg.poses.push_back(pose);
             }
 
-            if (this->states_pub.getNumSubscribers() > 0) this->states_pub.publish(msg);
+            if (this->states_pub->get_subscription_count() > 0) this->states_pub->publish(msg);
         }
 
         void publish_state(const State& state) {
-            nav_msgs::Odometry msg;
-            msg.header.stamp = ros::Time(state.time);
+            nav_msgs::msg::Odometry msg;
+            msg.header.stamp = rclcpp::Time(Conversions::sec2Nanosec(state.time));
             msg.header.frame_id = "map";
 
             msg.pose.pose.position.x = state.pos(0);
@@ -196,7 +202,7 @@ class Publishers {
             msg.twist.twist.angular.y = state.w(1);
             msg.twist.twist.angular.z = state.w(2);
 
-            if (this->state_pub.getNumSubscribers() > 0) this->state_pub.publish(msg);
+            if (this->state_pub->get_subscription_count() > 0) this->state_pub->publish(msg);
         }
 
         void cout_state(const State& state) {

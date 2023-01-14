@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 // Libraries
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <iostream>
 #include <math.h>
 #include <chrono>
@@ -9,22 +9,18 @@
 #include <deque>
 #include <vector>
 // TF library
-#include <tf/transform_datatypes.h>
-#include <tf/transform_broadcaster.h>
-#include <tf/transform_listener.h>
-#include <tf2_msgs/TFMessage.h>
-#include <geometry_msgs/TransformStamped.h>
-#include <geometry_msgs/Transform.h>
-#include <geometry_msgs/Vector3.h>
-#include <geometry_msgs/Quaternion.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 // ROS messages
-#include <nav_msgs/Odometry.h>
-#include <sensor_msgs/Imu.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/Bool.h>
-#include <geometry_msgs/PoseArray.h>
-#include <geometry_msgs/Pose.h>
+#include <nav_msgs/msg/odometry.hpp>
+#include <sensor_msgs/msg/imu.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <std_msgs/msg/float32.hpp>
+#include <std_msgs/msg/bool.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 // PCL Library
 #define PCL_NO_PRECOMPILE
 #include <pcl_conversions/pcl_conversions.h>
@@ -59,9 +55,9 @@ struct Params {
 
     bool estimate_extrinsics;
     bool print_extrinsics;
-    std::vector<float> initial_gravity;
-    std::vector<float> I_Rotation_L;
-    std::vector<float> I_Translation_L;
+    std::vector<double> initial_gravity;
+    std::vector<double> I_Rotation_L;
+    std::vector<double> I_Translation_L;
 
     double empty_lidar_time;
     double real_time_delay;
@@ -220,8 +216,8 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(custom::Point,
     (std::uint16_t, ring, ring)
 )
 
-typedef sensor_msgs::PointCloud2::ConstPtr PointCloud_msg;
-typedef sensor_msgs::ImuConstPtr IMU_msg;
+typedef sensor_msgs::msg::PointCloud2::SharedPtr PointCloud_msg;
+typedef sensor_msgs::msg::Imu::SharedPtr IMU_msg;
 typedef double TimeType;
 
 class Point;

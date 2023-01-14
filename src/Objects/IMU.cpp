@@ -16,9 +16,9 @@ extern struct Params Config;
 // class IMU {
     // public:
         IMU::IMU() : IMU::IMU (0.) {}
-        IMU::IMU(const sensor_msgs::ImuConstPtr& msg) : IMU::IMU(*msg) {}
+        IMU::IMU(const sensor_msgs::msg::Imu::ConstPtr& msg) : IMU::IMU(*msg) {}
 
-        IMU::IMU(const sensor_msgs::Imu& imu) {
+        IMU::IMU(const sensor_msgs::msg::Imu& imu) {
             // Linear accelerations
             this->a(0) = imu.linear_acceleration.x;
             this->a(1) = imu.linear_acceleration.y;
@@ -36,7 +36,7 @@ extern struct Params Config;
             this->q.w() = imu.orientation.w;
 
             // Time
-            this->time = imu.header.stamp.toSec();
+            this->time = Conversions::nanosec2Sec(imu.header.stamp.nanosec) + imu.header.stamp.sec;
         }
 
         IMU::IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time) : IMU::IMU(a, w, Eigen::Quaternionf (1,0,0,0), time) {

@@ -26,29 +26,29 @@ class Point {
         float intensity;
         float range;
 
-        Point();
+        explicit Point();
 
-        Point(const full_info::Point& p);
-        Point(const Eigen::Matrix<float, 3, 1>& p);
+        explicit Point(const full_info::Point& p);
+        explicit Point(const Eigen::Matrix<float, 3, 1>& p);
         
         // Delegate constructor (Eigen + attributes)
-        Point(const Eigen::Matrix<float, 3, 1>& p, const Point& attributes);
+        explicit Point(const Eigen::Matrix<float, 3, 1>& p, const Point& attributes);
         
         // HESAI specific
-            Point(const hesai_ros::Point& p);
-            Point(const hesai_ros::Point& p, double time_offset);
+            explicit Point(const hesai_ros::Point& p);
+            explicit Point(const hesai_ros::Point& p, double time_offset);
 
         // Velodyne specific
-            Point(const velodyne_ros::Point& p);
-            Point(const velodyne_ros::Point& p, double time_offset);
+            explicit Point(const velodyne_ros::Point& p);
+            explicit Point(const velodyne_ros::Point& p, double time_offset);
         
         // Ouster specific
-            Point(const ouster_ros::Point& p);
-            Point(const ouster_ros::Point& p, double time_offset);
+            explicit Point(const ouster_ros::Point& p);
+            explicit Point(const ouster_ros::Point& p, double time_offset);
 
         // Custom specific
-            Point(const custom::Point& p);
-            Point(const custom::Point& p, double time_offset);
+            explicit Point(const custom::Point& p);
+            explicit Point(const custom::Point& p, double time_offset);
 
         full_info::Point toPCL() const;
         Eigen::Matrix<float, 3, 1> toEigen() const;
@@ -85,9 +85,9 @@ class IMU {
         TimeType time;
 
         IMU();
-        IMU(const sensor_msgs::ImuConstPtr& msg);
+        IMU(const sensor_msgs::msg::Imu::ConstPtr& msg);
 
-        IMU(const sensor_msgs::Imu& imu);
+        IMU(const sensor_msgs::msg::Imu& imu);
         IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, double time);
         IMU (const Eigen::Vector3f& a, const Eigen::Vector3f& w, const Eigen::Quaternionf& q, double time);
         IMU (double time);
