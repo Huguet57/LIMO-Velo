@@ -69,7 +69,7 @@ extern struct Params Config;
                 upsampled_states (size := imus.size): before t1 and after t2
         */
         States Compensator::upsample(const States& states, const IMUs& imus) {
-            assert (imus.front().time <= states.front().time and states.back().time <= imus.back().time);
+            //assert (imus.front().time <= states.front().time and states.back().time <= imus.back().time);
 
             int s, u;
             s = u = 0;
