@@ -4,6 +4,7 @@ namespace Conversions {
     double microsec2Sec(std::uint64_t t);
     std::uint64_t microsec2Nanosec(std::uint64_t t) ;
     double nanosec2Sec(std::uint32_t t);
+    std::vector<float> double2floatVect(std::vector<double> v);
 }
 
 namespace Algorithms {

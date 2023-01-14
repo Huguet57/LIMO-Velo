@@ -11,9 +11,9 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
-#if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-#  add_compile_options(-Wextra -Wpedantic -O2)
-#endif()
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wextra -Wpedantic -O2)
+endif()
 
 
 
@@ -112,8 +112,46 @@ ament_target_dependencies(
   PCL
 )
 
-target_link_libraries(limovelo ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(limovelo ${PCL_LIBRARIES} ${PYTHON_LIBRARIES})
 target_include_directories(limovelo
   PUBLIC include/IKFoM/ include/IKFoM/IKFoM_toolkit include/ikd-Tree/ikd_Tree
   PRIVATE ${PYTHON_INCLUDE_DIRS}
 )
+
+
+install(
+  TARGETS
+  limovelo
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install launch files.
+install(
+  DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+
+install(
+  DIRECTORY
+  rviz
+  DESTINATION share/${PROJECT_NAME}/
+)
+
+install(
+  DIRECTORY
+  config
+  DESTINATION share/${PROJECT_NAME}
+)
+
+if(BUILD_TESTING)
+  set(ament_cmake_copyright_FOUND TRUE)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips cpplint (only works in a git repo)
+  # uncomment the line when this package is not in a git repo
+  #set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_package()
+

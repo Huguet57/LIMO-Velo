@@ -18,9 +18,9 @@ extern struct Params Config;
 
         State::State() {
             // Read YAML parameters
-            this->g = Eigen::Map<Eigen::Vector3f>(Config.initial_gravity.data(), 3);
-            this->tLI = Eigen::Map<Eigen::Vector3f>(Config.I_Translation_L.data(), 3);
-            this->RLI = Eigen::Map<Eigen::Matrix3f>(Config.I_Rotation_L.data(), 3, 3).transpose();
+            this->g = Eigen::Map<Eigen::Vector3f>(Conversions::double2floatVect(Config.initial_gravity).data(), 3);
+            this->tLI = Eigen::Map<Eigen::Vector3f>(Conversions::double2floatVect(Config.I_Translation_L).data(), 3);
+            this->RLI = Eigen::Map<Eigen::Matrix3f>(Conversions::double2floatVect(Config.I_Rotation_L).data(), 3, 3).transpose();
 
             // State
             this->pos = Eigen::Vector3f::Zero();

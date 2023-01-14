@@ -37,6 +37,11 @@ double Conversions::nanosec2Sec(std::uint32_t t) {
     return secs + nsecs*1e-9;
 }
 
+std::vector<float> Conversions::double2floatVect(std::vector<double> v) {
+    std::vector<float> doubleVec(v.begin(), v.end());
+    return doubleVec;
+}
+
 Eigen::Matrix<float, 4, 1> R3Math::estimate_plane(const PointVector &point) {
     int NUM_MATCH_POINTS = point.size();
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> A(NUM_MATCH_POINTS, 3);

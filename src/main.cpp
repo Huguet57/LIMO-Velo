@@ -52,6 +52,8 @@ int main(int argc, char** argv) {
     double delta = Config.Initialization.deltas.front();
     
     rclcpp::Rate rate(5000);
+    rclcpp::executors::SingleThreadedExecutor executor;
+    executor.add_node(node);
 
     while (rclcpp::ok()) {
         
@@ -129,7 +131,7 @@ int main(int argc, char** argv) {
             break;
         }
 
-        rclcpp::spin_some(node);
+        executor.spin_once();
         rate.sleep();
     }
 
@@ -240,10 +242,10 @@ void fill_config(rclcpp::Node::SharedPtr node) {
     node->declare_parameter("stamp_beginning", false);
     node->get_parameter("stamp_beginning", Config.stamp_beginning);
     
-    node->declare_parameter("/Initialization/times", {});
+    node->declare_parameter("/Initialization/times", std::vector<double>{});
     node->get_parameter("/Initialization/times", Config.Initialization.times);
     
-    node->declare_parameter("/Initialization/deltas", Config.full_rotation_time);
+    node->declare_parameter("/Initialization/deltas", std::vector<double>{Config.full_rotation_time});
     node->get_parameter("/Initialization/deltas", Config.Initialization.deltas);
     
     node->declare_parameter("initial_gravity", std::vector<double>{0.0, 0.0, -9.807});
