@@ -242,11 +242,11 @@ void fill_config(rclcpp::Node::SharedPtr node) {
     node->declare_parameter("stamp_beginning", false);
     node->get_parameter("stamp_beginning", Config.stamp_beginning);
     
-    node->declare_parameter("/Initialization/times", std::vector<double>{});
-    node->get_parameter("/Initialization/times", Config.Initialization.times);
+    node->declare_parameter("Initialization.times", std::vector<double>{});
+    node->get_parameter("Initialization.times", Config.Initialization.times);
     
-    node->declare_parameter("/Initialization/deltas", std::vector<double>{Config.full_rotation_time});
-    node->get_parameter("/Initialization/deltas", Config.Initialization.deltas);
+    node->declare_parameter("Initialization.deltas", std::vector<double>{Config.full_rotation_time});
+    node->get_parameter("Initialization.deltas", Config.Initialization.deltas);
     
     node->declare_parameter("initial_gravity", std::vector<double>{0.0, 0.0, -9.807});
     node->get_parameter("initial_gravity", Config.initial_gravity);
