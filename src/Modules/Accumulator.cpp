@@ -152,7 +152,7 @@ extern struct Params Config;
         }
 
         bool Accumulator::enough_imus() {
-            return this->BUFFER_I.size() > Config.real_time_delay*Config.imu_rate;
+            return this->BUFFER_I.size() > 2*Config.real_time_delay*Config.imu_rate + 10;
         }
 
         void Accumulator::set_initial_time() {
