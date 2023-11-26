@@ -80,6 +80,7 @@ class Accumulator {
             if (t > source.content.front().time) return source.content.front();
             
             int k_t = std::max(0, before_t(source, t));
+            if (k_t == 0) return source.content[k_t];
 
             // Get rightest content left to t (sorted new to old)
             for (int k = k_t; k < source.content.size(); ++k) {
