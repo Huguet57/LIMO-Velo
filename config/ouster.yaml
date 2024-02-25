@@ -59,10 +59,10 @@
     # Choose a set of times and field of view sizes (deltas) for the initialization.
     # The delta (t2 - t1) that will be used through the algorithm therefore is the last one in the 'deltas' vector
     # Tick the 'Localizator' box in RViz to see the initialization in action
-    #Initialization:
+    Initialization:
         # No initialization
         #times: []
-        #deltas: [0.1]
+        deltas: [0.1]
 
         # # With initialization
         # times: [2.0]
