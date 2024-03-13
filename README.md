@@ -1,8 +1,15 @@
 # LIMO-Velo
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 
-## News! 🎉
-Now with a ROS2 branch, `ros2` - thanks to [bertaveira](https://github.com/bertaveira). Broader LiDARs support is needed.
+## AVISO NAVEGANTES DE ARUS! INSTRUCCIONES PARA QUE FUNCIONE A LA PRIMERA
+1- Os aseguráis de tener todas las librerías necesarias que se especifican en el apartado Dependencies. Un poco más abajo. 
+
+2- Hacéis un workspace nuevo y en la carpeta de src clonais el repo. 
+
+3- Al hacer catkin build a mi por lo menos me peta el ordenador por un supuesto fallo de eigen. La solución es, cuando vuelve en sí el ordenador cerráis la terminal donde se está haciendo el catkin build, ya que no va a terminar nunca (lo he probado), y lo volvéis a intentar en otra terminal. Esta ya no da error y compila el código perfectamente. 
+
+4- Ya debería estar todo operativo, sobretodo yo he probado xaloc.launch que son con el coche de Barcelona y son los rosbags más completos y parecidos a los que vamos a tener. Los otros launch los probé con el dataset del KITT y funcionan, pero son de coches normales y no se como les podemos sacar provecho.
+
 
 ## A real-time LiDAR-Inertial SLAM for high velocities in spinning LiDARs.
 
@@ -58,12 +65,6 @@ Sometimes a higher map quality is needed, now a new ``high_quality_publish`` par
   Sometimes Xaloc needs more definition to see if a cluster of points is actually a cone.
 </p>
 
-## Work in progress (branch ``hdmaps``)
-<p align="center">
-  <img src="./config/docs/img/prelocalization-hdmaps.gif" alt="Prelocalizing with a given HD map" /><br />
-  Prelocalization with a previoulsy saved HD map. Still work in progress on the <code>hdmaps</code> branch. Official release will be in a couple of days.
-</p>
-
 # Sample datasets
 <p align="center">
   <img src="./config/docs/img/rosbag-xaloc.gif" alt="Xaloc's fast dataset" /><br />
@@ -100,30 +101,9 @@ Relevant parameters are:
 - ``mapping_offline`` is on an pre-alpha stage and it does not work 100% as it should of.
 - ``initialization`` which you can choose how you want the initialization of the pointcloud sizes (sizes =: deltas, in seconds).
 
-## 4. Modifying the LiDAR driver to get true real-time performance
-*TODO* - This section is intended to explain how to modify the LiDAR driver to increase its frequency by publishing parts of the pointcloud instead of waiting for all of it.
-
 # References
 - [IKFoM](https://github.com/hku-mars/IKFoM): Iterated Kalman Filters on Manifolds
 - [ikd-Tree](https://github.com/hku-mars/ikd-Tree): Incremental KD-Tree for Robotic Applications
 - [FAST-LIO2](https://github.com/hku-mars/FAST_LIO): Fast and Direct LIO SLAM
 
-# TODO list
-### Fixes in progress
-- [ ] Work with 9-DOF IMUs
-- [ ] Saving and loading HD-Maps (needs 9-DOF done)
-- [ ] Adding GPS as extra input
-- [ ] Rethink ``mapping_offline`` (see Discussions)
 
-### Design choices
-- [ ] Renew Buffer private structure. Interesting answer in StackOverflow: [https://stackoverflow.com/a/67236232](https://stackoverflow.com/a/67236232)
-- [ ] Simplify the upsampling in the Compensator.
-
-### Fixes to investigate
-- [ ] Interpolation and smoothing of states when mapping offline
-- [ ] Erase unused (potentially dangerous) points in the map
-- [ ] Check if need to add point in map
-- [ ] Try to add a module for removing dynamic objects such as people or vehicles
-- [ ] Use UKF instead of EKF
-- [ ] Add vision buffer and ability to paint the map's points
-- [ ] Initialize IMU measurements
