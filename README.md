@@ -5,6 +5,9 @@ Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 1- Os aseguráis de tener todas las librerías necesarias que se especifican en el apartado Dependencies. Un poco más abajo. 
 
 2- Hacéis un workspace nuevo y en la carpeta de src clonais el repo. 
+¡¡MUY IMPORTANTE CLONAR CON EL SIGUIENTE COMANDO!!
+
+	git clone --recurse-submodulesgit@github.com:ARUSfs/LIMO-Velo.git
 
 3- Al hacer catkin build a mi por lo menos me peta el ordenador por un supuesto fallo de eigen. La solución es, cuando vuelve en sí el ordenador cerráis la terminal donde se está haciendo el catkin build, ya que no va a terminar nunca (lo he probado), y lo volvéis a intentar en otra terminal. Esta ya no da error y compila el código perfectamente. 
 
