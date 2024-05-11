@@ -2,7 +2,8 @@
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 
 ## News! 🎉
-Now with a ROS2 branch, `ros2` - thanks to [bertaveira](https://github.com/bertaveira). Broader LiDARs support is needed.
+- Now with a ROS2 branch, `ros2` - thanks to [bertaveira](https://github.com/bertaveira). Broader LiDARs support is needed.
+- [bertaveira](https://github.com/bertaveira) is also working on a [LIMO-Velo++](https://github.com/bertaveira/LIMO_Velo) with python bindings. Check out his work in progress!
 
 ## A real-time LiDAR-Inertial SLAM for high velocities in spinning LiDARs.
 
