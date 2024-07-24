@@ -2,6 +2,7 @@
 Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
 
 ## News! 🎉
+- [Oriol](https://github.com/fetty31) just released [Fast-LIMO](https://github.com/fetty31/fast_LIMO) - a thread-safe and fast implementation of LIMO-Velo!
 - Now with a ROS2 branch, `ros2` - thanks to [bertaveira](https://github.com/bertaveira). Broader LiDARs support is needed.
 - [bertaveira](https://github.com/bertaveira) is also working on a [LIMO-Velo++](https://github.com/bertaveira/LIMO_Velo) with python bindings. Check out his work in progress!
 
