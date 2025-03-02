@@ -1,5 +1,5 @@
 # LIMO-Velo
-Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
+Contact me at ``andreuhuguet@gmail.com`` for questions or ideas.
 
 ## News! 🎉
 - [Carlos](https://github.com/CPerezRuiz335) is working on [LIMOncello](https://github.com/CPerezRuiz335/LIMOncello) that improves the Lie Algebra of the Kalman Filter, is written in functional code and has thread safety just like [Fast-LIMO](https://github.com/fetty31/fast_LIMO). Better, safer and simpler!
