@@ -168,7 +168,7 @@ extern struct Params Config;
         }
 
         bool Accumulator::enough_imus() {
-            return this->BUFFER_I.size() > Config.real_time_delay*Config.imu_rate;
+            return this->BUFFER_I.size() > 2*Config.real_time_delay*Config.imu_rate + 10;
         }
 
         void Accumulator::set_initial_time() {
@@ -214,4 +214,3 @@ extern struct Params Config;
             // Warn missing 'time' information
             RCLCPP_ERROR(rclcpp::get_logger("limovelo"), "LiDAR points are missing 'time' information.");
             RCLCPP_ERROR(rclcpp::get_logger("limovelo"), "Delta has been fixed to %f (s) leading to a fixed %d (Hz) localization.", Config.full_rotation_time, (int) 1./Config.full_rotation_time);
-        }

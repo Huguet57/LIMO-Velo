@@ -1,5 +1,5 @@
-# LIMO-Velo (ROS2)
-Contact me at ``andreu.huguet@estudiantat.upc.edu`` for questions or ideas.
+# LIMO-Velo
+Contact me at ``rafaguilvalero@gmail.com`` for questions or ideas.
 
 ## A real-time LiDAR-Inertial SLAM for high velocities in spinning LiDARs.
 
