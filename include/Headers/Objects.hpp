@@ -46,9 +46,9 @@ class Point {
             explicit Point(const ouster_ros::Point& p);
             explicit Point(const ouster_ros::Point& p, double time_offset);
 
-        // Custom specific
-            explicit Point(const custom::Point& p);
-            explicit Point(const custom::Point& p, double time_offset);
+        // rslidar specific
+            explicit Point(const rslidar_ros::Point& p);
+            explicit Point(const rslidar_ros::Point& p, double time_offset);
 
         full_info::Point toPCL() const;
         Eigen::Matrix<float, 3, 1> toEigen() const;

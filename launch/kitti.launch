@@ -1,7 +1,0 @@
-
-<launch>
-    <rosparam command="load" file="$(find limovelo)/config/kitti.yaml" />
-    <node pkg="limovelo" type="limovelo" name="limovelo" output="screen" />
-    <!-- <node pkg="limovelo" type="limovelo" name="limovelo" output="screen" launch-prefix="valgrind" /> -->
-    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find limovelo)/rviz/kitti.rviz" />
-</launch>

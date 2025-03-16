@@ -21,9 +21,9 @@ class PointCloudProcessor {
             Points oustermsg2points(const PointCloud_msg&);
             double get_begin_time(const pcl::PointCloud<ouster_ros::Point>&);
 
-        // Custom specific
-            Points custommsg2points(const PointCloud_msg&);
-            double get_begin_time(const pcl::PointCloud<custom::Point>&);
+        // rslidar specific
+            Points rslidarmsg2points(const PointCloud_msg&);
+            double get_begin_time(const pcl::PointCloud<rslidar_ros::Point>&);
         
         template <typename PointType> Points to_points(const typename pcl::PointCloud<PointType>&);
 

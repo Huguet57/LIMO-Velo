@@ -21,7 +21,9 @@ int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
     auto node = std::make_shared<rclcpp::Node>("limovelo");
 
-    // Fill configurations Params with YAML
+    Points buffer_mapped_points_;
+
+    // Fill configurations Params con YAML
     fill_config(node);
 
     // Objects
@@ -38,10 +40,10 @@ int main(int argc, char** argv) {
         std::bind(&Accumulator::receive_lidar, &accum, std::placeholders::_1)
     );
 
-    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub = 
-        node->create_subscription<sensor_msgs::msg::Imu>(
+    rclcpp::Subscription<common_msgs::msg::State>::SharedPtr state_sub = 
+        node->create_subscription<common_msgs::msg::State>(
         Config.imus_topic, 1,
-        std::bind(&Accumulator::receive_imu, &accum, std::placeholders::_1)
+        std::bind(&Accumulator::receive_state, &accum, std::placeholders::_1)
     );
 
     // Time variables
@@ -74,7 +76,10 @@ int main(int argc, char** argv) {
                 // Define t1 but don't use to localize repeated points
                 t1 = std::max(t2 - delta, loc.last_time_updated);
                 // Check if interval has enough field of view
-                if (t2 - t1 < delta - 1e-6) break;
+                if (t2 - t1 < delta - 1e-6) {
+                    if (Config.print_debug) RCLCPP_WARN(rclcpp::get_logger("limovelo"), "Not enough field of view to localize");
+                    break;
+                };
 
             // Step 1. LOCALIZATION
 
@@ -84,7 +89,11 @@ int main(int argc, char** argv) {
                 // Compensated pointcloud given a path
                 Points compensated = comp.compensate(t1, t2);
                 Points ds_compensated = comp.downsample(compensated);
-                if (ds_compensated.size() < Config.MAX_POINTS2MATCH) break; 
+                if (ds_compensated.size() < Config.MAX_POINTS2MATCH) {
+                    if (Config.print_debug) RCLCPP_WARN(rclcpp::get_logger("limovelo"), "ds_compensated.size(): %d, Config.MAX_POINTS2MATCH: %d", ds_compensated.size(), Config.MAX_POINTS2MATCH);
+                    if (Config.print_debug) RCLCPP_WARN(rclcpp::get_logger("limovelo"), "Not enough points to match");
+                    break;
+                }
 
                 // Localize points in map
                 loc.correct(ds_compensated, t2);
@@ -96,36 +105,40 @@ int main(int argc, char** argv) {
                 // Publish pointcloud used to localize
                 Points global_compensated = Xt2 * Xt2.I_Rt_L() * compensated;
                 Points global_ds_compensated = Xt2 * Xt2.I_Rt_L() * ds_compensated;
-                publish.pointcloud(global_ds_compensated, true);
+                // publish.pointcloud(global_ds_compensated, true);
 
                 // Publish updated extrinsics
                 if (Config.print_extrinsics) publish.extrinsics(Xt2);
 
             // Step 2. MAPPING
 
-                // Add updated points to map (mapping online)
-                if (Config.mapping_online) {
+                // Update map and add points to buffer
+                if (Config.mapping) {
+                    map.add(global_ds_compensated, t2, true);
+                    buffer_mapped_points_.insert(
+                        buffer_mapped_points_.end(),   // Position
+                        global_compensated.begin(), // First
+                        global_compensated.end()    // Last
+                    );
+                    // Publish historical pointcloud
+                    publish.pointcloud(buffer_mapped_points_, false);
+                    if (Config.print_debug) RCLCPP_INFO(rclcpp::get_logger("limovelo"), "\033[1;32mHistoric pcl published, size:\033[0m %d", buffer_mapped_points_.size());
+                }
+                else {
                     map.add(global_ds_compensated, t2, true);
                     if (Config.high_quality_publish) publish.pointcloud(global_compensated, false);                    
                     else publish.pointcloud(global_ds_compensated, false);                    
                 }
-                // Add updated points to map (mapping offline)
-                else if (map.hasToMap(t2)) {
-                    State Xt2 = loc.latest_state();
-                    // Map points at [t2 - FULL_ROTATION_TIME, t2]
-                    Points full_compensated = comp.compensate(t2 - Config.full_rotation_time, t2);
-                    Points global_full_compensated = Xt2 * Xt2.I_Rt_L() * full_compensated;
-                    Points global_full_ds_compensated = comp.downsample(global_full_compensated);
-
-                    map.add(global_full_ds_compensated, t2, true);
-                    if (Config.high_quality_publish) publish.pointcloud(global_full_compensated, false);
-                    else publish.pointcloud(global_full_ds_compensated, false);
-                }
 
             // Step 3. ERASE OLD DATA
 
-                // Empty too old LiDAR points
-                accum.clear_lidar(t2 - Config.empty_lidar_time);
+                // Empty too old LiDAR points from the accumulator
+                accum.clear_lidar(t2 - Config.time_without_clear_BUFFER_L);
+
+                // Remove oldest points from buffer_mapped_points_
+                while (!buffer_mapped_points_.empty() && buffer_mapped_points_.front().time < t2 - Config.time_without_clear_buffer_mapped_points) {
+                    buffer_mapped_points_.pop_front();
+                }
 
             // Trick to call break in the middle of the program
             break;
@@ -140,8 +153,11 @@ int main(int argc, char** argv) {
 
 void fill_config(rclcpp::Node::SharedPtr node) {
     // Read YAML parameters
-    node->declare_parameter("mapping_online", true);
-    node->get_parameter("mapping_online", Config.mapping_online);
+    node->declare_parameter("mapping", true);
+    node->get_parameter("mapping", Config.mapping);
+
+    node->declare_parameter("print_debug", false);
+    node->get_parameter("print_debug", Config.print_debug);
 
     node->declare_parameter("real_time", true);
     node->get_parameter("real_time", Config.real_time);
@@ -203,8 +219,11 @@ void fill_config(rclcpp::Node::SharedPtr node) {
     node->declare_parameter("full_rotation_time", 0.1);
     node->get_parameter("full_rotation_time", Config.full_rotation_time);
     
-    node->declare_parameter("empty_lidar_time", 20.);
-    node->get_parameter("empty_lidar_time", Config.empty_lidar_time);
+    node->declare_parameter("time_without_clear_BUFFER_L", 20.);
+    node->get_parameter("time_without_clear_BUFFER_L", Config.time_without_clear_BUFFER_L);
+
+    node->declare_parameter("time_without_clear_buffer_mapped_points", 20.);
+    node->get_parameter("time_without_clear_buffer_mapped_points", Config.time_without_clear_buffer_mapped_points);
     
     node->declare_parameter("real_time_delay", 1.);
     node->get_parameter("real_time_delay", Config.real_time_delay);

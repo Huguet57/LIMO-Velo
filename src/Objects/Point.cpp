@@ -87,8 +87,8 @@ extern struct Params Config;
                 this->time += time_offset;
             }
 
-        // Custom specific
-            Point::Point(const custom::Point& p) {
+        // rslidar specific
+            Point::Point(const rslidar_ros::Point& p) {
                 this->set_XYZ(p);
 
                 // -------------------------------------------
@@ -102,7 +102,7 @@ extern struct Params Config;
                 this->time = p.timestamp; // or p.time
             }
 
-            Point::Point(const custom::Point& p, double time_offset)
+            Point::Point(const rslidar_ros::Point& p, double time_offset)
                 // Construct point as usual first
                 : Point::Point (p)
             {

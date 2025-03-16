@@ -21,7 +21,11 @@ extern struct Params Config;
 
             // Points from t1 to t2
             Points points = accum.get_points(t1, t2);
-            if (points.empty()) return Points();
+            if (Config.print_debug) RCLCPP_INFO(rclcpp::get_logger("limovelo"), "Points: %ld", points.size());
+            if (points.empty()) {
+                RCLCPP_WARN(rclcpp::get_logger("limovelo"), "No points to compensate");
+                return Points();
+            };
 
             // (Integrated) States surrounding t1 and t2
             States path_taken = this->path(t1, t2);
@@ -42,7 +46,11 @@ extern struct Params Config;
             states.push_front(accum.get_prev_state(t1));
 
             // Get imus from first state to just after t2
+            if (Config.print_debug) RCLCPP_INFO(rclcpp::get_logger("limovelo"), "t1: %f", t1);
+            if (Config.print_debug) RCLCPP_INFO(rclcpp::get_logger("limovelo"), "t2: %f", t2);
+            if (Config.print_debug) RCLCPP_INFO(rclcpp::get_logger("limovelo"), "states.size(): %ld", states.size());
             IMUs imus = accum.get_imus(states.front().time, t2);
+            if (Config.print_debug) RCLCPP_INFO(rclcpp::get_logger("limovelo"), "imus.size(): %ld", imus.size());
             imus.push_back(accum.get_next_imu(t2));
 
             return this->upsample(states, imus);
@@ -121,7 +129,10 @@ extern struct Params Config;
         */
 
         Points Compensator::compensate(const States& states, const State& Xt2, const Points& points) {
-            // States have to surround points
+            if (states.empty()) {
+                RCLCPP_WARN(rclcpp::get_logger("limovelo"), "Compensator::compensate: States vector is empty, skipping compensation.");
+                return points;
+            }
             assert (not states.empty() and states.front().time <= points.front().time and  points.back().time <= states.back().time);
 
             Points t2_inv_ps;

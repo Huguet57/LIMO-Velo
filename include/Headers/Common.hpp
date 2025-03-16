@@ -21,6 +21,7 @@
 #include <std_msgs/msg/bool.hpp>
 #include <geometry_msgs/msg/pose_array.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include "common_msgs/msg/state.hpp"
 // PCL Library
 #define PCL_NO_PRECOMPILE
 #include <pcl_conversions/pcl_conversions.h>
@@ -41,7 +42,7 @@ namespace LIDAR_TYPE {
     const std::string Velodyne = "velodyne";
     const std::string Hesai = "hesai";
     const std::string Ouster = "ouster";
-    const std::string Custom = "custom";
+    const std::string rslidar = "rslidar";
 }
 
 struct InitializationParams {
@@ -50,8 +51,9 @@ struct InitializationParams {
 };
 
 struct Params {
-    bool mapping_online;
+    bool mapping;
     bool real_time;
+    bool pub_full_pcl;
 
     bool estimate_extrinsics;
     bool print_extrinsics;
@@ -59,7 +61,8 @@ struct Params {
     std::vector<double> I_Rotation_L;
     std::vector<double> I_Translation_L;
 
-    double empty_lidar_time;
+    double time_without_clear_BUFFER_L;
+    double time_without_clear_buffer_mapped_points;
     double real_time_delay;
 
     double full_rotation_time;
@@ -77,6 +80,7 @@ struct Params {
 
     double degeneracy_threshold;
     bool print_degeneracy_values;
+    bool print_debug;
 
     int MAX_NUM_ITERS;
     int MAX_POINTS2MATCH;
@@ -121,6 +125,17 @@ namespace hesai_ros {
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     } EIGEN_ALIGN16;
 }
+
+namespace rslidar_ros {
+    struct Point {
+        PCL_ADD_POINT4D
+        float intensity;
+        double timestamp;
+        uint16_t ring;
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    } EIGEN_ALIGN16;
+}
+
 
 namespace full_info {
   struct EIGEN_ALIGN16 Point {
@@ -177,6 +192,16 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(hesai_ros::Point,
     (std::uint16_t, ring, ring)
 )
 
+POINT_CLOUD_REGISTER_POINT_STRUCT(rslidar_ros::Point,
+    (float, x, x)
+    (float, y, y)
+    (float, z, z)
+    (float, intensity, intensity)
+    (double, timestamp, timestamp)
+    (std::uint16_t, ring, ring)
+)
+
+
 POINT_CLOUD_REGISTER_POINT_STRUCT(full_info::Point,
     (float, x, x)
     (float, y, y)
@@ -217,7 +242,7 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(custom::Point,
 )
 
 typedef sensor_msgs::msg::PointCloud2::SharedPtr PointCloud_msg;
-typedef sensor_msgs::msg::Imu::SharedPtr IMU_msg;
+typedef common_msgs::msg::State State_msg;
 typedef double TimeType;
 
 class Point;

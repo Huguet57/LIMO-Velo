@@ -47,11 +47,17 @@ extern struct Params Config;
                 for (Point p : points) this->add(p);
             }
 
-            void Accumulator::receive_imu(const IMU_msg msg) {
+            void Accumulator::receive_state(const State_msg msg) {
                 // Turn message to IMU object
-                IMU imu(msg);
+                auto imu_msg = sensor_msgs::msg::Imu();
+
+                imu_msg.header.stamp = msg.header.stamp;
+                imu_msg.linear_acceleration.x = msg.ax;
+                imu_msg.linear_acceleration.y = msg.ay;
+                imu_msg.angular_velocity.z = msg.r;
+
                 // Add it to the IMU buffer
-                this->add(imu);
+                this->add(imu_msg);
             }
 
         // Empty buffers
@@ -104,11 +110,21 @@ extern struct Params Config;
             // Only check it once
             if (this->is_ready) return true;
             
+            // Debugging checks
+            if (Config.print_debug) {
+                RCLCPP_INFO(rclcpp::get_logger("limovelo"), "BUFFER_I size: %ld", this->BUFFER_I.size());
+                RCLCPP_INFO(rclcpp::get_logger("limovelo"), "BUFFER_L size: %ld", this->BUFFER_L.size());
+                RCLCPP_INFO(rclcpp::get_logger("limovelo"), "BUFFER_X size: %ld", this->BUFFER_X.size());
+            }
+
             // Ready if there's enough IMUs to fit the delay
             if (this->enough_imus()) {
                 this->set_initial_time();
                 Localizator::getInstance().initialize(this->initial_time);
+                if (Config.print_debug) RCLCPP_INFO(rclcpp::get_logger("limovelo"), "Accumulator is now ready");
                 return this->is_ready = true;
+            } else {
+                if (Config.print_debug) RCLCPP_WARN(rclcpp::get_logger("limovelo"), "Not enough IMUs yet");
             }
 
             return this->is_ready = false;

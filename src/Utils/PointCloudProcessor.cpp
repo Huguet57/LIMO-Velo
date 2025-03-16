@@ -25,7 +25,7 @@ extern struct Params Config;
             if (Config.LiDAR_type == LIDAR_TYPE::Velodyne) return this->velodynemsg2points(msg);
             if (Config.LiDAR_type == LIDAR_TYPE::Hesai) return this->hesaimsg2points(msg);
             if (Config.LiDAR_type == LIDAR_TYPE::Ouster) return this->oustermsg2points(msg);
-            if (Config.LiDAR_type == LIDAR_TYPE::Custom) return this->custommsg2points(msg);
+            if (Config.LiDAR_type == LIDAR_TYPE::rslidar) return this->rslidarmsg2points(msg);
             
             // Unknown LiDAR type
             RCLCPP_ERROR(rclcpp::get_logger("limovelo"), "Unknown LiDAR type! Change your YAML parameters file.");
@@ -70,21 +70,17 @@ extern struct Params Config;
                 else return Conversions::microsec2Sec(pcl.header.stamp) + Conversions::nanosec2Sec(pcl.points.front().t) - Conversions::nanosec2Sec(pcl.points.back().t);
             }
 
-        // Custom specific
-            Points PointCloudProcessor::custommsg2points(const PointCloud_msg& msg) {
-                pcl::PointCloud<custom::Point>::Ptr raw_pcl(new pcl::PointCloud<custom::Point>());
+        // rslidar specific
+            Points PointCloudProcessor::rslidarmsg2points(const PointCloud_msg& msg) {
+                pcl::PointCloud<rslidar_ros::Point>::Ptr raw_pcl(new pcl::PointCloud<rslidar_ros::Point>());
                 pcl::fromROSMsg(*msg, *raw_pcl);
                 return this->to_points(*raw_pcl);
             }
 
             // Change this to fit the timestamp of the first point
-            double PointCloudProcessor::get_begin_time(const pcl::PointCloud<custom::Point>& pcl) {
-                // // Example: Points with relative time
-                // if (Config.stamp_beginning) return Conversions::microsec2Sec(pcl.header.stamp) + pcl.points.front().time;
-                // else return Conversions::microsec2Sec(pcl.header.stamp) + pcl.points.front().time - pcl.points.back().time;
-                
-                // Example: Points with absolute time
-                return 0.d;
+            double PointCloudProcessor::get_begin_time(const pcl::PointCloud<rslidar_ros::Point>& pcl) {
+                if (Config.stamp_beginning) return Conversions::microsec2Sec(pcl.header.stamp) + pcl.points.front().timestamp;
+                else return Conversions::microsec2Sec(pcl.header.stamp) + pcl.points.front().timestamp - pcl.points.back().timestamp;
             }
 
         template <typename PointType>
